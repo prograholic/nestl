@@ -37,35 +37,8 @@ void ensure_vector_size(Vector& vec, size_t expectedSize)
 }
 
 template <typename Vector, typename VectorConstructor>
-void test_vector_ex()
+void test_vector_assignment(const std::true_type& /* true_type */)
 {
-    {
-        /// construct vector from other vector (move)
-        Vector v1;
-        ASSERT_SUCCESS(VectorConstructor::construct(v1));
-        Vector v2(std::move(v1));
-        ensure_vector_size(v2, VectorConstructor::expected_size);
-    }
-
-    {
-        /// request vector's allocator
-        Vector v;
-        ASSERT_SUCCESS(VectorConstructor::construct(v));
-        typename Vector::allocator_type alloc = v.get_allocator();
-        ensure_vector_size(v, VectorConstructor::expected_size);
-    }
-
-    {
-        /// assign vector (move)
-        Vector v1;
-        ASSERT_SUCCESS(VectorConstructor::construct(v1));
-
-        Vector v2;
-
-        v2 = std::move(v1);
-        ensure_vector_size(v2, VectorConstructor::expected_size);
-    }
-
     {
         /// assign empty vector to another
         Vector v1;
@@ -117,6 +90,56 @@ void test_vector_ex()
     }
 }
 
+template <typename Vector, typename VectorConstructor>
+void test_vector_assignment(const std::false_type& /* false_type */)
+{
+}
+
+
+
+
+template <typename Vector, typename VectorConstructor>
+void test_vector_ex()
+{
+    {
+        /// construct vector from other vector (move)
+        Vector v1;
+        ASSERT_SUCCESS(VectorConstructor::construct(v1));
+        Vector v2(std::move(v1));
+        ensure_vector_size(v2, VectorConstructor::expected_size);
+    }
+
+    {
+        /// request vector's allocator
+        Vector v;
+        ASSERT_SUCCESS(VectorConstructor::construct(v));
+        typename Vector::allocator_type alloc = v.get_allocator();
+        ensure_vector_size(v, VectorConstructor::expected_size);
+    }
+
+    {
+        /// assign vector (move)
+        Vector v1;
+        ASSERT_SUCCESS(VectorConstructor::construct(v1));
+
+        Vector v2;
+
+        v2 = std::move(v1);
+        ensure_vector_size(v2, VectorConstructor::expected_size);
+    }
+
+    typedef typename Vector::value_type value_type;
+
+    typedef typename std::conditional
+    <
+        std::is_nothrow_copy_constructible<value_type>::value || nestl::has_assign_copy_member<value_type>::value,
+        std::true_type,
+        std::false_type
+    >::type should_test_assignment;
+
+    test_vector_assignment<Vector, VectorConstructor>(should_test_assignment());
+}
+
 
 template<size_t count>
 struct assign_vector_constructor
@@ -131,7 +154,7 @@ struct assign_vector_constructor
     {
         ensure_vector_size(v, 0);
 
-        return v.assign(count);
+        return v.resize(count);
     }
 };
 

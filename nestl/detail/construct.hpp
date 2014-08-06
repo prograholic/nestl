@@ -60,7 +60,7 @@ OperationError construct(T* ptr, Allocator& alloc, Args&& ... args)
 {
     typedef typename std::conditional
     <
-        std::is_nothrow_move_constructible<T>::value || std::is_nothrow_copy_constructible<T>::value,
+        std::is_nothrow_move_constructible<T>::value || std::is_nothrow_copy_constructible<T>::value || ((sizeof...(Args) == 0) && std::is_nothrow_default_constructible<T>::value),
         has_nothrow_constructor,
         typename std::conditional
         <

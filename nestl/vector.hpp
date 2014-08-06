@@ -12,7 +12,7 @@
 
 
 
-//#include <vector>
+#include <vector>
 #include <system_error>
 #include <initializer_list>
 #include <iterator>
@@ -205,6 +205,13 @@ private:
 
     template <typename InputIterator>
     operation_error assign_iterator(std::input_iterator_tag /* tag */, InputIterator first, InputIterator last) noexcept;
+
+    template <typename ... Args>
+    operation_error insert_value(const_iterator pos, Args&& ... args) noexcept;
+
+    template <typename ... Args>
+    operation_error do_resize(size_type count, Args&& ... args) noexcept;
+
 };
 
 
@@ -503,23 +510,20 @@ typename vector<T, A>::operation_error vector<T, A>::shrink_to_fit() noexcept
 template <typename T, typename A>
 void vector<T, A>::clear() noexcept
 {
-    NESTL_ASSERT(0 && "not implemented");
+    nestl::detail::destroy(m_allocator, m_start, m_finish);
+    m_finish = m_start;
 }
 
 template <typename T, typename A>
 typename vector<T, A>::operation_error vector<T, A>::insert(const_iterator pos, const value_type& value) noexcept
 {
-    NESTL_ASSERT(0 && "not implemented");
-
-    return operation_error(std::errc::not_enough_memory);
+    return insert_value(pos, value);
 }
 
 template <typename T, typename A>
 typename vector<T, A>::operation_error vector<T, A>::insert(const_iterator pos, value_type&& value) noexcept
 {
-    NESTL_ASSERT(0 && "not implemented");
-
-    return operation_error(std::errc::not_enough_memory);
+    return insert_value(pos, value);
 }
 
 
@@ -533,6 +537,19 @@ template <typename T, typename A>
 typename vector<T, A>::operation_error vector<T, A>::push_back(value_type&& value) noexcept
 {
     return this->insert(this->cend(), std::move(value));
+}
+
+
+template <typename T, typename A>
+typename vector<T, A>::operation_error vector<T, A>::resize(size_type count) noexcept
+{
+    return do_resize(count);
+}
+
+template <typename T, typename A>
+typename vector<T, A>::operation_error vector<T, A>::resize(size_type count, const value_type& value) noexcept
+{
+    return do_resize(count, value);
 }
 
 /// Private implementation
@@ -588,6 +605,75 @@ typename vector<T, A>::operation_error vector<T, A>::assign_iterator(std::input_
     return operation_error();
 }
 
+template <typename T, typename A>
+template <typename ... Args>
+typename vector<T, A>::operation_error vector<T, A>::insert_value(const_iterator pos, Args&& ... args) noexcept
+{
+    NESTL_ASSERT(pos >= m_start);
+    NESTL_ASSERT(pos <= m_finish);
+
+    /// we should calculate offset before possible reallocation
+    size_t offset = pos - m_start;
+
+    if (capacity() == size())
+    {
+        operation_error err = this->reserve(size() + 1);
+        if (err)
+        {
+            return err;
+        }
+    }
+    NESTL_ASSERT(capacity() > size());
+
+    value_type* last = m_finish;
+    value_type* first = m_start + offset;
+    for (value_type* val = last; val != first; --val)
+    {
+        value_type* oldLocation = val - 1;
+        operation_error err = nestl::detail::construct<operation_error>(val, m_allocator, *oldLocation);
+        if (err)
+        {
+            return err;
+        }
+        nestl::detail::destroy(m_allocator, oldLocation, val);
+    }
+
+    ++m_finish;
+
+    operation_error err = nestl::detail::construct<operation_error>(first, m_allocator, std::forward<Args>(args) ...);
+    return err;
+}
+
+template <typename T, typename A>
+template <typename ... Args>
+typename vector<T, A>::operation_error vector<T, A>::do_resize(size_type count, Args&& ... args) noexcept
+{
+    if (count <= size())
+    {
+        nestl::detail::destroy(m_allocator, m_start + count, m_finish);
+        m_finish = m_start + count;
+    }
+    else
+    {
+        operation_error err = reserve(count);
+        if (err)
+        {
+            return err;
+        }
+
+        while (m_finish < m_start + count)
+        {
+            operation_error err = nestl::detail::construct<operation_error>(m_finish, m_allocator, std::forward<Args>(args) ...);
+            if (err)
+            {
+                return err;
+            }
+            ++m_finish;
+        }
+    }
+
+    return operation_error();
+}
 
 } // namespace nestl
 
