@@ -158,6 +158,7 @@ struct TriviallyCopyable
 
 
 void vector_test();
+void shared_ptr_test();
 
 
 #endif // TESTS_TESTS_H

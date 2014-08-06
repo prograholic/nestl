@@ -25,9 +25,7 @@ OperationError uninitialised_copy(InputIterator first, InputIterator last, Forwa
         }
     }
 
-    /// disable destruction
-    guard.m_last = guard.m_first;
-
+    guard.release();
     return OperationError();
 }
 

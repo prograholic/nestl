@@ -17,35 +17,9 @@
 #include <initializer_list>
 #include <iterator>
 
+
 namespace nestl
 {
-
-namespace detail
-{
-
-template<typename Allocator>
-struct allocation_scoped_guard : private nestl::noncopyable
-{
-    typedef typename std::allocator_traits<Allocator>::pointer pointer_type;
-
-    allocation_scoped_guard(Allocator& alloc, pointer_type ptr, size_t size) noexcept
-        : m_alloc(alloc)
-        , m_ptr(ptr)
-        , m_size(size)
-    {
-    }
-
-    ~allocation_scoped_guard() noexcept
-    {
-        m_alloc.deallocate(m_ptr, m_size);
-    }
-
-    Allocator& m_alloc;
-    pointer_type m_ptr;
-    size_t m_size;
-};
-
-} // namespace detail
 
 /**
  * @brief
@@ -739,7 +713,7 @@ typename vector<T, A>::operation_error vector<T, A>::do_reserve(size_type new_ca
     {
         return operation_error(std::errc::not_enough_memory);
     }
-    detail::allocation_scoped_guard<allocator_type> guard(m_allocator, ptr, new_cap);
+    nestl::detail::allocation_scoped_guard<value_type*, allocator_type> guard(m_allocator, ptr, new_cap);
 
     auto err = nestl::uninitialised_copy<operation_error>(m_start, m_finish, ptr, m_allocator);
     if (err)
@@ -755,8 +729,7 @@ typename vector<T, A>::operation_error vector<T, A>::do_reserve(size_type new_ca
     m_finish = ptr + current_size;
     m_end_of_storage = ptr + new_cap;
 
-    /// release guard
-    guard.m_ptr = 0;
+    guard.release();
     return operation_error();
 }
 

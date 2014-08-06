@@ -10,3 +10,5 @@ nestl/type_traits.hpp
 nestl/memory.hpp
 tests/vector_test.cpp
 tests/tests.h
+nestl/shared_ptr.hpp
+tests/shared_ptr_test.cpp
