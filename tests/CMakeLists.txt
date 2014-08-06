@@ -1,3 +1,3 @@
 project(nestl_tests)
 
-add_executable(nestl_tests main.cpp)
+add_executable(nestl_tests main.cpp vector_test.cpp)

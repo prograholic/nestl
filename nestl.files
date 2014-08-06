@@ -8,3 +8,5 @@ nestl/config.hpp
 nestl/detail/construct.hpp
 nestl/type_traits.hpp
 nestl/memory.hpp
+tests/vector_test.cpp
+tests/tests.h

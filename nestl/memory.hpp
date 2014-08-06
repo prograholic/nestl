@@ -10,37 +10,11 @@
 namespace nestl
 {
 
-namespace detail
-{
-
-template <typename ForwardIterator, typename Allocator>
-struct uninitialised_copy_guard
-{
-    uninitialised_copy_guard(ForwardIterator first, ForwardIterator& last, Allocator& alloc) noexcept
-        : m_first(first)
-        , m_last(last)
-        , m_alloc(alloc)
-    {
-    }
-
-    ~uninitialised_copy_guard() noexcept
-    {
-        nestl::detail::destroy(m_alloc, m_first, m_last);
-    }
-
-    ForwardIterator m_first;
-    ForwardIterator& m_last;
-    Allocator& m_alloc;
-
-};
-
-} // namespace detail
-
 template <typename OperationError, typename InputIterator, typename ForwardIterator, typename Allocator>
 OperationError uninitialised_copy(InputIterator first, InputIterator last, ForwardIterator output, Allocator& alloc) noexcept
 {
     ForwardIterator cur = output;
-    detail::uninitialised_copy_guard<ForwardIterator, Allocator> guard(output, cur, alloc);
+    nestl::detail::destruction_scoped_guard<ForwardIterator, Allocator> guard(output, cur, alloc);
 
     for ( ; first != last; ++first, ++cur)
     {

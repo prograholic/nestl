@@ -209,9 +209,15 @@ private:
     template <typename ... Args>
     operation_error insert_value(const_iterator pos, Args&& ... args) noexcept;
 
+    template <typename InputIterator>
+    operation_error insert_range(const_iterator pos, InputIterator first, InputIterator last) noexcept;
+
     template <typename ... Args>
     operation_error do_resize(size_type count, Args&& ... args) noexcept;
 
+    operation_error grow(size_type requiredCapacity) noexcept;
+
+    operation_error do_reserve(size_type new_cap) noexcept;
 };
 
 
@@ -270,7 +276,7 @@ typename vector<T, A>::operation_error vector<T, A>::assign(size_type n, const_r
 
     NESTL_ASSERT(empty());
 
-    auto err = reserve(n);
+    auto err = grow(n);
     if (err)
     {
         return err;
@@ -466,30 +472,7 @@ typename vector<T, A>::operation_error vector<T, A>::reserve(size_type new_cap) 
         }
     }
 
-    value_type* ptr = m_allocator.allocate(new_cap);
-    if (!ptr)
-    {
-        return operation_error(std::errc::not_enough_memory);
-    }
-    detail::allocation_scoped_guard<allocator_type> guard(m_allocator, ptr, new_cap);
-
-    auto err = nestl::uninitialised_copy<operation_error>(m_start, m_finish, ptr, m_allocator);
-    if (err)
-    {
-        return err;
-    }
-
-    const size_t current_size = size();
-    nestl::detail::destroy(m_allocator, m_start, m_finish);
-    m_allocator.deallocate(m_start, m_end_of_storage - m_start);
-
-    m_start = ptr;
-    m_finish = ptr + current_size;
-    m_end_of_storage = ptr + new_cap;
-
-    /// release guard
-    guard.m_ptr = 0;
-    return operation_error();
+    return do_reserve(new_cap);
 }
 
 template <typename T, typename A>
@@ -501,9 +484,12 @@ typename vector<T, A>::size_type vector<T, A>::capacity() const noexcept
 template <typename T, typename A>
 typename vector<T, A>::operation_error vector<T, A>::shrink_to_fit() noexcept
 {
-    NESTL_ASSERT(0 && "not implemented");
+    if (capacity() > size())
+    {
+        return do_reserve(size());
+    }
 
-    return operation_error(std::errc::not_enough_memory);
+    return operation_error();
 }
 
 
@@ -526,6 +512,19 @@ typename vector<T, A>::operation_error vector<T, A>::insert(const_iterator pos, 
     return insert_value(pos, value);
 }
 
+template <typename T, typename A>
+template<typename InputIterator>
+typename vector<T, A>::operation_error vector<T, A>::insert(const_iterator pos, InputIterator first, InputIterator last) noexcept
+{
+    return this->insert_range(pos, first, last);
+}
+
+template <typename T, typename A>
+typename vector<T, A>::operation_error vector<T, A>::insert(const_iterator pos, std::initializer_list<T> ilist) noexcept
+{
+    return this->insert(pos, ilist.begin(), ilist.end());
+}
+
 
 template <typename T, typename A>
 typename vector<T, A>::operation_error vector<T, A>::push_back(const value_type& value) noexcept
@@ -539,6 +538,16 @@ typename vector<T, A>::operation_error vector<T, A>::push_back(value_type&& valu
     return this->insert(this->cend(), std::move(value));
 }
 
+template <typename T, typename A>
+template<typename ... Args>
+typename vector<T, A>::operation_error vector<T, A>::emplace_back(Args&& ... args) noexcept
+{
+    return insert_value(this->cend(), std::forward<Args>(args) ...);
+}
+
+template <typename T, typename A>
+void vector<T, A>::pop_back() noexcept
+{}
 
 template <typename T, typename A>
 typename vector<T, A>::operation_error vector<T, A>::resize(size_type count) noexcept
@@ -550,6 +559,13 @@ template <typename T, typename A>
 typename vector<T, A>::operation_error vector<T, A>::resize(size_type count, const value_type& value) noexcept
 {
     return do_resize(count, value);
+}
+
+template <typename T, typename A>
+void vector<T, A>::swap(vector& other) noexcept
+{
+    std::swap(m_allocator, other.m_allocator);
+    this->swap_data(other);
 }
 
 /// Private implementation
@@ -576,7 +592,7 @@ typename vector<T, A>::operation_error vector<T, A>::assign_iterator(std::random
     NESTL_ASSERT(empty());
     size_t required_size = std::distance(first, last);
 
-    auto err = this->reserve(required_size);
+    auto err = this->grow(required_size);
     if (err)
     {
         return err;
@@ -617,7 +633,7 @@ typename vector<T, A>::operation_error vector<T, A>::insert_value(const_iterator
 
     if (capacity() == size())
     {
-        operation_error err = this->reserve(size() + 1);
+        operation_error err = this->grow(capacity() + 1);
         if (err)
         {
             return err;
@@ -644,6 +660,30 @@ typename vector<T, A>::operation_error vector<T, A>::insert_value(const_iterator
     return err;
 }
 
+
+template <typename T, typename A>
+template <typename InputIterator>
+typename vector<T, A>::operation_error vector<T, A>::insert_range(const_iterator pos, InputIterator first, InputIterator last) noexcept
+{
+    NESTL_ASSERT(pos >= m_start);
+    NESTL_ASSERT(pos <= m_finish);
+
+    /// we should calculate offset before possible reallocation
+    size_t offset = pos - m_start;
+
+    for ( ; first != last; ++first, ++offset)
+    {
+        const_iterator newPos = m_start + offset;
+        operation_error err = insert_value(newPos, *first);
+        if (err)
+        {
+            return err;
+        }
+    }
+
+    return operation_error();
+}
+
 template <typename T, typename A>
 template <typename ... Args>
 typename vector<T, A>::operation_error vector<T, A>::do_resize(size_type count, Args&& ... args) noexcept
@@ -655,7 +695,7 @@ typename vector<T, A>::operation_error vector<T, A>::do_resize(size_type count, 
     }
     else
     {
-        operation_error err = reserve(count);
+        operation_error err = grow(count);
         if (err)
         {
             return err;
@@ -672,6 +712,51 @@ typename vector<T, A>::operation_error vector<T, A>::do_resize(size_type count, 
         }
     }
 
+    return operation_error();
+}
+
+
+template <typename T, typename A>
+typename vector<T, A>::operation_error vector<T, A>::grow(size_type requiredCapacity) noexcept
+{
+    size_t newCapacity = (((capacity() + 1) * 3) / 2);
+    if (newCapacity < requiredCapacity)
+    {
+        newCapacity = requiredCapacity;
+    }
+
+    /// @bug overflow error
+    NESTL_ASSERT(newCapacity > capacity());
+
+    return reserve(newCapacity);
+}
+
+template <typename T, typename A>
+typename vector<T, A>::operation_error vector<T, A>::do_reserve(size_type new_cap) noexcept
+{
+    value_type* ptr = m_allocator.allocate(new_cap);
+    if (!ptr)
+    {
+        return operation_error(std::errc::not_enough_memory);
+    }
+    detail::allocation_scoped_guard<allocator_type> guard(m_allocator, ptr, new_cap);
+
+    auto err = nestl::uninitialised_copy<operation_error>(m_start, m_finish, ptr, m_allocator);
+    if (err)
+    {
+        return err;
+    }
+
+    const size_t current_size = size();
+    nestl::detail::destroy(m_allocator, m_start, m_finish);
+    m_allocator.deallocate(m_start, m_end_of_storage - m_start);
+
+    m_start = ptr;
+    m_finish = ptr + current_size;
+    m_end_of_storage = ptr + new_cap;
+
+    /// release guard
+    guard.m_ptr = 0;
     return operation_error();
 }
 
