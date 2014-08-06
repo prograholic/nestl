@@ -3,10 +3,12 @@
 
 #include <nestl/config.hpp>
 
+#include <nestl/memory.hpp>
+#include <nestl/type_traits.hpp>
+
 #include <new>
 #include <limits>
-#include <memory>
-#include <type_traits>
+
 
 namespace nestl
 {

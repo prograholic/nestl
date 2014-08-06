@@ -4,19 +4,48 @@
 #include <nestl/config.hpp>
 
 #include <nestl/allocator.hpp>
+#include <nestl/memory.hpp>
 #include <nestl/noncopyable.hpp>
 
 #include <nestl/detail/construct.hpp>
 
+
+
+
+//#include <vector>
 #include <system_error>
-
-
-#include <vector>
 #include <initializer_list>
 #include <iterator>
 
 namespace nestl
 {
+
+namespace detail
+{
+
+template<typename Allocator>
+struct allocation_scoped_guard : private nestl::noncopyable
+{
+    typedef typename std::allocator_traits<Allocator>::pointer pointer_type;
+
+    allocation_scoped_guard(Allocator& alloc, pointer_type ptr, size_t size) noexcept
+        : m_alloc(alloc)
+        , m_ptr(ptr)
+        , m_size(size)
+    {
+    }
+
+    ~allocation_scoped_guard() noexcept
+    {
+        m_alloc.deallocate(m_ptr, m_size);
+    }
+
+    Allocator& m_alloc;
+    pointer_type m_ptr;
+    size_t m_size;
+};
+
+} // namespace detail
 
 /**
  * @brief
@@ -217,7 +246,7 @@ typename vector<T, A>::allocator_type vector<T, A>::get_allocator() const noexce
 template <typename T, typename A>
 vector<T, A>& vector<T, A>::operator=(vector&& other) noexcept
 {
-    move_assign(typename std::allocator_traits<A>::propagate_on_container_move_assignment(), std::move(other));
+    move_assign(typename std::allocator_traits<allocator_type>::propagate_on_container_move_assignment(), std::move(other));
     return *this;
 }
 
@@ -250,10 +279,7 @@ typename vector<T, A>::operation_error vector<T, A>::assign(size_type n, const_r
         --n;
     }
 
-
-    NESTL_ASSERT(0 && "not implemented");
-
-    return operation_error(std::errc::not_enough_memory);
+    return operation_error();
 }
 
 template <typename T, typename A>
@@ -424,10 +450,39 @@ typename vector<T, A>::operation_error vector<T, A>::reserve(size_type new_cap) 
     {
         return operation_error();
     }
-    NESTL_ASSERT(0 && "not implemented");
+    else
+    {
+        if (new_cap > max_size())
+        {
+            /// @todo add support for value_too_large
+            return operation_error(std::errc::invalid_argument);
+        }
+    }
 
-    /// @todo return value_too_large for new_cap > max_size()
-    return operation_error(std::errc::not_enough_memory);
+    value_type* ptr = m_allocator.allocate(new_cap);
+    if (!ptr)
+    {
+        return operation_error(std::errc::not_enough_memory);
+    }
+    detail::allocation_scoped_guard<allocator_type> guard(m_allocator, ptr, new_cap);
+
+    auto err = nestl::uninitialised_copy<operation_error>(m_start, m_finish, ptr, m_allocator);
+    if (err)
+    {
+        return err;
+    }
+
+    const size_t current_size = size();
+    nestl::detail::destroy(m_allocator, m_start, m_finish);
+    m_allocator.deallocate(m_start, m_end_of_storage - m_start);
+
+    m_start = ptr;
+    m_finish = ptr + current_size;
+    m_end_of_storage = ptr + new_cap;
+
+    /// release guard
+    guard.m_ptr = 0;
+    return operation_error();
 }
 
 template <typename T, typename A>

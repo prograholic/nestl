@@ -158,29 +158,54 @@ void test_vector(const char* name)
 
 
 
-struct NonCopyable :  private nestl::noncopyable
+struct NonCopyableButAssignCopyable :  private nestl::noncopyable
 {
-    NonCopyable()
+    NonCopyableButAssignCopyable() noexcept
     {
         assert(ms_count >= 0);
         ++ms_count;
     }
 
-    ~NonCopyable()
+    ~NonCopyableButAssignCopyable() noexcept
     {
         assert(ms_count > 0);
         --ms_count;
     }
 
-    std::error_code assign_copy(const NonCopyable& other) noexcept
+    std::error_condition assign_copy(const NonCopyableButAssignCopyable& other) noexcept
     {
-        return std::error_code();
+        return std::error_condition();
     }
 
     static int ms_count;
 };
 
-int NonCopyable::ms_count = 0;
+int NonCopyableButAssignCopyable::ms_count = 0;
+
+
+struct NonCopyableButMoveable :  private nestl::noncopyable
+{
+    NonCopyableButMoveable() noexcept
+    {
+        assert(ms_count >= 0);
+        ++ms_count;
+    }
+
+    NonCopyableButMoveable(NonCopyableButMoveable&& other) noexcept
+    {
+        assert(ms_count >= 0);
+    }
+
+    ~NonCopyableButMoveable() noexcept
+    {
+        assert(ms_count > 0);
+        --ms_count;
+    }
+
+    static int ms_count;
+};
+
+int NonCopyableButMoveable::ms_count = 0;
 
 struct TriviallyCopyable
 {
@@ -191,12 +216,19 @@ struct TriviallyCopyable
 
 int main(int argc, char* argv [])
 {
-    test_vector<int, nestl::allocator<int>>                            ("int,               nestl::allocator<int>              ");
+    test_vector<int, nestl::allocator<int>>(
+                "int,                                nestl::allocator<int>                         ");
 
-    test_vector<NonCopyable, nestl::allocator<NonCopyable>>            ("NonCopyable,       nestl::allocator<NonCopyable>      ");
-    ASSERT_TRUE(NonCopyable::ms_count == 0);
+    test_vector<NonCopyableButAssignCopyable, nestl::allocator<NonCopyableButAssignCopyable>>(
+                "NonCopyableButAssignCopyable,       nestl::allocator<NonCopyableButAssignCopyable>");
+    ASSERT_TRUE(NonCopyableButAssignCopyable::ms_count == 0);
 
-    test_vector<TriviallyCopyable, nestl::allocator<TriviallyCopyable>>("TriviallyCopyable, nestl::allocator<TriviallyCopyable>");
+    test_vector<NonCopyableButMoveable, nestl::allocator<NonCopyableButMoveable>>(
+                "NonCopyableButMoveable,             nestl::allocator<NonCopyableButMoveable>      ");
+    ASSERT_TRUE(NonCopyableButMoveable::ms_count == 0);
+
+    test_vector<TriviallyCopyable, nestl::allocator<TriviallyCopyable>>(
+                "TriviallyCopyable,                  nestl::allocator<TriviallyCopyable>           ");
 
     return 0;
 }

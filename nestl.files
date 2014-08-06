@@ -6,3 +6,5 @@ nestl/allocator.hpp
 nestl/noncopyable.hpp
 nestl/config.hpp
 nestl/detail/construct.hpp
+nestl/type_traits.hpp
+nestl/memory.hpp
