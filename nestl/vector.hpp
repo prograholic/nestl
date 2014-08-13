@@ -7,7 +7,7 @@
 #include <nestl/memory.hpp>
 #include <nestl/noncopyable.hpp>
 
-#include <nestl/detail/construct.hpp>
+#include <nestl/class_traits.hpp>
 
 
 

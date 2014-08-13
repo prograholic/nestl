@@ -9,6 +9,7 @@
 
 #include <nestl/noncopyable.hpp>
 
+#include <nestl/class_traits.hpp>
 
 #define DUMP_ASSERT_AND_EXIT(x, ...) \
     std::cerr << "assertion failed: " #x << "at " << __FILE__ << ":" << __LINE__ << " " << __VA_ARGS__ << std::endl; \
@@ -76,6 +77,44 @@ struct NonCopyableButAssignCopyable : private nestl::noncopyable
 };
 
 
+namespace nestl
+{
+
+template <>
+struct class_traits<NonCopyableButAssignCopyable>
+{
+    template<typename OperationError, typename Allocator>
+    static OperationError construct(NonCopyableButAssignCopyable* ptr, Allocator& alloc) noexcept
+    {
+        alloc.construct(ptr);
+
+        return OperationError();
+    }
+
+    template<typename OperationError, typename Allocator, typename ... Args>
+    static OperationError construct(NonCopyableButAssignCopyable* ptr, Allocator& alloc, Args&& ... args) noexcept
+    {
+        alloc.construct(ptr);
+
+        NonCopyableButAssignCopyable* tmp = ptr + 1;
+        nestl::detail::destruction_scoped_guard<NonCopyableButAssignCopyable*, Allocator> guard(ptr, tmp, alloc);
+
+        OperationError err = ptr->assign_copy(std::forward<Args>(args) ...);
+        if (err)
+        {
+            return err;
+        }
+
+        /// disable destruction of object;
+        tmp = ptr;
+
+        return err;
+    }
+};
+
+}
+
+
 struct NonCopyableButMoveable :  private nestl::noncopyable
 {
     NonCopyableButMoveable() noexcept
@@ -103,6 +142,23 @@ struct NonCopyableButMoveable :  private nestl::noncopyable
     static allocation_count ms_count;
 };
 
+
+namespace nestl
+{
+
+template <>
+struct class_traits<NonCopyableButMoveable>
+{
+    template<typename OperationError, typename Allocator, typename ... Args>
+    static OperationError construct(NonCopyableButMoveable* ptr, Allocator& alloc, Args&& ... args) noexcept
+    {
+        alloc.construct(ptr, std::move<Args>(args) ...);
+
+        return OperationError();
+    }
+};
+
+}
 
 
 struct CopyableButNotMoveable
