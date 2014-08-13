@@ -7,12 +7,7 @@
 #include <nestl/memory.hpp>
 #include <nestl/noncopyable.hpp>
 
-#include <nestl/class_traits.hpp>
 
-
-
-
-#include <vector>
 #include <system_error>
 #include <initializer_list>
 #include <iterator>

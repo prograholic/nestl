@@ -102,7 +102,7 @@ struct shared_ptr_constructor
         if (allocate)
         {
             nestl::allocator<T> alloc;
-            operation_error err = nestl::make_shared_ex_d_a<T, std::default_delete<T>>(ptr, alloc);
+            operation_error err = nestl::make_shared_ex_a<T>(ptr, alloc);
             if (err)
             {
                 return err;

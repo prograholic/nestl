@@ -58,7 +58,7 @@ public:
 };
 
 
-template <typename T, typename TypeAllocator, typename Deleter, typename OperationError>
+template <typename T, typename TypeAllocator, typename OperationError>
 class type_stored_by_value : public shared_count_base
 {
 public:
@@ -81,8 +81,8 @@ public:
 
     virtual void destroy_value() noexcept
     {
-        Deleter deleter;
-        deleter(get());
+        T* value = get();
+        nestl::detail::destroy(m_allocator, value, value + 1);
     }
 
     virtual void destroy_self() noexcept
@@ -94,9 +94,9 @@ public:
     }
 
     template <typename ... Args>
-    operation_error initialize(TypeAllocator& typeAlloc, Args&& ... args) noexcept
+    operation_error initialize(Args&& ... args) noexcept
     {
-        operation_error err = nestl::detail::construct<operation_error>(get(), typeAlloc, std::forward<Args>(args) ...);
+        operation_error err = nestl::detail::construct<operation_error>(get(), m_allocator, std::forward<Args>(args) ...);
         return err;
     }
 
@@ -163,9 +163,9 @@ private:
     element_type* m_ptr;
     detail::shared_count_base* m_refcount;
 
-    template <typename Type, typename Deleter, typename Allocator, typename Y, typename ... Args>
+    template <typename Type, typename Allocator, typename Y, typename ... Args>
     friend
-    typename shared_ptr<Type>::operation_error make_shared_ex_d_a(shared_ptr<Y>& sp, Allocator& alloc, Args&& ... args);
+    typename shared_ptr<Type>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, Args&& ... args);
 };
 
 
@@ -334,13 +334,13 @@ shared_ptr<T>::operator bool() const noexcept
 
 
 
-template <typename T, typename Deleter, typename Allocator, typename Y, typename ... Args>
-typename shared_ptr<T>::operation_error make_shared_ex_d_a(shared_ptr<Y>& sp, Allocator& alloc, Args&& ... args)
+template <typename T, typename Allocator, typename Y, typename ... Args>
+typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, Args&& ... args)
 {
     static_assert(sizeof(T), "T must be complete type");
     typedef typename shared_ptr<T>::operation_error operation_error;
 
-    typedef detail::type_stored_by_value<T, Allocator, Deleter, operation_error> shared_count_t;
+    typedef detail::type_stored_by_value<T, Allocator, operation_error> shared_count_t;
     typedef typename shared_count_t::allocator_type SharedCountAllocator;
     SharedCountAllocator sharedCountAlloc;
 
@@ -357,7 +357,7 @@ typename shared_ptr<T>::operation_error make_shared_ex_d_a(shared_ptr<Y>& sp, Al
         return err;
     }
 
-    err = ptr->initialize(alloc, std::forward<Args>(args) ...);
+    err = ptr->initialize(std::forward<Args>(args) ...);
     if (err)
     {
         return err;

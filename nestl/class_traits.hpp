@@ -4,6 +4,7 @@
 #include <nestl/config.hpp>
 
 #include <nestl/detail/construct.hpp>
+
 /**
  * @file implementation of class_traits template
  */
@@ -39,7 +40,7 @@ OperationError construct(T* ptr, Allocator& alloc, Args&& ... args) noexcept
 #undef NESTL_CALL_CLASS_TRAITS_CONSTRUCT
 }
 
-}
+} // namespace detail
 
 } // namespace nestl
 
