@@ -96,8 +96,8 @@ struct class_traits<NonCopyableButAssignCopyable>
     {
         alloc.construct(ptr);
 
-        NonCopyableButAssignCopyable* tmp = ptr + 1;
-        nestl::detail::destruction_scoped_guard<NonCopyableButAssignCopyable*, Allocator> guard(ptr, tmp, alloc);
+        NonCopyableButAssignCopyable* end = ptr + 1;
+        nestl::detail::destruction_scoped_guard<NonCopyableButAssignCopyable*, Allocator> guard(ptr, end, alloc);
 
         OperationError err = ptr->assign_copy(std::forward<Args>(args) ...);
         if (err)

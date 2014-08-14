@@ -349,4 +349,11 @@ void vector_test()
 {
     common_test();
     test_vector_int();
+
+    typedef nestl::vector<NonCopyableButAssignCopyable> noncopy_vec_t;
+    typedef nestl::vector<noncopy_vec_t> noncopy_vec_vec_t;
+
+    noncopy_vec_t vec;
+    noncopy_vec_vec_t vvec;
+    ASSERT_SUCCESS(vvec.push_back(vec));
 }

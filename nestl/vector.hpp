@@ -6,6 +6,7 @@
 #include <nestl/allocator.hpp>
 #include <nestl/memory.hpp>
 #include <nestl/noncopyable.hpp>
+#include <nestl/class_traits.hpp>
 
 
 #include <system_error>
@@ -187,6 +188,48 @@ private:
     operation_error grow(size_type requiredCapacity) noexcept;
 
     operation_error do_reserve(size_type new_cap) noexcept;
+};
+
+
+template <typename T, typename VectorAllocator>
+struct class_traits <nestl::vector<T, VectorAllocator> >
+{
+    typedef nestl::vector<T, VectorAllocator> vector_t;
+
+    template <typename OperationError, typename Allocator>
+    static OperationError construct(vector_t* ptr, Allocator& alloc) noexcept
+    {
+        alloc.construct(ptr);
+
+        return OperationError();
+    }
+
+    template <typename OperationError, typename Allocator>
+    static OperationError construct(vector_t* ptr, Allocator& alloc, vector_t&& other) noexcept
+    {
+        alloc.construct(ptr, std::move(other));
+
+        return OperationError();
+    }
+
+    template <typename OperationError, typename Allocator>
+    static OperationError construct(vector_t* ptr, Allocator& alloc, const vector_t& other) noexcept
+    {
+        alloc.construct(ptr);
+
+        vector_t* end = ptr + 1;
+        nestl::detail::destruction_scoped_guard<vector_t*, Allocator> guard(ptr, end, alloc);
+
+        OperationError err = ptr->assign_copy(other);
+        if (err)
+        {
+            return err;
+        }
+
+        guard.release();
+
+        return err;
+    }
 };
 
 
