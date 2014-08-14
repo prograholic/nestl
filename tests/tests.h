@@ -105,8 +105,7 @@ struct class_traits<NonCopyableButAssignCopyable>
             return err;
         }
 
-        /// disable destruction of object;
-        tmp = ptr;
+        guard.release();
 
         return err;
     }
