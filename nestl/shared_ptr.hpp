@@ -49,7 +49,7 @@ public:
         }
     }
 
-public:
+private:
     long m_use_count;
 
     virtual void destroy_value() noexcept = 0;
