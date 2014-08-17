@@ -22,6 +22,7 @@ public:
 
     shared_count_base() noexcept
         : m_use_count(0)
+        , m_weak_use_count(0)
     {
     }
 
@@ -31,26 +32,49 @@ public:
 
     long use_count() const noexcept
     {
+        NESTL_ASSERT(m_use_count >= 0);
         return m_use_count;
     }
 
     void add_ref() noexcept
     {
+        NESTL_ASSERT(m_use_count >= 0);
         ++m_use_count;
     }
 
     void release() noexcept
     {
+        NESTL_ASSERT(m_use_count > 0);
         --m_use_count;
         if (m_use_count == 0)
         {
             destroy_value();
+            if (m_weak_use_count == 0)
+            {
+                destroy_self();
+            }
+        }
+    }
+
+    void weak_add_ref() noexcept
+    {
+        NESTL_ASSERT(m_weak_use_count >= 0);
+        ++m_weak_use_count;
+    }
+
+    void weak_release() noexcept
+    {
+        NESTL_ASSERT(m_weak_use_count > 0);
+        --m_weak_use_count;
+        if ((m_weak_use_count == 0) && (m_use_count == 0))
+        {
             destroy_self();
         }
     }
 
 private:
     long m_use_count;
+    long m_weak_use_count;
 
     virtual void destroy_value() noexcept = 0;
 
@@ -108,6 +132,9 @@ private:
 } // namespace detail
 
 template <typename T>
+class weak_ptr;
+
+template <typename T>
 class shared_ptr
 {
 public:
@@ -163,10 +190,146 @@ private:
     element_type* m_ptr;
     detail::shared_count_base* m_refcount;
 
+    shared_ptr(element_type* ptr, detail::shared_count_base* refcount)
+        : m_ptr(ptr)
+        , m_refcount(refcount)
+    {
+        if (m_refcount)
+        {
+            m_refcount->add_ref();
+        }
+    }
+
+    template <typename Type>
+    friend class weak_ptr;
+
     template <typename Type, typename Allocator, typename Y, typename ... Args>
     friend
     typename shared_ptr<Type>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, Args&& ... args);
 };
+
+
+template <typename T>
+class weak_ptr
+{
+public:
+    typedef T                    element_type;
+    typedef T*                   pointer_type;
+    typedef std::error_condition operation_error;
+
+    weak_ptr()
+        : m_ptr(0)
+        , m_refcount(0)
+    {
+    }
+
+    weak_ptr(weak_ptr&& other)
+        : m_ptr(other.m_ptr)
+        , m_refcount(other.m_refcount)
+    {
+        other.m_ptr = 0;
+        other.m_refcount = 0;
+    }
+
+    weak_ptr(const shared_ptr<T>& sp) noexcept
+        : m_ptr(sp.m_ptr)
+        , m_refcount(sp.m_refcount)
+    {
+        if (m_refcount)
+        {
+            m_refcount->weak_add_ref();
+        }
+    }
+
+    weak_ptr(const weak_ptr& other) noexcept
+        : m_ptr(other.m_ptr)
+        , m_refcount(other.m_refcount)
+    {
+        if (m_refcount)
+        {
+            m_refcount->weak_add_ref();
+        }
+    }
+
+
+    void reset() noexcept
+    {
+        const weak_ptr tmp(std::move(*this));
+    }
+
+    ~weak_ptr()
+    {
+        if (m_refcount)
+        {
+            m_refcount->weak_release();
+        }
+    }
+
+    weak_ptr& operator=(const shared_ptr<T>& other) noexcept
+    {
+        const weak_ptr tmp(std::move(*this));
+
+        m_ptr = other.m_ptr;
+        m_refcount = other.m_refcount;
+        if (m_refcount)
+        {
+            m_refcount->weak_add_ref();
+        }
+
+        return *this;
+    }
+
+    weak_ptr& operator=(const weak_ptr& other) noexcept
+    {
+        const weak_ptr tmp(std::move(*this));
+
+        m_ptr = other.m_ptr;
+        m_refcount = other.m_refcount;
+        if (m_refcount)
+        {
+            m_refcount->weak_add_ref();
+        }
+
+        return *this;
+    }
+
+    weak_ptr& operator=(weak_ptr&& other) noexcept
+    {
+        const weak_ptr tmp(std::move(*this));
+
+        m_ptr = other.m_ptr;
+        m_refcount = other.m_refcount;
+
+        return *this;
+    }
+
+    bool expired() const noexcept
+    {
+        return use_count() == 0;
+    }
+
+    long use_count() const noexcept
+    {
+        if (m_refcount)
+        {
+            return (m_refcount)->use_count();
+        }
+
+        return 0;
+    }
+
+    shared_ptr<T> lock()
+    {
+        return shared_ptr<T>(m_ptr, m_refcount);
+    }
+
+private:
+    element_type* m_ptr;
+    detail::shared_count_base* m_refcount;
+
+};
+
+
 
 
 /// Implementation
@@ -363,9 +526,7 @@ typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allo
         return err;
     }
 
-    sp.m_refcount = ptr;
-    sp.m_ptr = ptr->get();
-    ptr->add_ref();
+    sp = shared_ptr<Y>(ptr->get(), ptr);
 
     allocationGuard.release();
     return operation_error();
