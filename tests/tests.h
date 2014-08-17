@@ -8,18 +8,25 @@
 #include <map>
 
 #include <nestl/noncopyable.hpp>
-
 #include <nestl/class_traits.hpp>
 
+
 #define DUMP_ASSERT_AND_EXIT(x, ...) \
-    std::cerr << "assertion failed: " #x << "at " << __FILE__ << ":" << __LINE__ << " " << __VA_ARGS__ << std::endl; \
+    std::cerr << "assertion failed: " #x << " at " << __FILE__ << ":" << __LINE__ << " " << __VA_ARGS__ << std::endl; \
     std::exit(EXIT_FAILURE); \
 
 // gtest-like macro
 #define ASSERT_TRUE(x) do {if (!(x)) {DUMP_ASSERT_AND_EXIT(x, "")}} while (0)
 
-#define ASSERT_SUCCESS(x) do {auto res = (x); if (res.value() != 0) {DUMP_ASSERT_AND_EXIT(x, ", returned result: " << res.message())}} while (0)
 
+#define ASSERT_SUCCESS_EX(x, msg) do {auto res = (x); if (res.value() != 0) {DUMP_ASSERT_AND_EXIT(x, msg)}} while (0)
+
+#define ASSERT_SUCCESS(x) ASSERT_SUCCESS_EX(x, ", returned result: " << res.message())
+
+
+#define ASSERT_FAILURE_EX(x, msg) do {auto res = (x); if (res.value() == 0) {DUMP_ASSERT_AND_EXIT(x, msg)}} while (0)
+
+#define ASSERT_FAILURE(x) ASSERT_FAILURE_EX(x, "expected failure")
 
 typedef std::map<const volatile void*, int> allocation_count_impl;
 
@@ -70,10 +77,17 @@ struct NonCopyableButAssignCopyable : private nestl::noncopyable
 
     std::error_condition assign_copy(const NonCopyableButAssignCopyable& other) noexcept
     {
+        if (return_error_on_assign)
+        {
+            return std::error_condition(std::errc::not_enough_memory);
+        }
+
         return std::error_condition();
     }
 
     static allocation_count ms_count;
+
+    static bool return_error_on_assign;
 };
 
 
@@ -108,6 +122,12 @@ struct class_traits<NonCopyableButAssignCopyable>
         guard.release();
 
         return err;
+    }
+
+    template <typename OperationError, typename Y>
+    static OperationError assign(NonCopyableButAssignCopyable& dest, Y&& src) noexcept
+    {
+        return dest.assign_copy(src);
     }
 };
 
@@ -214,6 +234,6 @@ struct TriviallyCopyable
 
 void vector_test();
 void shared_ptr_test();
-
+void algorithm_test();
 
 #endif // TESTS_TESTS_H

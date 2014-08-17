@@ -6,4 +6,24 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_compile_options(-std=c++11)
 
+
+set (nestl_sources
+	nestl/nestl.cpp
+
+	nestl/algorithm.hpp
+	nestl/allocator.hpp
+	nestl/class_traits.hpp
+	nestl/config.hpp
+	nestl/iterator.hpp
+	nestl/memory.hpp
+	nestl/noncopyable.hpp
+	nestl/shared_ptr.hpp
+	nestl/type_traits.hpp
+	nestl/vector.hpp
+)
+
+
+add_library(nestl_lib ${nestl_sources})
+
+
 add_subdirectory(tests)

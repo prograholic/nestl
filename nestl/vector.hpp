@@ -190,7 +190,11 @@ private:
     operation_error do_reserve(size_type new_cap) noexcept;
 };
 
-
+/**
+ * @brief specialization of class_traits for nestl::vector
+ *
+ * Allows construct one vector from another (emulate copy construction)
+ */
 template <typename T, typename VectorAllocator>
 struct class_traits <nestl::vector<T, VectorAllocator> >
 {
@@ -666,9 +670,14 @@ typename vector<T, A>::operation_error vector<T, A>::insert_value(const_iterator
         nestl::detail::destroy(m_allocator, oldLocation, val);
     }
 
-    ++m_finish;
 
     operation_error err = nestl::detail::construct<operation_error>(first, m_allocator, std::forward<Args>(args) ...);
+    if (err)
+    {
+        return err;
+    }
+
+    ++m_finish;
     return err;
 }
 
