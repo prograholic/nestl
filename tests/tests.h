@@ -9,6 +9,7 @@
 
 #include <nestl/noncopyable.hpp>
 #include <nestl/class_traits.hpp>
+#include <nestl/operation_error.hpp>
 
 
 #define DUMP_ASSERT_AND_EXIT(x, ...) \
@@ -19,12 +20,12 @@
 #define ASSERT_TRUE(x) do {if (!(x)) {DUMP_ASSERT_AND_EXIT(x, "")}} while (0)
 
 
-#define ASSERT_SUCCESS_EX(x, msg) do {auto res = (x); if (res.value() != 0) {DUMP_ASSERT_AND_EXIT(x, msg)}} while (0)
+#define ASSERT_SUCCESS_EX(x, msg) do {auto res = (x); if (res) {DUMP_ASSERT_AND_EXIT(x, msg)}} while (0)
 
-#define ASSERT_SUCCESS(x) ASSERT_SUCCESS_EX(x, ", returned result: " << res.message())
+#define ASSERT_SUCCESS(x) ASSERT_SUCCESS_EX(x, ", returned result: " << nestl::error_info::message(res))
 
 
-#define ASSERT_FAILURE_EX(x, msg) do {auto res = (x); if (res.value() == 0) {DUMP_ASSERT_AND_EXIT(x, msg)}} while (0)
+#define ASSERT_FAILURE_EX(x, msg) do {auto res = (x); if (!res) {DUMP_ASSERT_AND_EXIT(x, msg)}} while (0)
 
 #define ASSERT_FAILURE(x) ASSERT_FAILURE_EX(x, "expected failure")
 

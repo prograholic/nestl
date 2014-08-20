@@ -16,7 +16,7 @@ void copy_success_test()
     long output [size] = {0};
 
     auto err = nestl::copy<std::error_condition>(std::begin(input), std::end(input), output);
-    ASSERT_SUCCESS_EX(err, "nestl::copy failed with error: " << err.message());
+    ASSERT_SUCCESS_EX(err, "nestl::copy failed with error: " << err.error().message());
 }
 
 
@@ -84,6 +84,49 @@ void copy_fail_back_inserter_test()
 
 
 
+void copy_success_inserter_test()
+{
+    {
+        nestl::vector<NonCopyableButAssignCopyable> input;
+        ASSERT_SUCCESS(input.push_back(NonCopyableButAssignCopyable()));
+        ASSERT_SUCCESS(input.push_back(NonCopyableButAssignCopyable()));
+        ASSERT_SUCCESS(input.push_back(NonCopyableButAssignCopyable()));
+
+
+        nestl::vector<NonCopyableButAssignCopyable> output;
+        ASSERT_SUCCESS(output.push_back(NonCopyableButAssignCopyable()));
+
+        ASSERT_SUCCESS(nestl::copy<std::error_condition>(std::begin(input), std::end(input), nestl::inserter(output, output.begin())));
+    }
+
+    ensure_allocation_count_empty(NonCopyableButAssignCopyable::ms_count);
+}
+
+void copy_fail_inserter_test()
+{
+    {
+        nestl::vector<NonCopyableButAssignCopyable> input;
+        ASSERT_SUCCESS(input.push_back(NonCopyableButAssignCopyable()));
+        ASSERT_SUCCESS(input.push_back(NonCopyableButAssignCopyable()));
+        ASSERT_SUCCESS(input.push_back(NonCopyableButAssignCopyable()));
+
+
+        nestl::vector<NonCopyableButAssignCopyable> output;
+        ASSERT_SUCCESS(output.push_back(NonCopyableButAssignCopyable()));
+
+        NonCopyableButAssignCopyable::return_error_on_assign = true;
+        auto err = nestl::copy<std::error_condition>(std::begin(input), std::end(input), nestl::inserter(output, output.begin()));
+        NonCopyableButAssignCopyable::return_error_on_assign = false;
+
+        ASSERT_FAILURE(err);
+        ASSERT_TRUE(output.size() == 1);
+    }
+
+    ensure_allocation_count_empty(NonCopyableButAssignCopyable::ms_count);
+}
+
+
+
 
 void algorithm_test()
 {
@@ -91,8 +134,12 @@ void algorithm_test()
 
     copy_success_test();
     copy_fail_test();
+
     copy_success_back_inserter_test();
     copy_fail_back_inserter_test();
+
+    copy_success_inserter_test();
+    copy_fail_inserter_test();
 
     std::cerr << "test of algorithms finished" << std::endl;
 }

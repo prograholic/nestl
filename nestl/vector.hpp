@@ -7,6 +7,7 @@
 #include <nestl/memory.hpp>
 #include <nestl/noncopyable.hpp>
 #include <nestl/class_traits.hpp>
+#include <nestl/operation_error.hpp>
 
 
 #include <system_error>
@@ -40,6 +41,8 @@ public:
     typedef std::reverse_iterator<const_iterator>                           const_reverse_iterator;
 
     typedef std::error_condition                                            operation_error;
+
+    typedef nestl::result_with_operation_error<iterator, operation_error>   iterator_with_operation_error;
 
 
 // constructors
@@ -126,23 +129,23 @@ public:
 // modifiers
     void clear() noexcept;
 
-    operation_error insert(const_iterator pos, const value_type& value) noexcept;
+    iterator_with_operation_error insert(const_iterator pos, const value_type& value) noexcept;
 
-    operation_error insert(const_iterator pos, value_type&& value) noexcept;
+    iterator_with_operation_error insert(const_iterator pos, value_type&& value) noexcept;
 
     operation_error insert(const_iterator pos, size_type count, const value_type& value) noexcept;
 
     template<typename InputIterator>
     operation_error insert(const_iterator pos, InputIterator first, InputIterator last) noexcept;
 
-    operation_error insert(const_iterator pos, std::initializer_list<T> ilist) noexcept;
+    iterator_with_operation_error insert(const_iterator pos, std::initializer_list<T> ilist) noexcept;
 
     template<typename ... Args>
-    operation_error emplace(const_iterator pos, Args&&... args) noexcept;
+    iterator_with_operation_error emplace(const_iterator pos, Args&&... args) noexcept;
 
-    operation_error erase(const_iterator pos) noexcept;
+    iterator_with_operation_error erase(const_iterator pos) noexcept;
 
-    operation_error erase(const_iterator first, const_iterator last) noexcept;
+    iterator_with_operation_error erase(const_iterator first, const_iterator last) noexcept;
 
     operation_error push_back(const value_type& value) noexcept;
 
@@ -177,10 +180,10 @@ private:
     operation_error assign_iterator(std::input_iterator_tag /* tag */, InputIterator first, InputIterator last) noexcept;
 
     template <typename ... Args>
-    operation_error insert_value(const_iterator pos, Args&& ... args) noexcept;
+    iterator_with_operation_error insert_value(const_iterator pos, Args&& ... args) noexcept;
 
     template <typename InputIterator>
-    operation_error insert_range(const_iterator pos, InputIterator first, InputIterator last) noexcept;
+    iterator_with_operation_error insert_range(const_iterator pos, InputIterator first, InputIterator last) noexcept;
 
     template <typename ... Args>
     operation_error do_resize(size_type count, Args&& ... args) noexcept;
@@ -267,26 +270,30 @@ vector<T, A>::~vector() noexcept
 }
 
 template <typename T, typename A>
-typename vector<T, A>::allocator_type vector<T, A>::get_allocator() const noexcept
+typename vector<T, A>::allocator_type
+vector<T, A>::get_allocator() const noexcept
 {
     return m_allocator;
 }
 
 template <typename T, typename A>
-vector<T, A>& vector<T, A>::operator=(vector&& other) noexcept
+vector<T, A>&
+vector<T, A>::operator=(vector&& other) noexcept
 {
     move_assign(typename std::allocator_traits<allocator_type>::propagate_on_container_move_assignment(), std::move(other));
     return *this;
 }
 
 template <typename T, typename A>
-typename vector<T, A>::operation_error vector<T, A>::assign_copy(const vector& other) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::assign_copy(const vector& other) noexcept
 {
     return this->assign(other.cbegin(), other.cend());
 }
 
 template <typename T, typename A>
-typename vector<T, A>::operation_error vector<T, A>::assign(size_type n, const_reference val) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::assign(size_type n, const_reference val) noexcept
 {
     const vector tmp(std::move(*this));
 
@@ -313,7 +320,8 @@ typename vector<T, A>::operation_error vector<T, A>::assign(size_type n, const_r
 
 template <typename T, typename A>
 template <typename InputIterator>
-typename vector<T, A>::operation_error vector<T, A>::assign(InputIterator first, InputIterator last) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::assign(InputIterator first, InputIterator last) noexcept
 {
     const vector tmp(std::move(*this));
 
@@ -321,135 +329,156 @@ typename vector<T, A>::operation_error vector<T, A>::assign(InputIterator first,
 }
 
 template <typename T, typename A>
-typename vector<T, A>::operation_error vector<T, A>::assign(std::initializer_list<typename vector<T, A>::value_type> ilist) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::assign(std::initializer_list<typename vector<T, A>::value_type> ilist) noexcept
 {
     return this->assign(ilist.begin(), ilist.end());
 }
 
 template <typename T, typename A>
-typename vector<T, A>::reference vector<T, A>::operator[](typename vector<T, A>::size_type pos) noexcept
+typename vector<T, A>::reference
+vector<T, A>::operator[](typename vector<T, A>::size_type pos) noexcept
 {
     NESTL_ASSERT(pos < size());
     return m_start[pos];
 }
 
 template <typename T, typename A>
-typename vector<T, A>::const_reference vector<T, A>::operator[](typename vector<T, A>::size_type pos) const noexcept
+typename vector<T, A>::const_reference
+vector<T, A>::operator[](typename vector<T, A>::size_type pos) const noexcept
 {
     NESTL_ASSERT(pos < size());
     return m_start[pos];
 }
 
 template <typename T, typename A>
-typename vector<T, A>::reference vector<T, A>::front() noexcept
+typename vector<T, A>::reference
+vector<T, A>::front() noexcept
 {
     NESTL_ASSERT(!empty());
     return *begin();
 }
 
 template <typename T, typename A>
-typename vector<T, A>::const_reference vector<T, A>::front() const noexcept
+typename vector<T, A>::const_reference
+vector<T, A>::front() const noexcept
 {
     assert(!empty());
     return *begin();
 }
 
 template <typename T, typename A>
-typename vector<T, A>::reference vector<T, A>::back() noexcept
+typename vector<T, A>::reference
+vector<T, A>::back() noexcept
 {
     NESTL_ASSERT(!empty());
     return *rbegin();
 }
 
 template <typename T, typename A>
-typename vector<T, A>::const_reference vector<T, A>::back() const noexcept
+typename vector<T, A>::const_reference
+vector<T, A>::back() const noexcept
 {
     NESTL_ASSERT(!empty());
     return *rbegin();
 }
 
 template <typename T, typename A>
-typename vector<T, A>::pointer vector<T, A>::data() noexcept
+typename vector<T, A>::pointer
+vector<T, A>::data() noexcept
 {
     NESTL_ASSERT(!empty());
     return m_start;
 }
 
 template <typename T, typename A>
-typename vector<T, A>::const_pointer vector<T, A>::data() const noexcept
+typename vector<T, A>::const_pointer
+vector<T, A>::data() const noexcept
 {
     NESTL_ASSERT(!empty());
     return m_start;
 }
 
 template <typename T, typename A>
-typename vector<T, A>::iterator vector<T, A>::begin() noexcept
+typename vector<T, A>::iterator
+vector<T, A>::begin() noexcept
 {
     return m_start;
 }
 
 template <typename T, typename A>
-typename vector<T, A>::const_iterator vector<T, A>::begin() const noexcept
+typename vector<T, A>::const_iterator
+vector<T, A>::begin() const noexcept
 {
     return m_start;
 }
 
 template <typename T, typename A>
-typename vector<T, A>::const_iterator vector<T, A>::cbegin() const noexcept
+typename vector<T, A>::const_iterator
+vector<T, A>::cbegin() const noexcept
 {
     return m_start;
 }
 
 template <typename T, typename A>
-typename vector<T, A>::iterator vector<T, A>::end() noexcept
+typename vector<T, A>::iterator
+vector<T, A>::end() noexcept
 {
     return m_finish;
 }
 
 template <typename T, typename A>
-typename vector<T, A>::const_iterator vector<T, A>::end() const noexcept
+typename vector<T, A>::const_iterator
+vector<T, A>::end() const noexcept
 {
     return m_finish;
 }
 
 template <typename T, typename A>
-typename vector<T, A>::const_iterator vector<T, A>::cend() const noexcept
+typename vector<T, A>::const_iterator
+vector<T, A>::cend() const noexcept
 {
     return m_finish;
 }
 
 template <typename T, typename A>
-typename vector<T, A>::reverse_iterator vector<T, A>::rbegin() noexcept
+typename vector<T, A>::reverse_iterator
+vector<T, A>::rbegin() noexcept
 {
     return reverse_iterator(m_finish);
 }
 
 template <typename T, typename A>
-typename vector<T, A>::const_reverse_iterator vector<T, A>::rbegin() const noexcept
+typename vector<T, A>::const_reverse_iterator
+vector<T, A>::rbegin() const noexcept
 {
     return const_reverse_iterator(m_finish);
 }
 
 template <typename T, typename A>
-typename vector<T, A>::const_reverse_iterator vector<T, A>::crbegin() const noexcept
+typename vector<T, A>::const_reverse_iterator
+vector<T, A>::crbegin() const noexcept
 {
     return const_reverse_iterator(m_finish);
 }
 
 template <typename T, typename A>
-typename vector<T, A>::reverse_iterator vector<T, A>::rend() noexcept
+typename vector<T, A>::reverse_iterator
+vector<T, A>::rend() noexcept
 {
     return reverse_iterator(m_start);
 }
 
 template <typename T, typename A>
-typename vector<T, A>::const_reverse_iterator vector<T, A>::rend() const noexcept
+typename vector<T, A>::const_reverse_iterator
+vector<T, A>::rend() const noexcept
 {
     return const_reverse_iterator(m_start);
 }
 
 template <typename T, typename A>
-typename vector<T, A>::const_reverse_iterator vector<T, A>::crend() const noexcept
+typename vector<T, A>::const_reverse_iterator
+vector<T, A>::crend() const noexcept
 {
     return const_reverse_iterator(m_start);
 }
@@ -461,19 +490,22 @@ bool vector<T, A>::empty() const noexcept
 }
 
 template <typename T, typename A>
-typename vector<T, A>::size_type vector<T, A>::size() const noexcept
+typename vector<T, A>::size_type
+vector<T, A>::size() const noexcept
 {
     return std::distance(m_start, m_finish);
 }
 
 template <typename T, typename A>
-typename vector<T, A>::size_type vector<T, A>::max_size() const noexcept
+typename vector<T, A>::size_type
+vector<T, A>::max_size() const noexcept
 {
     return m_allocator.max_size();
 }
 
 template <typename T, typename A>
-typename vector<T, A>::operation_error vector<T, A>::reserve(size_type new_cap) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::reserve(size_type new_cap) noexcept
 {
     if (new_cap <= capacity())
     {
@@ -492,13 +524,15 @@ typename vector<T, A>::operation_error vector<T, A>::reserve(size_type new_cap) 
 }
 
 template <typename T, typename A>
-typename vector<T, A>::size_type vector<T, A>::capacity() const noexcept
+typename vector<T, A>::size_type
+vector<T, A>::capacity() const noexcept
 {
     return std::distance(m_start, m_end_of_storage);
 }
 
 template <typename T, typename A>
-typename vector<T, A>::operation_error vector<T, A>::shrink_to_fit() noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::shrink_to_fit() noexcept
 {
     if (capacity() > size())
     {
@@ -517,13 +551,15 @@ void vector<T, A>::clear() noexcept
 }
 
 template <typename T, typename A>
-typename vector<T, A>::operation_error vector<T, A>::insert(const_iterator pos, const value_type& value) noexcept
+typename vector<T, A>::iterator_with_operation_error
+vector<T, A>::insert(const_iterator pos, const value_type& value) noexcept
 {
     return insert_value(pos, value);
 }
 
 template <typename T, typename A>
-typename vector<T, A>::operation_error vector<T, A>::insert(const_iterator pos, value_type&& value) noexcept
+typename vector<T, A>::iterator_with_operation_error
+vector<T, A>::insert(const_iterator pos, value_type&& value) noexcept
 {
     return insert_value(pos, value);
 }
@@ -532,47 +568,49 @@ template <typename T, typename A>
 template<typename InputIterator>
 typename vector<T, A>::operation_error vector<T, A>::insert(const_iterator pos, InputIterator first, InputIterator last) noexcept
 {
-    return this->insert_range(pos, first, last);
+    return this->insert_range(pos, first, last).error();
 }
 
 template <typename T, typename A>
-typename vector<T, A>::operation_error vector<T, A>::insert(const_iterator pos, std::initializer_list<T> ilist) noexcept
+typename vector<T, A>::iterator_with_operation_error
+vector<T, A>::insert(const_iterator pos, std::initializer_list<T> ilist) noexcept
 {
-    return this->insert(pos, ilist.begin(), ilist.end());
+    return this->insert_range(pos, std::begin(ilist), std::end(ilist));
 }
 
 
 template <typename T, typename A>
-typename vector<T, A>::operation_error vector<T, A>::push_back(const value_type& value) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::push_back(const value_type& value) noexcept
 {
-    return this->insert(this->cend(), value);
+    return this->insert(this->cend(), value).error();
 }
 
 template <typename T, typename A>
-typename vector<T, A>::operation_error vector<T, A>::push_back(value_type&& value) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::push_back(value_type&& value) noexcept
 {
-    return this->insert(this->cend(), std::move(value));
+    return this->insert(this->cend(), std::move(value)).error();
 }
 
 template <typename T, typename A>
 template<typename ... Args>
-typename vector<T, A>::operation_error vector<T, A>::emplace_back(Args&& ... args) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::emplace_back(Args&& ... args) noexcept
 {
-    return insert_value(this->cend(), std::forward<Args>(args) ...);
+    return insert_value(this->cend(), std::forward<Args>(args) ...).error();
 }
 
 template <typename T, typename A>
-void vector<T, A>::pop_back() noexcept
-{}
-
-template <typename T, typename A>
-typename vector<T, A>::operation_error vector<T, A>::resize(size_type count) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::resize(size_type count) noexcept
 {
     return do_resize(count);
 }
 
 template <typename T, typename A>
-typename vector<T, A>::operation_error vector<T, A>::resize(size_type count, const value_type& value) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::resize(size_type count, const value_type& value) noexcept
 {
     return do_resize(count, value);
 }
@@ -603,7 +641,8 @@ void vector<T, A>::move_assign(const std::true_type& /* true_val */, vector&& ot
 
 template <typename T, typename A>
 template <typename InputIterator>
-typename vector<T, A>::operation_error vector<T, A>::assign_iterator(std::random_access_iterator_tag /* tag */, InputIterator first, InputIterator last) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::assign_iterator(std::random_access_iterator_tag /* tag */, InputIterator first, InputIterator last) noexcept
 {
     NESTL_ASSERT(empty());
     size_t required_size = std::distance(first, last);
@@ -619,7 +658,8 @@ typename vector<T, A>::operation_error vector<T, A>::assign_iterator(std::random
 
 template <typename T, typename A>
 template <typename InputIterator>
-typename vector<T, A>::operation_error vector<T, A>::assign_iterator(std::input_iterator_tag /* tag */, InputIterator first, InputIterator last) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::assign_iterator(std::input_iterator_tag /* tag */, InputIterator first, InputIterator last) noexcept
 {
     NESTL_ASSERT(empty());
 
@@ -639,7 +679,8 @@ typename vector<T, A>::operation_error vector<T, A>::assign_iterator(std::input_
 
 template <typename T, typename A>
 template <typename ... Args>
-typename vector<T, A>::operation_error vector<T, A>::insert_value(const_iterator pos, Args&& ... args) noexcept
+typename vector<T, A>::iterator_with_operation_error
+vector<T, A>::insert_value(const_iterator pos, Args&& ... args) noexcept
 {
     NESTL_ASSERT(pos >= m_start);
     NESTL_ASSERT(pos <= m_finish);
@@ -652,7 +693,7 @@ typename vector<T, A>::operation_error vector<T, A>::insert_value(const_iterator
         operation_error err = this->grow(capacity() + 1);
         if (err)
         {
-            return err;
+            return nestl::make_result_with_operation_error(this->begin(), err);
         }
     }
     NESTL_ASSERT(capacity() > size());
@@ -665,7 +706,7 @@ typename vector<T, A>::operation_error vector<T, A>::insert_value(const_iterator
         operation_error err = nestl::detail::construct<operation_error>(val, m_allocator, *oldLocation);
         if (err)
         {
-            return err;
+            return nestl::make_result_with_operation_error(this->begin(), err);
         }
         nestl::detail::destroy(m_allocator, oldLocation, val);
     }
@@ -674,17 +715,18 @@ typename vector<T, A>::operation_error vector<T, A>::insert_value(const_iterator
     operation_error err = nestl::detail::construct<operation_error>(first, m_allocator, std::forward<Args>(args) ...);
     if (err)
     {
-        return err;
+        return nestl::make_result_with_operation_error(this->begin(), err);
     }
 
     ++m_finish;
-    return err;
+    return nestl::make_result_with_operation_error(first, err);
 }
 
 
 template <typename T, typename A>
 template <typename InputIterator>
-typename vector<T, A>::operation_error vector<T, A>::insert_range(const_iterator pos, InputIterator first, InputIterator last) noexcept
+typename vector<T, A>::iterator_with_operation_error
+vector<T, A>::insert_range(const_iterator pos, InputIterator first, InputIterator last) noexcept
 {
     NESTL_ASSERT(pos >= m_start);
     NESTL_ASSERT(pos <= m_finish);
@@ -692,22 +734,24 @@ typename vector<T, A>::operation_error vector<T, A>::insert_range(const_iterator
     /// we should calculate offset before possible reallocation
     size_t offset = pos - m_start;
 
+    iterator_with_operation_error err;
     for ( ; first != last; ++first, ++offset)
     {
         const_iterator newPos = m_start + offset;
-        operation_error err = insert_value(newPos, *first);
+        err = insert_value(newPos, *first);
         if (err)
         {
             return err;
         }
     }
 
-    return operation_error();
+    return err;
 }
 
 template <typename T, typename A>
 template <typename ... Args>
-typename vector<T, A>::operation_error vector<T, A>::do_resize(size_type count, Args&& ... args) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::do_resize(size_type count, Args&& ... args) noexcept
 {
     if (count <= size())
     {
@@ -738,7 +782,8 @@ typename vector<T, A>::operation_error vector<T, A>::do_resize(size_type count, 
 
 
 template <typename T, typename A>
-typename vector<T, A>::operation_error vector<T, A>::grow(size_type requiredCapacity) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::grow(size_type requiredCapacity) noexcept
 {
     size_t newCapacity = (((capacity() + 1) * 3) / 2);
     if (newCapacity < requiredCapacity)
@@ -753,7 +798,8 @@ typename vector<T, A>::operation_error vector<T, A>::grow(size_type requiredCapa
 }
 
 template <typename T, typename A>
-typename vector<T, A>::operation_error vector<T, A>::do_reserve(size_type new_cap) noexcept
+typename vector<T, A>::operation_error
+vector<T, A>::do_reserve(size_type new_cap) noexcept
 {
     value_type* ptr = m_allocator.allocate(new_cap);
     if (!ptr)

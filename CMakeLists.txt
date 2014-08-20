@@ -20,6 +20,7 @@ set (nestl_sources
 	nestl/shared_ptr.hpp
 	nestl/type_traits.hpp
 	nestl/vector.hpp
+	nestl/operation_error.hpp
 )
 
 
