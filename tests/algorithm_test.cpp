@@ -5,7 +5,7 @@
 #include <nestl/iterator.hpp>
 
 
-
+#if 0
 
 
 
@@ -145,3 +145,4 @@ void algorithm_test()
 }
 
 
+#endif //0

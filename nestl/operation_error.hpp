@@ -68,7 +68,7 @@ public:
         return m_error;
     }
 
-    const Type& value() const noexcept
+    const Type& result() const noexcept
     {
         return m_val;
     }

@@ -3,6 +3,8 @@
 
 #include <nestl/shared_ptr.hpp>
 
+#if 0
+
 template <typename SharedPtr>
 void ensure_shared_ptr(const SharedPtr& ptr, long use_count)
 {
@@ -189,3 +191,6 @@ void shared_ptr_test()
 
     shared_ptr_common_test<TriviallyCopyable>           ("TriviallyCopyable           ");
 }
+
+
+#endif //0

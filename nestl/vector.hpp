@@ -240,6 +240,35 @@ struct class_traits <nestl::vector<T, VectorAllocator> >
 };
 
 
+template <typename T, typename Allocator>
+bool operator == (const nestl::vector<T, Allocator>& left, const nestl::vector<T, Allocator>& right)
+{
+    if (left.size() != right.size())
+    {
+        return false;
+    }
+
+    auto leftIt = left.cbegin();
+    auto leftEnd = left.cend();
+
+    auto rightIt = right.cbegin();
+
+
+    while (leftIt != leftEnd)
+    {
+        if (!(*leftIt == *rightIt))
+        {
+            return false;
+        }
+
+        ++leftIt;
+        ++rightIt;
+    }
+
+    return true;
+}
+
+
 
 /// Implementation
 

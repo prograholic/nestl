@@ -3,7 +3,7 @@
 
 #include <nestl/config.hpp>
 
-#include <nestl/detail/construct.hpp>
+#include <nestl/class_traits.hpp>
 
 #include <memory>
 

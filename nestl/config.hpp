@@ -9,4 +9,6 @@
 
 #define NESTL_ASSERT(x) assert(x)
 
+#include <cstddef>
+
 #endif // NESTL_CONFIG_HPP
