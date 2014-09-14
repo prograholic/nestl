@@ -23,6 +23,25 @@ namespace nestl
 namespace detail
 {
 
+
+template <typename T>
+struct list_node
+{
+    list_node* m_next;
+    list_node* m_prev;
+
+    T m_value;
+
+    template <typename ... Args>
+    list_node(Args&& ... args)
+        : m_next(0)
+        , m_prev(0)
+        , m_value(std::forward<Args>(args) ...)
+    {
+    }
+};
+
+
 template <typename T>
 struct list_iterator
 {
@@ -32,21 +51,83 @@ struct list_iterator
     typedef T*                              pointer;
     typedef T&                              reference;
 
-    reference operator*() const noexcept;
+    typedef list_node<T>                    node_t;
 
-    pointer operator->() const noexcept;
+    list_iterator()
+        : m_node()
+    {
+    }
 
-    list_iterator& operator++() noexcept;
+    explicit list_iterator(node_t* node)
+        : m_node(node)
+    {
+    }
 
-    list_iterator operator++(int) noexcept;
+    reference operator*() const noexcept
+    {
+        NESTL_ASSERT(m_node);
+        return m_node->m_value;
+    }
 
-    list_iterator& operator--() noexcept;
+    pointer operator->() const noexcept
+    {
+        NESTL_ASSERT(m_node);
+        return std::addressof(m_node->m_value);
+    }
 
-    list_iterator operator--(int) noexcept;
+    list_iterator& operator++() noexcept
+    {
+        NESTL_ASSERT(m_node);
+        NESTL_ASSERT(m_node->m_next);
+        m_node = m_node->m_next;
 
-    bool operator==(const list_iterator& other) const noexcept;
+        return *this;
+    }
 
-    bool operator!=(const list_iterator& other) const noexcept;
+    list_iterator operator++(int) noexcept
+    {
+        list_iterator res = *this;
+
+        NESTL_ASSERT(m_node);
+        NESTL_ASSERT(m_node->m_next);
+
+        m_node = m_node->m_next;
+
+        return res;
+    }
+
+    list_iterator& operator--() noexcept
+    {
+        NESTL_ASSERT(m_node);
+        NESTL_ASSERT(m_node->m_prev);
+        m_node = m_node->m_prev;
+
+        return *this;
+    }
+
+    list_iterator operator--(int) noexcept
+    {
+        list_iterator res = *this;
+
+        NESTL_ASSERT(m_node);
+        NESTL_ASSERT(m_node->m_prev);
+
+        m_node = m_node->m_prev;
+
+        return res;
+    }
+
+    bool operator==(const list_iterator& other) const noexcept
+    {
+        return m_node == other.m_node;
+    }
+
+    bool operator!=(const list_iterator& other) const noexcept
+    {
+        return m_node != other.m_node;
+    }
+
+    node_t* m_node;
 };
 
 
@@ -61,23 +142,89 @@ struct list_const_iterator
 
     typedef list_iterator<T>                iterator;
 
-    list_const_iterator(const iterator& i) noexcept;
+    typedef const list_node<T>              node_t;
 
-    reference operator*() const noexcept;
+    list_const_iterator()
+        : m_node()
+    {
+    }
 
-    pointer operator->() const noexcept;
+    explicit list_const_iterator(const node_t* node)
+        : m_node(node)
+    {
+    }
 
-    list_const_iterator& operator++() noexcept;
+    list_const_iterator(const iterator& i) noexcept
+        : m_node(i.m_node)
+    {
+    }
 
-    list_const_iterator operator++(int) noexcept;
 
-    list_const_iterator& operator--() noexcept;
+    reference operator*() const noexcept
+    {
+        NESTL_ASSERT(m_node);
+        return m_node->m_value;
+    }
 
-    list_const_iterator operator--(int) noexcept;
+    pointer operator->() const noexcept
+    {
+        NESTL_ASSERT(m_node);
+        return std::addressof(m_node->m_value);
+    }
 
-    bool operator==(const list_const_iterator& other) const noexcept;
+    list_const_iterator& operator++() noexcept
+    {
+        NESTL_ASSERT(m_node);
+        NESTL_ASSERT(m_node->m_next);
+        m_node = m_node->m_next;
 
-    bool operator!=(const list_const_iterator& other) const noexcept;
+        return *this;
+    }
+
+    list_const_iterator operator++(int) noexcept
+    {
+        list_const_iterator res = *this;
+
+        NESTL_ASSERT(m_node);
+        NESTL_ASSERT(m_node->m_next);
+
+        m_node = m_node->m_next;
+
+        return res;
+    }
+
+    list_const_iterator& operator--() noexcept
+    {
+        NESTL_ASSERT(m_node);
+        NESTL_ASSERT(m_node->m_prev);
+        m_node = m_node->m_prev;
+
+        return *this;
+    }
+
+    list_const_iterator operator--(int) noexcept
+    {
+        list_const_iterator res = *this;
+
+        NESTL_ASSERT(m_node);
+        NESTL_ASSERT(m_node->m_prev);
+
+        m_node = m_node->m_prev;
+
+        return res;
+    }
+
+    bool operator==(const list_const_iterator& other) const noexcept
+    {
+        return m_node == other.m_node;
+    }
+
+    bool operator!=(const list_const_iterator& other) const noexcept
+    {
+        return m_node != other.m_node;
+    }
+
+    node_t* m_node;
 };
 
 } // namespace detail
