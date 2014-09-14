@@ -533,6 +533,19 @@ typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allo
 }
 
 
+template <typename T, typename Y, typename ... Args>
+typename shared_ptr<T>::operation_error make_shared_ex(shared_ptr<Y>& sp, Args&& ... args)
+{
+    nestl::allocator<T> alloc;
+    return make_shared_ex_a<T>(sp, alloc, std::forward<Args>(args) ...);
+}
+
+template <typename T, typename ... Args>
+typename shared_ptr<T>::operation_error make_shared(shared_ptr<T>& sp, Args&& ... args)
+{
+    return make_shared_ex<T>(sp, std::forward<Args>(args) ...);
+}
+
 
 } // namespace nestl
 
