@@ -392,7 +392,7 @@ template <typename T, typename A>
 typename vector<T, A>::const_reference
 vector<T, A>::front() const noexcept
 {
-    assert(!empty());
+    NESTL_ASSERT(!empty());
     return *begin();
 }
 

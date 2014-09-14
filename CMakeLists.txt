@@ -21,6 +21,7 @@ set (nestl_sources
 	nestl/type_traits.hpp
 	nestl/vector.hpp
 	nestl/operation_error.hpp
+	nestl/list.hpp
 )
 
 
