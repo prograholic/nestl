@@ -27,5 +27,6 @@ set (nestl_sources
 add_library(nestl_lib ${nestl_sources})
 
 if (EXISTS ${NESTL_GOOGLEMOCK_DIR}/CMakeLists.txt)
+  enable_testing()
   add_subdirectory(tests)
 endif()
