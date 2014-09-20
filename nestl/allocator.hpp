@@ -33,6 +33,23 @@ public:
         typedef allocator<U> other;
     };
 
+    allocator() noexcept
+    {
+    }
+
+    allocator(const allocator& other) noexcept
+    {
+    }
+
+    template <typename Y>
+    allocator(const allocator<Y>& other) noexcept
+    {
+    }
+
+    ~allocator() noexcept
+    {
+    }
+
     pointer address(reference x) const noexcept
     {
         return std::addressof(x);

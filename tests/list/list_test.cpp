@@ -251,9 +251,33 @@ TYPED_TEST_P(ListTestWithCopyableObjects, EmplaceBackOneElement)
 }
 
 
+TYPED_TEST_P(ListTestWithCopyableObjects, PushFrontOneElement)
+{
+    typename TestFixture::list_t l;
+    typename TestFixture::value_type val;
+
+    ASSERT_OPERATION_SUCCESS(l.push_front(val));
+
+    EXPECT_TRUE(CheckListSize(l, 1));
+}
+
+
+TYPED_TEST_P(ListTestWithCopyableObjects, EmplaceFrontOneElement)
+{
+    typename TestFixture::list_t l;
+    typename TestFixture::value_type val;
+
+    ASSERT_OPERATION_SUCCESS(l.emplace_front(val));
+
+    EXPECT_TRUE(CheckListSize(l, 1));
+}
+
+
 REGISTER_TYPED_TEST_CASE_P(ListTestWithCopyableObjects,
                            PushBackOneElement,
-                           EmplaceBackOneElement);
+                           EmplaceBackOneElement,
+                           PushFrontOneElement,
+                           EmplaceFrontOneElement);
 
 INSTANTIATE_TYPED_TEST_CASE_P(copyable_list_test, ListTestWithCopyableObjects, ListCopyableTypes);
 
