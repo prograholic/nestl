@@ -30,8 +30,42 @@ struct list_node_base
 
     static void swap(list_node_base& left, list_node_base& right)
     {
-        std::swap(left.m_prev, right.m_prev);
+        NESTL_ASSERT(left.m_next->m_prev == &left);
+        NESTL_ASSERT(left.m_prev->m_next == &left);
+
+        NESTL_ASSERT(right.m_next->m_prev == &right);
+        NESTL_ASSERT(right.m_prev->m_next == &right);
+
+
+        bool leftIsEmpty = (left.m_next == &left);
+        bool rightIsEmpty = (right.m_next == &right);
+
         std::swap(left.m_next, right.m_next);
+        std::swap(left.m_prev, right.m_prev);
+
+        if (leftIsEmpty)
+        {
+            right.m_next = &right;
+            right.m_prev = &right;
+        }
+
+        if (rightIsEmpty)
+        {
+            left.m_next = &left;
+            left.m_prev = &left;
+        }
+
+        left.m_next->m_prev = &left;
+        left.m_prev->m_next = &left;
+
+        right.m_next->m_prev = &right;
+        right.m_prev->m_next = &right;
+
+        NESTL_ASSERT(left.m_next->m_prev == &left);
+        NESTL_ASSERT(left.m_prev->m_next == &left);
+
+        NESTL_ASSERT(right.m_next->m_prev == &right);
+        NESTL_ASSERT(right.m_prev->m_next == &right);
     }
 
 
@@ -39,14 +73,14 @@ struct list_node_base
     {
         NESTL_ASSERT(node);
 
-        list_node_base* next = node->m_next;
-        NESTL_ASSERT(next->m_prev == node);
+        list_node_base* prev = node->m_prev;
+        NESTL_ASSERT(prev->m_next == node);
 
-        node->m_next = this;
-        next->m_prev = this;
+        node->m_prev = this;
+        prev->m_next = this;
 
-        m_next = next;
-        m_prev = node;
+        m_prev = prev;
+        m_next = node;
     }
 
     void remove()

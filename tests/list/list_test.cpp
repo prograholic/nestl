@@ -73,7 +73,7 @@ TYPED_TEST_P(ListTestCommon, CheckAssignWithSize1024)
     }
 }
 
-TYPED_TEST_P(ListTestCommon, CheckInsertIntoEmptyVector)
+TYPED_TEST_P(ListTestCommon, CheckInsertIntoEmptyList)
 {
     typename TestFixture::list_t l;
     typename TestFixture::value_type val;
@@ -94,7 +94,7 @@ REGISTER_TYPED_TEST_CASE_P(ListTestCommon,
                            CheckAssignWithSize0,
                            CheckAssignWithSize1,
                            CheckAssignWithSize1024,
-                           CheckInsertIntoEmptyVector);
+                           CheckInsertIntoEmptyList);
 
 INSTANTIATE_TYPED_TEST_CASE_P(common_list_test, ListTestCommon, ListCommonTypes);
 
@@ -159,7 +159,7 @@ TYPED_TEST_P(ListTestNumeric, CheckAssignFromInitializerList)
     #undef INITIALIZER_LIST_VALUES
 }
 
-TYPED_TEST_P(ListTestNumeric, InsertOneElementBeforeBeginToNonEmptyVector)
+TYPED_TEST_P(ListTestNumeric, InsertOneElementBeforeBeginToNonEmptyList)
 {
     typename TestFixture::list_t l;
     const size_t expectedSize = 5;
@@ -183,7 +183,7 @@ TYPED_TEST_P(ListTestNumeric, InsertOneElementBeforeBeginToNonEmptyVector)
     }
 }
 
-TYPED_TEST_P(ListTestNumeric, InsertOneElementBeforeEndToNonEmptyVector)
+TYPED_TEST_P(ListTestNumeric, InsertOneElementBeforeEndToNonEmptyList)
 {
     typename TestFixture::list_t l;
     const size_t expectedSize = 5;
@@ -194,7 +194,8 @@ TYPED_TEST_P(ListTestNumeric, InsertOneElementBeforeEndToNonEmptyVector)
     ASSERT_OPERATION_SUCCESS(st);
     ASSERT_TRUE(CheckListSize(l, expectedSize));
 
-    ASSERT_EQ(l.end()--, st.result());
+    auto beforeEnd = l.end(); --beforeEnd;
+    ASSERT_EQ(beforeEnd, st.result());
 
     auto constIt = l.cbegin();
     auto it = l.begin();
@@ -213,8 +214,8 @@ TYPED_TEST_P(ListTestNumeric, InsertOneElementBeforeEndToNonEmptyVector)
 REGISTER_TYPED_TEST_CASE_P(ListTestNumeric,
                            CheckAssignFromIterators,
                            CheckAssignFromInitializerList,
-                           InsertOneElementBeforeBeginToNonEmptyVector,
-                           InsertOneElementBeforeEndToNonEmptyVector);
+                           InsertOneElementBeforeBeginToNonEmptyList,
+                           InsertOneElementBeforeEndToNonEmptyList);
 
 INSTANTIATE_TYPED_TEST_CASE_P(numeric_list_test, ListTestNumeric, ListNumericTypes);
 
