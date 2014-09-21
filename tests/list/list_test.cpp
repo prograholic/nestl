@@ -209,13 +209,86 @@ TYPED_TEST_P(ListTestNumeric, InsertOneElementBeforeEndToNonEmptyList)
     }
 }
 
+TYPED_TEST_P(ListTestNumeric, PopFrontFromListWith1Element)
+{
+    typename TestFixture::list_t l;
+
+    ASSERT_OPERATION_SUCCESS(l.push_back(0));
+    ASSERT_TRUE(CheckListSize(l, 1));
+
+    l.pop_front();
+    ASSERT_TRUE(CheckListSize(l, 0));
+}
+
+TYPED_TEST_P(ListTestNumeric, PopBackFromListWith1Element)
+{
+    typename TestFixture::list_t l;
+
+    ASSERT_OPERATION_SUCCESS(l.push_back(0));
+    ASSERT_TRUE(CheckListSize(l, 1));
+
+    l.pop_back();
+    ASSERT_TRUE(CheckListSize(l, 0));
+}
+
+TYPED_TEST_P(ListTestNumeric, PopFrontFromListWith2Elements)
+{
+    typename TestFixture::list_t l;
+
+    ASSERT_OPERATION_SUCCESS(l.push_back(0));
+    ASSERT_OPERATION_SUCCESS(l.push_back(1));
+    ASSERT_TRUE(CheckListSize(l, 2));
+
+    l.pop_front();
+    ASSERT_TRUE(CheckListSize(l, 1));
+    ASSERT_EQ(1, l.front());
+}
+
+TYPED_TEST_P(ListTestNumeric, PopBackFromListWith2Elements)
+{
+    typename TestFixture::list_t l;
+
+    ASSERT_OPERATION_SUCCESS(l.push_back(0));
+    ASSERT_OPERATION_SUCCESS(l.push_back(1));
+    ASSERT_TRUE(CheckListSize(l, 2));
+
+    l.pop_back();
+    ASSERT_TRUE(CheckListSize(l, 1));
+    ASSERT_EQ(0, l.front());
+}
+
+
+TYPED_TEST_P(ListTestNumeric, MergeTwoNonEmptyLists)
+{
+    typename TestFixture::list_t l1;
+    ASSERT_OPERATION_SUCCESS(l1.assign({0, 2, 4, 6}));
+
+    typename TestFixture::list_t l2;
+    ASSERT_OPERATION_SUCCESS(l1.assign({1, 3, 5, 7}));
+
+    l1.merge(l2);
+    ASSERT_TRUE(CheckListSize(l2, 0));
+
+    ASSERT_TRUE(CheckListSize(l1, 8));
+
+    auto it = l2.begin();
+    for (int i = 0; i != 8; ++i)
+    {
+        EXPECT_EQ(i, *it);
+    }
+}
 
 
 REGISTER_TYPED_TEST_CASE_P(ListTestNumeric,
                            CheckAssignFromIterators,
                            CheckAssignFromInitializerList,
                            InsertOneElementBeforeBeginToNonEmptyList,
-                           InsertOneElementBeforeEndToNonEmptyList);
+                           InsertOneElementBeforeEndToNonEmptyList,
+                           PopFrontFromListWith1Element,
+                           PopBackFromListWith1Element,
+                           PopFrontFromListWith2Elements,
+                           PopBackFromListWith2Elements,
+                           MergeTwoNonEmptyLists);
 
 INSTANTIATE_TYPED_TEST_CASE_P(numeric_list_test, ListTestNumeric, ListNumericTypes);
 

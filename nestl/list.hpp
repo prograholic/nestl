@@ -60,12 +60,6 @@ struct list_node_base
 
         right.m_next->m_prev = &right;
         right.m_prev->m_next = &right;
-
-        NESTL_ASSERT(left.m_next->m_prev == &left);
-        NESTL_ASSERT(left.m_prev->m_next == &left);
-
-        NESTL_ASSERT(right.m_next->m_prev == &right);
-        NESTL_ASSERT(right.m_prev->m_next == &right);
     }
 
 
@@ -85,10 +79,19 @@ struct list_node_base
 
     void remove()
     {
+        NESTL_ASSERT((m_next != this) && "cannot remove from empty list");
+        NESTL_ASSERT((m_prev != this) && "cannot remove from empty list");
+
+        m_prev->m_next = m_next;
+        m_next->m_prev = m_prev;
+    }
+
+
+    void transfer(list_node_base* first, list_node_base* last)
+    {
         NESTL_ASSERT(0 && "not implemented");
     }
 };
-
 
 template <typename T>
 struct list_node : public list_node_base
@@ -937,7 +940,7 @@ template <typename T, typename A>
 typename list<T, A>::iterator
 list<T, A>::erase(const_iterator pos) noexcept
 {
-    node_type* node = pos.get_list_node();
+    node_type* node = static_cast<node_type*>(pos.get_list_node());
     iterator ret = iterator(node->m_next);
 
     node->remove();
@@ -1018,6 +1021,40 @@ list<T, A>::pop_front() noexcept
 {
     erase(cbegin());
 }
+
+/// Operations
+
+template <typename T, typename A>
+void
+list<T, A>::merge(list& other) noexcept
+{
+    merge(std::move(other));
+}
+
+template <typename T, typename A>
+void
+list<T, A>::merge(list&& other) noexcept
+{
+    merge(std::move(other), std::less<T>());
+}
+
+template <typename T, typename A>
+template <typename Compare>
+void
+list<T, A>::merge(list& other, Compare comp) noexcept
+{
+    merge(std::move(other), comp);
+}
+
+template <typename T, typename A>
+template <typename Compare>
+void
+list<T, A>::merge(list&& other, Compare comp) noexcept
+{
+    NESTL_ASSERT(0 && "not implemented");
+}
+
+
 
 /// Private implementation
 
