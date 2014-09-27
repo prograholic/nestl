@@ -1,3 +1,9 @@
+/**
+ * @file list.hpp - implementation of nestl::list container
+ *
+ * @note Implementation based on implementation of std::list from libstdc++
+ */
+
 #ifndef NESTL_LIST_HPP
 #define NESTL_LIST_HPP
 
@@ -23,75 +29,136 @@ namespace nestl
 namespace detail
 {
 
+
+#ifndef NDEBUG
+
+#define NESTL_CHECK_LIST_NODE(node) \
+    do \
+    { \
+        NESTL_ASSERT(node); \
+        NESTL_ASSERT((node)->m_prev); \
+        NESTL_ASSERT((node)->m_next); \
+        NESTL_ASSERT((node)->m_prev->m_next == (node)); \
+        NESTL_ASSERT((node)->m_next->m_prev == (node)); \
+    } \
+    while ((bool)(void*)0)\
+
+#else /* NDEBUG */
+
+#define NESTL_CHECK_LIST_NODE(node)
+
+#endif /* NDEBUG */
+
 struct list_node_base
 {
     list_node_base* m_next;
     list_node_base* m_prev;
 
-    static void swap(list_node_base& left, list_node_base& right)
+    static void swap(list_node_base& left, list_node_base& right) noexcept
     {
-        NESTL_ASSERT(left.m_next->m_prev == &left);
-        NESTL_ASSERT(left.m_prev->m_next == &left);
+        NESTL_CHECK_LIST_NODE(&left);
+        NESTL_CHECK_LIST_NODE(&right);
 
-        NESTL_ASSERT(right.m_next->m_prev == &right);
-        NESTL_ASSERT(right.m_prev->m_next == &right);
-
-
-        bool leftIsEmpty = (left.m_next == &left);
-        bool rightIsEmpty = (right.m_next == &right);
-
-        std::swap(left.m_next, right.m_next);
-        std::swap(left.m_prev, right.m_prev);
-
-        if (leftIsEmpty)
+        if (left.m_next != &left)
         {
-            right.m_next = &right;
-            right.m_prev = &right;
+            if (right.m_next != &right)
+            {
+                // Both left and right are not empty.
+                std::swap(left.m_next,right.m_next);
+                std::swap(left.m_prev,right.m_prev);
+                left.m_next->m_prev = left.m_prev->m_next = &left;
+                right.m_next->m_prev = right.m_prev->m_next = &right;
+            }
+            else
+            {
+                // left is not empty, right is empty.
+                right.m_next = left.m_next;
+                right.m_prev = left.m_prev;
+                right.m_next->m_prev = right.m_prev->m_next = &right;
+                left.m_next = left.m_prev = &left;
+            }
+        }
+        else if (right.m_next != &right)
+        {
+            // left is empty, right is not empty.
+            left.m_next = right.m_next;
+            left.m_prev = right.m_prev;
+            left.m_next->m_prev = left.m_prev->m_next = &left;
+            right.m_next = right.m_prev = &right;
         }
 
-        if (rightIsEmpty)
-        {
-            left.m_next = &left;
-            left.m_prev = &left;
-        }
-
-        left.m_next->m_prev = &left;
-        left.m_prev->m_next = &left;
-
-        right.m_next->m_prev = &right;
-        right.m_prev->m_next = &right;
+        NESTL_CHECK_LIST_NODE(&left);
+        NESTL_CHECK_LIST_NODE(&right);
     }
 
-
-    void inject(list_node_base* node)
+    void init_empty() noexcept
     {
-        NESTL_ASSERT(node);
+        m_next = this;
+        m_prev = this;
 
-        list_node_base* prev = node->m_prev;
-        NESTL_ASSERT(prev->m_next == node);
+        NESTL_CHECK_LIST_NODE(this);
+    }
 
+    void inject(list_node_base* node) noexcept
+    {
+        NESTL_CHECK_LIST_NODE(this);
+        NESTL_CHECK_LIST_NODE(node);
+
+        this->m_next = node;
+        this->m_prev = node->m_prev;
+        node->m_prev->m_next = this;
         node->m_prev = this;
-        prev->m_next = this;
 
-        m_prev = prev;
-        m_next = node;
+        NESTL_CHECK_LIST_NODE(this);
+        NESTL_CHECK_LIST_NODE(node);
     }
 
-    void remove()
+    void remove() noexcept
     {
-        NESTL_ASSERT((m_next != this) && "cannot remove from empty list");
-        NESTL_ASSERT((m_prev != this) && "cannot remove from empty list");
+        NESTL_CHECK_LIST_NODE(this);
 
-        m_prev->m_next = m_next;
-        m_next->m_prev = m_prev;
+        list_node_base* next_node = this->m_next;
+        NESTL_CHECK_LIST_NODE(next_node);
+
+        list_node_base* prev_node = this->m_prev;
+        NESTL_CHECK_LIST_NODE(prev_node);
+
+        prev_node->m_next = next_node;
+        next_node->m_prev = prev_node;
+
+        /**
+         * @note we do not check `this`, because after `remove` `this` usually will be destroyed
+         */
+        ///NESTL_CHECK_LIST_NODE(this);
+
+        NESTL_CHECK_LIST_NODE(next_node);
+        NESTL_CHECK_LIST_NODE(prev_node);
     }
 
 
-    void transfer(list_node_base* first, list_node_base* last)
+    void transfer(list_node_base* first, list_node_base* last) noexcept
     {
-        NESTL_ASSERT(0 && "not implemented");
+        NESTL_CHECK_LIST_NODE(this);
+        NESTL_CHECK_LIST_NODE(first);
+        NESTL_CHECK_LIST_NODE(last);
+
+        NESTL_ASSERT(this != last);
+
+        last->m_prev->m_next = this;
+        first->m_prev->m_next = last;
+        this->m_prev->m_next = first;
+
+        list_node_base* oldPrev = this->m_prev;
+        this->m_prev = last->m_prev;
+        last->m_prev = first->m_prev;
+        first->m_prev = oldPrev;
+
+        NESTL_CHECK_LIST_NODE(this);
+        NESTL_CHECK_LIST_NODE(first);
+        NESTL_CHECK_LIST_NODE(last);
     }
 };
+
 
 template <typename T>
 struct list_node : public list_node_base
@@ -120,7 +187,7 @@ struct list_node : public list_node_base
 
     T* get_pointer() noexcept
     {
-        return reinterpret_cast<T*>(&m_value);
+        return static_cast<T*>(static_cast<void*>(std::addressof(m_value)));
     }
 
     T& get_reference() noexcept
@@ -131,7 +198,7 @@ struct list_node : public list_node_base
 
     const T* get_pointer() const noexcept
     {
-        return reinterpret_cast<const T*>(&m_value);
+        return static_cast<const T*>(static_cast<const void*>(std::addressof(m_value)));
     }
 
     const T& get_reference() const noexcept
@@ -160,25 +227,28 @@ struct list_iterator
     explicit list_iterator(list_node_base* node)
         : m_node(node)
     {
+        NESTL_CHECK_LIST_NODE(m_node);
     }
 
     reference operator*() const noexcept
     {
-        NESTL_ASSERT(m_node);
+        NESTL_CHECK_LIST_NODE(m_node);
+
         return static_cast<node_t*>(m_node)->get_reference();
     }
 
     pointer operator->() const noexcept
     {
-        NESTL_ASSERT(m_node);
+        NESTL_CHECK_LIST_NODE(m_node);
+
         return static_cast<node_t*>(m_node)->get_pointer();
     }
 
     list_iterator& operator++() noexcept
     {
-        NESTL_ASSERT(m_node);
-        NESTL_ASSERT(m_node->m_next);
+        NESTL_CHECK_LIST_NODE(m_node);
         m_node = m_node->m_next;
+        NESTL_CHECK_LIST_NODE(m_node);
 
         return *this;
     }
@@ -187,19 +257,18 @@ struct list_iterator
     {
         list_iterator res = *this;
 
-        NESTL_ASSERT(m_node);
-        NESTL_ASSERT(m_node->m_next);
-
+        NESTL_CHECK_LIST_NODE(m_node);
         m_node = m_node->m_next;
+        NESTL_CHECK_LIST_NODE(m_node);
 
         return res;
     }
 
     list_iterator& operator--() noexcept
     {
-        NESTL_ASSERT(m_node);
-        NESTL_ASSERT(m_node->m_prev);
+        NESTL_CHECK_LIST_NODE(m_node);
         m_node = m_node->m_prev;
+        NESTL_CHECK_LIST_NODE(m_node);
 
         return *this;
     }
@@ -208,26 +277,33 @@ struct list_iterator
     {
         list_iterator res = *this;
 
-        NESTL_ASSERT(m_node);
-        NESTL_ASSERT(m_node->m_prev);
-
+        NESTL_CHECK_LIST_NODE(m_node);
         m_node = m_node->m_prev;
+        NESTL_CHECK_LIST_NODE(m_node);
 
         return res;
     }
 
     bool operator==(const list_iterator& other) const noexcept
     {
+        NESTL_CHECK_LIST_NODE(m_node);
+        NESTL_CHECK_LIST_NODE(other.m_node);
+
         return m_node == other.m_node;
     }
 
     bool operator!=(const list_iterator& other) const noexcept
     {
+        NESTL_CHECK_LIST_NODE(m_node);
+        NESTL_CHECK_LIST_NODE(other.m_node);
+
         return m_node != other.m_node;
     }
 
     list_node_base* get_list_node() const
     {
+        NESTL_CHECK_LIST_NODE(m_node);
+
         return m_node;
     }
 
@@ -258,31 +334,33 @@ struct list_const_iterator
     explicit list_const_iterator(const list_node_base* node)
         : m_node(node)
     {
+        NESTL_CHECK_LIST_NODE(m_node);
     }
 
     list_const_iterator(const iterator& i) noexcept
         : m_node(i.get_list_node())
     {
+        NESTL_CHECK_LIST_NODE(m_node);
     }
 
 
     reference operator*() const noexcept
     {
-        NESTL_ASSERT(m_node);
+        NESTL_CHECK_LIST_NODE(m_node);
         return static_cast<node_t*>(m_node)->get_reference();
     }
 
     pointer operator->() const noexcept
     {
-        NESTL_ASSERT(m_node);
+        NESTL_CHECK_LIST_NODE(m_node);
         return static_cast<node_t*>(m_node)->get_pointer();
     }
 
     list_const_iterator& operator++() noexcept
     {
-        NESTL_ASSERT(m_node);
-        NESTL_ASSERT(m_node->m_next);
+        NESTL_CHECK_LIST_NODE(m_node);
         m_node = m_node->m_next;
+        NESTL_CHECK_LIST_NODE(m_node);
 
         return *this;
     }
@@ -291,19 +369,18 @@ struct list_const_iterator
     {
         list_const_iterator res = *this;
 
-        NESTL_ASSERT(m_node);
-        NESTL_ASSERT(m_node->m_next);
-
+        NESTL_CHECK_LIST_NODE(m_node);
         m_node = m_node->m_next;
+        NESTL_CHECK_LIST_NODE(m_node);
 
         return res;
     }
 
     list_const_iterator& operator--() noexcept
     {
-        NESTL_ASSERT(m_node);
-        NESTL_ASSERT(m_node->m_prev);
+        NESTL_CHECK_LIST_NODE(m_node);
         m_node = m_node->m_prev;
+        NESTL_CHECK_LIST_NODE(m_node);
 
         return *this;
     }
@@ -312,27 +389,34 @@ struct list_const_iterator
     {
         list_const_iterator res = *this;
 
-        NESTL_ASSERT(m_node);
-        NESTL_ASSERT(m_node->m_prev);
-
+        NESTL_CHECK_LIST_NODE(m_node);
         m_node = m_node->m_prev;
+        NESTL_CHECK_LIST_NODE(m_node);
 
         return res;
     }
 
     bool operator==(const list_const_iterator& other) const noexcept
     {
+        NESTL_CHECK_LIST_NODE(m_node);
+        NESTL_CHECK_LIST_NODE(other.m_node);
+
         return m_node == other.m_node;
     }
 
     bool operator!=(const list_const_iterator& other) const noexcept
     {
+        NESTL_CHECK_LIST_NODE(m_node);
+        NESTL_CHECK_LIST_NODE(other.m_node);
+
         return m_node != other.m_node;
     }
 
 
     list_node_base* get_list_node() const
     {
+        NESTL_CHECK_LIST_NODE(m_node);
+
         return const_cast<list_node_base*>(m_node);
     }
 
@@ -536,6 +620,9 @@ private:
 
     template <typename ... Args>
     operation_error create_node(node_type*& node, Args&& ... args) noexcept;
+
+    template <typename ListIterator1, typename ListIterator2, typename ListIterator3>
+    void transfer(ListIterator1 pos, ListIterator2 first, ListIterator3 last) noexcept;
 };
 
 
@@ -924,12 +1011,14 @@ template<typename ... Args>
 typename list<T, A>::iterator_with_operation_error
 list<T, A>::emplace(const_iterator pos, Args&&... args) noexcept
 {
-    node_type* newNode;
+    node_type* newNode = 0;
     auto err = create_node(newNode, std::forward<Args>(args)...);
     if (err)
     {
         return nestl::make_result_with_operation_error(end(), err);
     }
+    newNode->init_empty();
+    NESTL_CHECK_LIST_NODE(newNode);
 
     newNode->inject(pos.get_list_node());
 
@@ -1022,6 +1111,14 @@ list<T, A>::pop_front() noexcept
     erase(cbegin());
 }
 
+
+template <typename T, typename A>
+void
+list<T, A>::swap(list& other) noexcept
+{
+    swap_data(other);
+}
+
 /// Operations
 
 template <typename T, typename A>
@@ -1035,7 +1132,7 @@ template <typename T, typename A>
 void
 list<T, A>::merge(list&& other) noexcept
 {
-    merge(std::move(other), std::less<T>());
+    merge(std::forward<list&&>(other), std::less<T>());
 }
 
 template <typename T, typename A>
@@ -1051,21 +1148,149 @@ template <typename Compare>
 void
 list<T, A>::merge(list&& other, Compare comp) noexcept
 {
-    NESTL_ASSERT(0 && "not implemented");
+    NESTL_ASSERT(this != &other);
+
+    iterator first1 = begin();
+    iterator last1 = end();
+
+    iterator first2 = other.begin();
+    iterator last2 = other.end();
+
+    while ((first1 != last1) && (first2 != last2))
+    {
+        if (comp(*first2, *first1))
+        {
+            iterator next = first2;
+            transfer(first1, first2, ++next);
+            first2 = next;
+        }
+        else
+        {
+            ++first1;
+        }
+    }
+
+    if (first2 != last2)
+    {
+        transfer(last1, first2, last2);
+    }
+}
+
+template <typename T, typename A>
+void
+list<T, A>::splice(const_iterator pos, list& other) noexcept
+{
+    splice(pos, std::move(other));
+}
+
+template <typename T, typename A>
+void
+list<T, A>::splice(const_iterator pos, list&& other) noexcept
+{
+    if (!other.empty())
+    {
+        this->transfer(pos, other.begin(), other.end());
+    }
+}
+
+template <typename T, typename A>
+void
+list<T, A>::splice(const_iterator pos, list& other, const_iterator it) noexcept
+{
+    splice(pos, std::move(other), it);
+}
+
+template <typename T, typename A>
+void
+list<T, A>::splice(const_iterator pos, list&& /* other */, const_iterator it) noexcept
+{
+    iterator j = iterator(it.get_list_node());
+    ++j;
+    if ((pos == it) || (pos == j))
+    {
+        return;
+    }
+
+    this->transfer(pos, it, j);
+}
+
+template <typename T, typename A>
+void
+list<T, A>::splice(const_iterator pos, list& other, const_iterator first, const_iterator last) noexcept
+{
+    splice(pos, std::move(other), first, last);
+}
+
+template <typename T, typename A>
+void
+list<T, A>::splice(const_iterator pos, list&& other, const_iterator first, const_iterator last) noexcept
+{
+    if (first != last)
+    {
+        this->transfer(pos, first, last);
+    }
+}
+
+
+
+template <typename T, typename A>
+void
+list<T, A>::sort()
+{
+    sort(std::less<value_type>());
+}
+
+template <typename T, typename A>
+template<typename Compare>
+void
+list<T, A>::sort(Compare comp)
+{
+    // Do nothing if the list has length 0 or 1.
+    if ((this->m_node.m_next != &this->m_node) &&
+        (this->m_node.m_next->m_next != &this->m_node))
+    {
+        list carry;
+        list tmp[64];
+        list* fill = &tmp[0];
+        list* counter;
+
+        do
+        {
+            carry.splice(carry.begin(), *this, begin());
+
+            for(counter = &tmp[0]; counter != fill && !counter->empty(); ++counter)
+            {
+                counter->merge(carry, comp);
+                carry.swap(*counter);
+            }
+
+            carry.swap(*counter);
+            if (counter == fill)
+            {
+                ++fill;
+            }
+        }
+        while (!empty());
+
+        for (counter = &tmp[1]; counter != fill; ++counter)
+        {
+            counter->merge(*(counter - 1), comp);
+        }
+        swap( *(fill - 1) );
+    }
 }
 
 
 
 /// Private implementation
 
+
 template <typename T, typename A>
 void
 list<T, A>::init_empty_list() noexcept
 {
-    m_node.m_next = &m_node;
-    m_node.m_prev = &m_node;
+    m_node.init_empty();
 }
-
 
 template <typename T, typename A>
 void
@@ -1123,6 +1348,14 @@ list<T, A>::create_node(node_type*& node, Args&& ... args) noexcept
     node = tmp;
 
     return err;
+}
+
+template <typename T, typename A>
+template <typename ListIterator1, typename ListIterator2, typename ListIterator3>
+void
+list<T, A>::transfer(ListIterator1 pos, ListIterator2 first, ListIterator3 last) noexcept
+{
+    pos.get_list_node()->transfer(first.get_list_node(), last.get_list_node());
 }
 
 } // namespace nestl

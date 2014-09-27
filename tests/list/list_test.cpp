@@ -260,19 +260,76 @@ TYPED_TEST_P(ListTestNumeric, PopBackFromListWith2Elements)
 
 TYPED_TEST_P(ListTestNumeric, MergeTwoNonEmptyLists)
 {
+
+    {
+        std::list<int> l1;
+        l1.assign({0, 2, 4, 6});
+
+        std::list<int> l2;
+        l2.assign({1, 3, 5, 7});
+
+        l1.merge(l2);
+        ASSERT_TRUE(CheckListSize(l2, 0));
+
+        ASSERT_TRUE(CheckListSize(l1, 8));
+
+        auto it = l1.begin();
+        for (int i = 0; i != 8; ++i, ++it)
+        {
+            EXPECT_EQ(i, *it);
+        }
+    }
+
+
+
     typename TestFixture::list_t l1;
     ASSERT_OPERATION_SUCCESS(l1.assign({0, 2, 4, 6}));
 
     typename TestFixture::list_t l2;
-    ASSERT_OPERATION_SUCCESS(l1.assign({1, 3, 5, 7}));
+    ASSERT_OPERATION_SUCCESS(l2.assign({1, 3, 5, 7}));
 
     l1.merge(l2);
     ASSERT_TRUE(CheckListSize(l2, 0));
 
     ASSERT_TRUE(CheckListSize(l1, 8));
 
-    auto it = l2.begin();
-    for (int i = 0; i != 8; ++i)
+    auto it = l1.begin();
+    for (int i = 0; i != 8; ++i, ++it)
+    {
+        EXPECT_EQ(i, *it);
+    }
+}
+
+
+TYPED_TEST_P(ListTestNumeric, SortEmptyList)
+{
+    typename TestFixture::list_t l;
+
+    l.sort();
+    ASSERT_TRUE(CheckListSize(l, 0));
+}
+
+TYPED_TEST_P(ListTestNumeric, SortListWithOneElement)
+{
+    typename TestFixture::list_t l;
+    ASSERT_OPERATION_SUCCESS(l.assign({0}));
+
+    l.sort();
+    ASSERT_TRUE(CheckListSize(l, 1));
+    EXPECT_EQ(0, l.front());
+}
+
+
+TYPED_TEST_P(ListTestNumeric, SortListWithSeveralElements)
+{
+    typename TestFixture::list_t l;
+    ASSERT_OPERATION_SUCCESS(l.assign({0, 4, 2, 3, 1}));
+
+    l.sort();
+    ASSERT_TRUE(CheckListSize(l, 5));
+
+    auto it = l.begin();
+    for (int i = 0; i != 5; ++i, ++it)
     {
         EXPECT_EQ(i, *it);
     }
@@ -288,7 +345,10 @@ REGISTER_TYPED_TEST_CASE_P(ListTestNumeric,
                            PopBackFromListWith1Element,
                            PopFrontFromListWith2Elements,
                            PopBackFromListWith2Elements,
-                           MergeTwoNonEmptyLists);
+                           MergeTwoNonEmptyLists,
+                           SortEmptyList,
+                           SortListWithOneElement,
+                           SortListWithSeveralElements);
 
 INSTANTIATE_TYPED_TEST_CASE_P(numeric_list_test, ListTestNumeric, ListNumericTypes);
 
