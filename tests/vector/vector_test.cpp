@@ -19,13 +19,6 @@ class VectorTestCommon : public VectorTestBase<TypeWithAllocator>
 TYPED_TEST_CASE_P(VectorTestCommon);
 
 
-TYPED_TEST_P(VectorTestCommon, ConstructorWithoutParameters)
-{
-    typename TestFixture::vector_t vec;
-
-    EXPECT_TRUE(CheckVectorSize(vec, 0));
-}
-
 TYPED_TEST_P(VectorTestCommon, CheckAssignWithSize0)
 {
     typename TestFixture::vector_t vec;
@@ -93,13 +86,12 @@ TYPED_TEST_P(VectorTestCommon, CheckInsertIntoEmptyVector)
 
 
 REGISTER_TYPED_TEST_CASE_P(VectorTestCommon,
-                           ConstructorWithoutParameters,
                            CheckAssignWithSize0,
                            CheckAssignWithSize1,
                            CheckAssignWithSize1024,
                            CheckInsertIntoEmptyVector);
 
-INSTANTIATE_TYPED_TEST_CASE_P(common_vector_test, VectorTestCommon, VectorCommonTypes);
+INSTANTIATE_TYPED_TEST_CASE_P(common_vector_test, VectorTestCommon, VectorCommonTypesWithDefaultAllocator);
 
 
 ////////////////////////////////////////////////////////////////////////////////

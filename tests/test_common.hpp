@@ -2,12 +2,8 @@
 #define NESTL_TESTS_TEST_COMMON_HPP
 
 #include "tests/nestl_printers.hpp"
+#include "tests/allocators.hpp"
 #include <gmock/gmock.h>
-
-
-
-
-
 
 
 namespace nestl
@@ -41,8 +37,6 @@ struct checker
         return ::testing::AssertionSuccess();
     }
 };
-
-
 
 
 #define EXPECT_OPERATION_SUCCESS(val) EXPECT_PRED1(checker(), val)

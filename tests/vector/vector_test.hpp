@@ -76,6 +76,14 @@ public:
 };
 
 
+/**
+ * @brief base class for all vector tests
+ */
+class VectorTestBase2 : public ::testing::Test
+{
+};
+
+
 
 /**
  * @brief Type list definitions for tests
@@ -87,14 +95,41 @@ typedef ::testing::Types
     type_with_allocator<nestl::vector<int> >,
     type_with_allocator<non_copyable>,
     type_with_allocator<nestl::vector<non_copyable> >
-> VectorCommonTypes;
+> VectorCommonTypesWithDefaultAllocator;
+
+
+typedef ::testing::Types
+<
+    type_with_allocator<int, zero_allocator<int> >,
+    type_with_allocator<nestl::vector<int>, zero_allocator<nestl::vector<int> > >,
+    type_with_allocator<non_copyable, zero_allocator<non_copyable> >,
+    type_with_allocator<nestl::vector<non_copyable>, zero_allocator<nestl::vector<non_copyable> > >
+> VectorCommonTypesWithZeroAllocator;
+
+
+
+
+typedef ::testing::Types
+<
+    type_with_allocator<int>,
+    type_with_allocator<nestl::vector<int> >,
+    type_with_allocator<non_copyable>,
+    type_with_allocator<nestl::vector<non_copyable> >,
+
+    type_with_allocator<int, zero_allocator<int> >,
+    type_with_allocator<nestl::vector<int>, zero_allocator<nestl::vector<int> > >,
+    type_with_allocator<non_copyable, zero_allocator<non_copyable> >,
+    type_with_allocator<nestl::vector<non_copyable>, zero_allocator<nestl::vector<non_copyable> > >
+> VectorCommonTypesWithDifferentAllocators;
+
+
 
 typedef ::testing::Types
 <
     type_with_allocator<int>
 > VectorNumericTypes;
 
-typedef VectorCommonTypes VectorCopyableTypes;
+typedef VectorCommonTypesWithDefaultAllocator VectorCopyableTypes;
 
 
 } // namespace test

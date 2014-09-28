@@ -10,6 +10,36 @@
 namespace nestl
 {
 
+
+template <typename Allocator>
+struct allocator_traits
+{
+    typedef Allocator                           allocator_type;
+    typedef typename allocator_type::value_type value_type;
+
+
+/**
+ * @note This macro allows to use nested type of allocator (if it has corresponding type)
+ * Otherwise it declares type usign default type
+ *
+ * @note This macro is taken from stdlibc++
+ */
+#define NESTL_ALLOC_DECLARE_NESTED_TYPE(NestedType, DefaultType) \
+  private: \
+  template<typename T> \
+    static typename T::NestedType NESTL_##NestedType##_helper(T*); \
+  static DefaultType NESTL_##NestedType##_helper(...); \
+    typedef decltype(NESTL_##NestedType##_helper((Allocator*)0)) nestl_nested_type_##NestedType; \
+  public:
+
+
+
+#undef NESTL_ALLOC_DECLARE_NESTED_TYPE
+
+};
+
+
+
 template <typename OperationError, typename InputIterator, typename ForwardIterator, typename Allocator>
 OperationError uninitialised_copy(InputIterator first, InputIterator last, ForwardIterator output, Allocator& alloc) noexcept
 {
