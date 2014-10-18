@@ -113,9 +113,9 @@ TYPED_TEST_P(ListTestNumeric, CheckAssignFromIterators)
 {
     typename TestFixture::list_t l;
     typename TestFixture::value_type values [] = {0, 1, 2, 3, 4, 5};
-    const size_t expectedSize = std::distance(std::begin(values), std::end(values));
+    const size_t expectedSize = nestl::distance(nestl::begin(values), nestl::end(values));
 
-    ASSERT_OPERATION_SUCCESS(l.assign(std::begin(values), std::end(values)));
+    ASSERT_OPERATION_SUCCESS(l.assign(nestl::begin(values), nestl::end(values)));
 
     ASSERT_TRUE(CheckListSize(l, expectedSize));
 
@@ -260,7 +260,7 @@ TYPED_TEST_P(ListTestNumeric, PopBackFromListWith2Elements)
 
 TYPED_TEST_P(ListTestNumeric, MergeTwoNonEmptyLists)
 {
-
+#if 0
     {
         std::list<int> l1;
         l1.assign({0, 2, 4, 6});
@@ -279,7 +279,7 @@ TYPED_TEST_P(ListTestNumeric, MergeTwoNonEmptyLists)
             EXPECT_EQ(i, *it);
         }
     }
-
+#endif //0
 
 
     typename TestFixture::list_t l1;

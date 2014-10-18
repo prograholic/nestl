@@ -14,7 +14,7 @@ namespace test
 
 struct checker
 {
-    ::testing::AssertionResult operator()(const std::error_condition& ec)
+    ::testing::AssertionResult operator()(const nestl::error_condition& ec)
     {
         if (ec)
         {
@@ -59,20 +59,20 @@ struct type_with_allocator
 
 struct non_copyable : private nestl::noncopyable
 {
-    non_copyable()
+    non_copyable() NESTL_NOEXCEPT_SPEC
         : v(0)
     {
     }
 
-    non_copyable(int x)
+    non_copyable(int x) NESTL_NOEXCEPT_SPEC
         : v(x)
     {
     }
 
-    std::error_condition assign(const non_copyable& other) noexcept
+    nestl::error_condition assign(const non_copyable& other) NESTL_NOEXCEPT_SPEC
     {
         v = other.v;
-        return std::error_condition();
+        return nestl::error_condition();
     }
 
     int v;
@@ -98,7 +98,9 @@ template <>
 struct class_traits<test::non_copyable>
 {
     template <typename OperationError, typename Allocator>
-    static OperationError construct(test::non_copyable* ptr, Allocator& alloc, const test::non_copyable& other) noexcept
+    static OperationError construct(test::non_copyable* ptr,
+                                    Allocator& alloc,
+                                    const test::non_copyable& other) NESTL_NOEXCEPT_SPEC
     {
         alloc.construct(ptr);
 
@@ -116,7 +118,7 @@ struct class_traits<test::non_copyable>
     }
 
     template <typename OperationError, typename Allocator>
-    static OperationError construct(test::non_copyable* ptr, Allocator& alloc) noexcept
+    static OperationError construct(test::non_copyable* ptr, Allocator& alloc) NESTL_NOEXCEPT_SPEC
     {
         alloc.construct(ptr);
         return OperationError();

@@ -30,7 +30,7 @@ template <typename List>
             "while it should be " << shouldBeEmpty;
     }
 
-    size_t dist = std::distance(l.begin(), l.end());
+    size_t dist = nestl::distance(l.begin(), l.end());
     if (dist != expectedSize)
     {
         return ::testing::AssertionFailure() <<
@@ -38,7 +38,7 @@ template <typename List>
             "got " << dist << " elements";
     }
 
-    size_t cdist = std::distance(l.cbegin(), l.cend());
+    size_t cdist = nestl::distance(l.cbegin(), l.cend());
     if (cdist != expectedSize)
     {
         return ::testing::AssertionFailure() <<

@@ -16,11 +16,11 @@ namespace noncopyable_  // protection from unintended ADL
 class noncopyable
 {
 protected:
-    constexpr noncopyable() = default;
-    ~noncopyable() = default;
+    NESTL_CONSTEXPR noncopyable() NESTL_COMPILER_GENERATED_IMPL;
+    ~noncopyable() NESTL_COMPILER_GENERATED_IMPL;
 
-    noncopyable( const noncopyable& ) = delete;
-    noncopyable& operator=( const noncopyable& ) = delete;
+    noncopyable( const noncopyable& ) NESTL_DELETED_IMPL;
+    noncopyable& operator=( const noncopyable& ) NESTL_DELETED_IMPL;
 };
 
 } // namespace noncopyable_

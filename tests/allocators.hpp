@@ -2,9 +2,10 @@
 #define NESTL_TESTS_ALLOCATORS_HPP
 
 #include <nestl/allocator.hpp>
+#include <nestl/shared_ptr.hpp>
+#include <nestl/move.hpp>
 
 #include <set>
-#include <memory>
 
 #include <gtest/gtest.h>
 
@@ -24,25 +25,25 @@ public:
 
     typedef T value_type;
 
-    minimal_allocator() noexcept
+    minimal_allocator() NESTL_NOEXCEPT_SPEC
     {
     }
 
-    minimal_allocator(const minimal_allocator& other) noexcept
+    minimal_allocator(const minimal_allocator& other) NESTL_NOEXCEPT_SPEC
     {
     }
 
     template <typename Y>
-    minimal_allocator(const minimal_allocator<Y>& other) noexcept
+    minimal_allocator(const minimal_allocator<Y>& other) NESTL_NOEXCEPT_SPEC
     {
     }
 
-    T* allocate(std::size_t n, const void* /* hint */ = 0) noexcept
+    T* allocate(std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
         return static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
     }
 
-    void deallocate(T* p, std::size_t /* n */) noexcept
+    void deallocate(T* p, std::size_t /* n */) NESTL_NOEXCEPT_SPEC
     {
         ::operator delete(p);
     }
@@ -59,29 +60,29 @@ public:
 
     typedef T               value_type;
 
-    zero_allocator() noexcept
+    zero_allocator() NESTL_NOEXCEPT_SPEC
     {
     }
 
-    zero_allocator(const zero_allocator& other) noexcept
+    zero_allocator(const zero_allocator& other) NESTL_NOEXCEPT_SPEC
     {
     }
 
     template <typename Y>
-    zero_allocator(const zero_allocator<Y>& other) noexcept
+    zero_allocator(const zero_allocator<Y>& other) NESTL_NOEXCEPT_SPEC
     {
     }
 
-    ~zero_allocator() noexcept
+    ~zero_allocator() NESTL_NOEXCEPT_SPEC
     {
     }
 
-    T* allocate(std::size_t n, const void* /* hint */ = 0) noexcept
+    T* allocate(std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
         return 0;
     }
 
-    void deallocate(T* p, std::size_t /* n */) noexcept
+    void deallocate(T* p, std::size_t /* n */) NESTL_NOEXCEPT_SPEC
     {
         ::operator delete(p);
     }
@@ -98,37 +99,79 @@ public:
 
     typedef T               value_type;
 
-    allocator_with_state() noexcept
-        : m_allocated_storage(std::make_shared<std::set<void*> >())
+    allocator_with_state() NESTL_NOEXCEPT_SPEC
+        : m_allocated_storage()
     {
+         nestl::error_condition err = nestl::make_shared(m_allocated_storage);
+         if (err)
+         {
+             ADD_FAILURE() << "make_shared failed";
+         }
     }
 
-    allocator_with_state(const allocator_with_state& other) noexcept
+    allocator_with_state(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
         : m_allocated_storage(other.m_allocated_storage)
     {
     }
 
     template <typename Y>
-    allocator_with_state(const allocator_with_state<Y>& other) noexcept
+    allocator_with_state(const allocator_with_state<Y>& other) NESTL_NOEXCEPT_SPEC
         : m_allocated_storage(other.m_allocated_storage)
     {
     }
 
-    ~allocator_with_state() noexcept
+    allocator_with_state(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
+        : m_allocated_storage(nestl::move(other.m_allocated_storage))
     {
-        if (!m_allocated_storage->empty())
+    }
+
+    template <typename Y>
+    allocator_with_state(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
+        : m_allocated_storage(nestl::move(other.m_allocated_storage))
+    {
+    }
+
+    allocator_with_state& operator=(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
+    {
+        m_allocated_storage = other.m_allocated_storage;
+        return *this;
+    }
+
+    template <typename Y>
+    allocator_with_state& operator=(const allocator_with_state<Y>& other) NESTL_NOEXCEPT_SPEC
+    {
+        m_allocated_storage = other.m_allocated_storage;
+        return *this;
+    }
+
+    allocator_with_state& operator=(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
+    {
+        m_allocated_storage = nestl::move(other.m_allocated_storage);
+        return *this;
+    }
+
+    template <typename Y>
+    allocator_with_state& operator=(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
+    {
+        m_allocated_storage = nestl::move(other.m_allocated_storage);
+        return *this;
+    }
+
+    ~allocator_with_state() NESTL_NOEXCEPT_SPEC
+    {
+        if (m_allocated_storage && !m_allocated_storage->empty())
         {
             ADD_FAILURE() << "memory leaks detected!!!";
         }
     }
 
-    T* allocate(std::size_t n, const void* /* hint */ = 0) noexcept
+    T* allocate(std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
         T* res = static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
 
 
-        auto pos = m_allocated_storage->find(res);
-        if (pos == m_allocated_storage->end())
+        std::set<void*>::const_iterator pos = m_allocated_storage->find(res);
+        if (pos != m_allocated_storage->end())
         {
             ADD_FAILURE() << "pointer [" << static_cast<void*>(res) << "] already belong to this allocator";
 
@@ -142,16 +185,19 @@ public:
         return res;
     }
 
-    void deallocate(T* p, std::size_t /* n */) noexcept
+    void deallocate(T* p, std::size_t /* n */) NESTL_NOEXCEPT_SPEC
     {
-        auto pos = m_allocated_storage->find(p);
+        std::set<void*>::const_iterator pos = m_allocated_storage->find(p);
         if (pos == m_allocated_storage->end())
         {
-            ADD_FAILURE() << "pointer [" << static_cast<void*>(p) << "] does not belong to this allocator";
+            if (p)
+            {
+                ADD_FAILURE() << "pointer [" << static_cast<void*>(p) << "] does not belong to this allocator";
 
-            /**
-             * @note possible memory leak here, because we do not know how to deallocate
-             */
+                /**
+                 * @note possible memory leak here, because we do not know how to deallocate
+                 */
+            }
         }
         else
         {
@@ -164,7 +210,7 @@ public:
 
 private:
 
-    std::shared_ptr<std::set<void*> > m_allocated_storage;
+    nestl::shared_ptr<std::set<void*> > m_allocated_storage;
 };
 
 

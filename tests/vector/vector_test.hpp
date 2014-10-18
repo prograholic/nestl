@@ -38,7 +38,7 @@ template <typename Vector>
     }
 
 
-    size_t dist = std::distance(v.begin(), v.end());
+    size_t dist = nestl::distance(v.begin(), v.end());
     if (dist != expectedSize)
     {
         return ::testing::AssertionFailure() <<
@@ -46,7 +46,7 @@ template <typename Vector>
             "got " << dist << " elements";
     }
 
-    size_t cdist = std::distance(v.cbegin(), v.cend());
+    size_t cdist = nestl::distance(v.cbegin(), v.cend());
     if (cdist != expectedSize)
     {
         return ::testing::AssertionFailure() <<
@@ -93,8 +93,8 @@ typedef ::testing::Types
 <
     type_with_allocator<int>,
     type_with_allocator<nestl::vector<int> >,
-    type_with_allocator<non_copyable>,
-    type_with_allocator<nestl::vector<non_copyable> >
+    type_with_allocator<non_copyable>/*,
+    type_with_allocator<nestl::vector<non_copyable> > */
 > VectorCommonTypesWithDefaultAllocator;
 
 

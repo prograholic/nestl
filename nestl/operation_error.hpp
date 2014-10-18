@@ -3,7 +3,8 @@
 
 #include <nestl/config.hpp>
 
-#include <type_traits>
+#include <nestl/type_traits.hpp>
+//#include <nestl/string.hpp>
 
 namespace nestl
 {
@@ -16,15 +17,11 @@ template <typename OperationError>
 struct operation_error_traits
 {
 
-    static int value(const OperationError& e) noexcept
+    static int value(const OperationError& e) NESTL_NOEXCEPT_SPEC
     {
         return e.value();
     }
 
-    static std::string message(const OperationError& e)
-    {
-        return e.message();
-    }
 };
 
 
@@ -32,16 +29,11 @@ namespace error_info
 {
 
 template <typename OperationError>
-int value(const OperationError& e) noexcept
+int value(const OperationError& e) NESTL_NOEXCEPT_SPEC
 {
     return nestl::operation_error_traits<OperationError>::value(e);
 }
 
-template <typename OperationError>
-std::string message(const OperationError& e)
-{
-    return nestl::operation_error_traits<OperationError>::message(e);
-}
 
 } // namespace error_info
 
@@ -57,26 +49,39 @@ public:
     {
     }
 
-    result_with_operation_error(const Type& val, const OperationError& err) noexcept
+    result_with_operation_error(const Type& val, const OperationError& err) NESTL_NOEXCEPT_SPEC
         : m_val(val)
         , m_error(err)
     {
     }
 
-    const OperationError& error() const noexcept
+    const OperationError& error() const NESTL_NOEXCEPT_SPEC
     {
         return m_error;
     }
 
-    const Type& result() const noexcept
+    const Type& result() const NESTL_NOEXCEPT_SPEC
     {
         return m_val;
     }
 
-    explicit operator bool() const noexcept
+#if NESTL_HAS_EXPLICIT_OPERATOR
+
+    explicit operator bool() const NESTL_NOEXCEPT_SPEC
     {
         return m_error ? true : false;
     }
+
+#else /* NESTL_HAS_EXPLICIT_OPERATOR */
+
+    typedef OperationError result_with_operation_error::*unspecified_bool_type;
+
+    operator unspecified_bool_type() const NESTL_NOEXCEPT_SPEC
+    {
+        return m_error ? &result_with_operation_error::m_error : 0;
+    }
+
+#endif /* NESTL_HAS_EXPLICIT_OPERATOR */
 
 private:
     Type m_val;
@@ -86,7 +91,7 @@ private:
 
 template <typename Type, typename OperationError>
 result_with_operation_error<Type, OperationError>
-make_result_with_operation_error(const Type& val, const OperationError& err) noexcept
+make_result_with_operation_error(const Type& val, const OperationError& err) NESTL_NOEXCEPT_SPEC
 {
     return result_with_operation_error<Type, OperationError>(val, err);
 }
@@ -100,14 +105,9 @@ struct operation_error_traits <result_with_operation_error<Type, OperationError>
 
     typedef result_with_operation_error<Type, OperationError> operation_error;
 
-    static int value(const operation_error& e) noexcept
+    static int value(const operation_error& e) NESTL_NOEXCEPT_SPEC
     {
         return e.error().value();
-    }
-
-    static std::string message(const operation_error& e)
-    {
-        return e.error().message();
     }
 };
 

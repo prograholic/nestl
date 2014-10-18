@@ -4,24 +4,41 @@ project(nestl)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_compile_options(-std=c++11)
+
+if (NESTL_ENABLE_CXX11)
+  message(STATUS "Using nestl with c++ 11 features")
+  add_compile_options(-std=c++11)
+else()
+  message(STATUS "Using nestl with c++ 03 features")
+endif()
 
 
 set (nestl_sources
 	nestl/nestl.cpp
 
+	nestl/addressof.hpp
 	nestl/algorithm.hpp
+	nestl/alignment.hpp
 	nestl/allocator.hpp
+	nestl/allocator_traits.hpp
+	nestl/assert.hpp
+	nestl/char_traits.hpp
 	nestl/class_traits.hpp
 	nestl/config.hpp
+	nestl/declval.hpp
+	nestl/initializer_list.hpp
 	nestl/iterator.hpp
+	nestl/list.hpp
 	nestl/memory.hpp
+	nestl/move.hpp
 	nestl/noncopyable.hpp
+	nestl/operation_error.hpp
 	nestl/shared_ptr.hpp
+	nestl/static_assert.hpp
+	nestl/string.hpp
+	nestl/system_error.hpp
 	nestl/type_traits.hpp
 	nestl/vector.hpp
-	nestl/operation_error.hpp
-	nestl/list.hpp
 )
 
 

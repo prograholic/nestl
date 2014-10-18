@@ -14,13 +14,12 @@
 #include <nestl/noncopyable.hpp>
 #include <nestl/class_traits.hpp>
 #include <nestl/operation_error.hpp>
+#include <nestl/algorithm.hpp>
+#include <nestl/system_error.hpp>
+#include <nestl/initializer_list.hpp>
+#include <nestl/iterator.hpp>
 
-
-#include <system_error>
-#include <initializer_list>
-#include <iterator>
-
-#include <list>
+//#include <list>
 
 namespace nestl
 {
@@ -208,16 +207,17 @@ struct list_node : public list_node_base
 };
 
 
-template <typename T>
+template <typename T, typename OperationError>
 struct list_iterator
 {
-    typedef std::ptrdiff_t                  difference_type;
-    typedef std::bidirectional_iterator_tag iterator_category;
-    typedef T                               value_type;
-    typedef T*                              pointer;
-    typedef T&                              reference;
+    typedef ptrdiff_t                         difference_type;
+    typedef nestl::bidirectional_iterator_tag iterator_category;
+    typedef T                                 value_type;
+    typedef T*                                pointer;
+    typedef T&                                reference;
+    typedef OperationError                    operation_error;
 
-    typedef list_node<T>                    node_t;
+    typedef list_node<T>                      node_t;
 
     list_iterator()
         : m_node()
@@ -230,14 +230,14 @@ struct list_iterator
         NESTL_CHECK_LIST_NODE(m_node);
     }
 
-    reference operator*() const noexcept
+    reference operator*() const NESTL_NOEXCEPT_SPEC
     {
         NESTL_CHECK_LIST_NODE(m_node);
 
         return static_cast<node_t*>(m_node)->get_reference();
     }
 
-    pointer operator->() const noexcept
+    pointer operator->() const NESTL_NOEXCEPT_SPEC
     {
         NESTL_CHECK_LIST_NODE(m_node);
 
@@ -313,18 +313,19 @@ private:
 };
 
 
-template <typename T>
+template <typename T, typename OperationError>
 struct list_const_iterator
 {
-    typedef std::ptrdiff_t                  difference_type;
-    typedef std::bidirectional_iterator_tag iterator_category;
-    typedef T                               value_type;
-    typedef const T*                        pointer;
-    typedef const T&                        reference;
+    typedef ptrdiff_t                         difference_type;
+    typedef nestl::bidirectional_iterator_tag iterator_category;
+    typedef T                                 value_type;
+    typedef const T*                          pointer;
+    typedef const T&                          reference;
+    typedef OperationError                    operation_error;
 
-    typedef list_iterator<T>                iterator;
+    typedef list_iterator<T, operation_error> iterator;
 
-    typedef const list_node<T>              node_t;
+    typedef const list_node<T>                node_t;
 
     list_const_iterator()
         : m_node()
@@ -439,13 +440,14 @@ public:
     typedef const T&                                                      const_reference;
     typedef typename std::allocator_traits<allocator_type>::pointer       pointer;
     typedef typename std::allocator_traits<allocator_type>::const_pointer const_pointer;
-
-    typedef detail::list_iterator<value_type>                             iterator;
-    typedef detail::list_const_iterator<value_type>                       const_iterator;
-    typedef std::reverse_iterator<iterator>                               reverse_iterator;
-    typedef std::reverse_iterator<const_iterator>                         const_reverse_iterator;
-
     typedef std::error_condition                                          operation_error;
+
+    typedef detail::list_iterator<value_type, operation_error>            iterator;
+    typedef detail::list_const_iterator<value_type, operation_error>      const_iterator;
+    typedef nestl::reverse_iterator<iterator>                             reverse_iterator;
+    typedef nestl::reverse_iterator<const_iterator>                       const_reverse_iterator;
+
+
     typedef nestl::result_with_operation_error<iterator, operation_error> iterator_with_operation_error;
 
     // constructors
@@ -927,7 +929,7 @@ template <typename T, typename A>
 typename list<T, A>::size_type
 list<T, A>::size() const noexcept
 {
-    return std::distance(cbegin(), cend());
+    return nestl::distance(cbegin(), cend());
 }
 
 template <typename T, typename A>

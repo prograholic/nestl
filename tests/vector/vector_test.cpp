@@ -1,5 +1,6 @@
 #include "tests/vector/vector_test.hpp"
 
+#include <nestl/algorithm.hpp>
 
 namespace nestl
 {
@@ -55,8 +56,8 @@ TYPED_TEST_P(VectorTestCommon, CheckAssignWithSize1024)
 
     ASSERT_TRUE(CheckVectorSize(vec, expectedSize));
 
-    auto constIt = vec.cbegin();
-    auto it = vec.begin();
+    typename TestFixture::vector_t::const_iterator constIt = vec.cbegin();
+    typename TestFixture::vector_t::iterator it = vec.begin();
     for (size_t i = 0; i != expectedSize; ++i)
     {
         EXPECT_EQ(defaultParam, *constIt);
@@ -106,16 +107,19 @@ TYPED_TEST_CASE_P(VectorTestNumeric);
 
 TYPED_TEST_P(VectorTestNumeric, CheckAssignFromIterators)
 {
+    typedef typename TestFixture::vector_t::const_iterator const_iterator;
+    typedef typename TestFixture::vector_t::iterator       iterator;
+
     typename TestFixture::vector_t vec;
     typename TestFixture::value_type values [] = {0, 1, 2, 3, 4, 5};
-    const size_t expectedSize = std::distance(std::begin(values), std::end(values));
+    const size_t expectedSize = nestl::distance(nestl::begin(values), nestl::end(values));
 
-    ASSERT_OPERATION_SUCCESS(vec.assign(std::begin(values), std::end(values)));
+    ASSERT_OPERATION_SUCCESS(vec.assign(nestl::begin(values), nestl::end(values)));
 
     ASSERT_TRUE(CheckVectorSize(vec, expectedSize));
 
-    auto constIt = vec.cbegin();
-    auto it = vec.begin();
+    const_iterator constIt = vec.cbegin();
+    iterator it = vec.begin();
     for (size_t i = 0; i != expectedSize; ++i)
     {
         EXPECT_EQ(values[i], *constIt);
@@ -127,22 +131,25 @@ TYPED_TEST_P(VectorTestNumeric, CheckAssignFromIterators)
     }
 }
 
-
+#if NESTL_HAS_INITIALIZER_LIST
 
 TYPED_TEST_P(VectorTestNumeric, CheckAssignFromInitializerList)
 {
+    typedef typename TestFixture::vector_t::const_iterator const_iterator;
+    typedef typename TestFixture::vector_t::iterator       iterator;
+
     #define INITIALIZER_LIST_VALUES {0, 1, 2, 3, 4, 5}
 
     typename TestFixture::vector_t vec;
     typename TestFixture::value_type values [] = INITIALIZER_LIST_VALUES;
-    const size_t expectedSize = std::distance(std::begin(values), std::end(values));
+    const size_t expectedSize = nestl::distance(nestl::begin(values), nestl::end(values));
 
     ASSERT_OPERATION_SUCCESS(vec.assign(INITIALIZER_LIST_VALUES));
 
     ASSERT_TRUE(CheckVectorSize(vec, expectedSize));
 
-    auto constIt = vec.cbegin();
-    auto it = vec.begin();
+    const_iterator constIt = vec.cbegin();
+    iterator it = vec.begin();
     for (size_t i = 0; i != expectedSize; ++i)
     {
         EXPECT_EQ(values[i], *constIt);
@@ -156,13 +163,21 @@ TYPED_TEST_P(VectorTestNumeric, CheckAssignFromInitializerList)
     #undef INITIALIZER_LIST_VALUES
 }
 
+#endif /* NESTL_HAS_INITIALIZER_LIST */
+
+
 TYPED_TEST_P(VectorTestNumeric, InsertOneElementBeforeBeginToNonEmptyVector)
 {
+    typedef typename TestFixture::vector_t::iterator_with_operation_error iterator_with_operation_error;
+
     typename TestFixture::vector_t vec;
 
-    ASSERT_OPERATION_SUCCESS(vec.assign({1, 2, 3, 4}));
+    ASSERT_OPERATION_SUCCESS(vec.push_back(1));
+    ASSERT_OPERATION_SUCCESS(vec.push_back(2));
+    ASSERT_OPERATION_SUCCESS(vec.push_back(3));
+    ASSERT_OPERATION_SUCCESS(vec.push_back(4));
 
-    auto st = vec.insert(vec.begin(), 0);
+    iterator_with_operation_error st = vec.insert(vec.begin(), 0);
     ASSERT_OPERATION_SUCCESS(st);
     ASSERT_TRUE(CheckVectorSize(vec, 5));
     ASSERT_EQ(vec.begin(), st.result());
@@ -176,11 +191,16 @@ TYPED_TEST_P(VectorTestNumeric, InsertOneElementBeforeBeginToNonEmptyVector)
 
 TYPED_TEST_P(VectorTestNumeric, InsertOneElementBeforeEndToNonEmptyVector)
 {
+    typedef typename TestFixture::vector_t::iterator_with_operation_error iterator_with_operation_error;
+
     typename TestFixture::vector_t vec;
 
-    ASSERT_OPERATION_SUCCESS(vec.assign({0, 1, 2, 3}));
+    ASSERT_OPERATION_SUCCESS(vec.push_back(0));
+    ASSERT_OPERATION_SUCCESS(vec.push_back(1));
+    ASSERT_OPERATION_SUCCESS(vec.push_back(2));
+    ASSERT_OPERATION_SUCCESS(vec.push_back(3));
 
-    auto st = vec.insert(vec.end(), 4);
+    iterator_with_operation_error st = vec.insert(vec.end(), 4);
     ASSERT_OPERATION_SUCCESS(st);
     ASSERT_TRUE(CheckVectorSize(vec, 5));
     ASSERT_EQ(vec.end() - 1, st.result());
@@ -193,10 +213,11 @@ TYPED_TEST_P(VectorTestNumeric, InsertOneElementBeforeEndToNonEmptyVector)
 }
 
 
-
 REGISTER_TYPED_TEST_CASE_P(VectorTestNumeric,
                            CheckAssignFromIterators,
+#if NESTL_HAS_INITIALIZER_LIST
                            CheckAssignFromInitializerList,
+#endif /* NESTL_HAS_INITIALIZER_LIST */
                            InsertOneElementBeforeBeginToNonEmptyVector,
                            InsertOneElementBeforeEndToNonEmptyVector);
 
@@ -248,3 +269,4 @@ INSTANTIATE_TYPED_TEST_CASE_P(copyable_vector_test, VectorTestWithCopyableObject
 } // namespace test
 
 } // namespace nestl
+
