@@ -8,6 +8,7 @@
 #include <nestl/allocator.hpp>
 #include <nestl/alignment.hpp>
 #include <nestl/assert.hpp>
+#include <nestl/swap.hpp>
 
 #include <nestl/detail/construct.hpp>
 
@@ -130,6 +131,19 @@ public:
 
 #else /* NESTL_HAS_VARIADIC_TEMPLATES */
 
+    operation_error initialize() NESTL_NOEXCEPT_SPEC
+    {
+        operation_error err = nestl::detail::construct<operation_error>(get(), m_allocator);
+        return err;
+    }
+
+    template <typename Arg>
+    operation_error initialize(const Arg& arg) NESTL_NOEXCEPT_SPEC
+    {
+        operation_error err = nestl::detail::construct<operation_error>(get(), m_allocator, arg);
+        return err;
+    }
+
 #endif /* NESTL_HAS_VARIADIC_TEMPLATES */
 
 private:
@@ -225,6 +239,10 @@ private:
     friend
     typename shared_ptr<Type>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, Args&& ... args);
 #else /* NESTL_HAS_VARIADIC_TEMPLATES */
+    template <typename Type, typename Allocator, typename Y>
+    friend
+    typename shared_ptr<Type>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc);
+
     template <typename Type, typename Allocator, typename Y, typename Arg>
     friend
     typename shared_ptr<Type>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, const Arg& arg);
@@ -333,7 +351,7 @@ public:
 #if NESTL_HAS_RVALUE_REF
     weak_ptr& operator=(weak_ptr&& other) NESTL_NOEXCEPT_SPEC
     {
-        const weak_ptr tmp(std::move(*this));
+        const weak_ptr tmp(nestl::move(*this));
 
         m_ptr = other.m_ptr;
         m_refcount = other.m_refcount;
@@ -469,7 +487,7 @@ shared_ptr<T>& shared_ptr<T>::operator=(shared_ptr<Y>&& other) NESTL_NOEXCEPT_SP
 {
     if (&other != this)
     {
-        const shared_ptr tmp(std::move(*this));
+        const shared_ptr tmp(nestl::move(*this));
 
         this->swap(other);
     }
@@ -496,8 +514,8 @@ void shared_ptr<T>::reset() NESTL_NOEXCEPT_SPEC
 template <typename T>
 void shared_ptr<T>::swap(shared_ptr& other) NESTL_NOEXCEPT_SPEC
 {
-    std::swap(m_ptr, other.m_ptr);
-    std::swap(m_refcount, other.m_refcount);
+    nestl::swap(m_ptr, other.m_ptr);
+    nestl::swap(m_refcount, other.m_refcount);
 }
 
 template <typename T>
@@ -542,7 +560,7 @@ shared_ptr<T>::operator bool() const NESTL_NOEXCEPT_SPEC
 template <typename T>
 shared_ptr<T>::operator shared_ptr::unspecified_bool_type() const NESTL_NOEXCEPT_SPEC
 {
-    return use_count() == 0 ? 0 : &m_ptr;
+    return use_count() == 0 ? 0 : &shared_ptr::m_ptr;
 }
 #endif /* NESTL_HAS_EXPLICIT_OPERATOR */
 

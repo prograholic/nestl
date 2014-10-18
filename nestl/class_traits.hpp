@@ -28,6 +28,12 @@ struct class_traits
 
 #else /* NESTL_HAS_VARIADIC_TEMPLATES */
 
+    template <typename OperationError, typename Allocator>
+    static OperationError construct(T* ptr, Allocator& alloc) NESTL_NOEXCEPT_SPEC
+    {
+        return nestl::detail::construct_impl<OperationError>(ptr, alloc);
+    }
+
     template <typename OperationError, typename Allocator, typename Arg>
     static OperationError construct(T* ptr, Allocator& alloc, const Arg& arg) NESTL_NOEXCEPT_SPEC
     {
@@ -99,6 +105,21 @@ OperationError assign(T& dest, Args&& ... args) noexcept
 }
 
 #else /* NESTL_HAS_VARIADIC_TEMPLATES */
+
+template<typename OperationError, typename T, typename Allocator>
+OperationError construct(T* ptr, Allocator& alloc) NESTL_NOEXCEPT_SPEC
+{
+#define NESTL_CALL_CLASS_TRAITS_CONSTRUCT \
+    nestl::class_traits<T>:: template construct<OperationError>(ptr, alloc)
+
+    NESTL_STATIC_ASSERT(NESTL_NOEXCEPT_OPERATOR(NESTL_CALL_CLASS_TRAITS_CONSTRUCT),
+                        "User should provide nothrow class_traits::construct method");
+
+
+    return NESTL_CALL_CLASS_TRAITS_CONSTRUCT;
+
+#undef NESTL_CALL_CLASS_TRAITS_CONSTRUCT
+}
 
 template<typename OperationError, typename T, typename Allocator, typename Arg>
 OperationError construct(T* ptr, Allocator& alloc, const Arg& arg) NESTL_NOEXCEPT_SPEC

@@ -94,6 +94,14 @@ OperationError construct_impl(T* ptr, Allocator& alloc, Args&& ... args) NESTL_N
 
 #else /* NESTL_HAS_VARIADIC_TEMPLATES */
 
+template<typename OperationError, typename T, typename Allocator>
+OperationError construct_impl(T* ptr, Allocator& alloc) NESTL_NOEXCEPT_SPEC
+{
+    nestl::allocator_traits<Allocator>::construct(alloc, ptr);
+
+    return OperationError();
+}
+
 template<typename OperationError, typename T, typename Allocator, typename Arg>
 OperationError construct_impl(T* ptr, Allocator& alloc, const Arg& arg) NESTL_NOEXCEPT_SPEC
 {
@@ -101,7 +109,6 @@ OperationError construct_impl(T* ptr, Allocator& alloc, const Arg& arg) NESTL_NO
 
     return OperationError();
 }
-
 
 #endif /* NESTL_HAS_VARIADIC_TEMPLATES */
 

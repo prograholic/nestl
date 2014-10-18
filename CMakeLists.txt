@@ -32,11 +32,13 @@ set (nestl_sources
 	nestl/memory.hpp
 	nestl/move.hpp
 	nestl/noncopyable.hpp
+	nestl/numeric_limits.hpp
 	nestl/operation_error.hpp
 	nestl/shared_ptr.hpp
 	nestl/static_assert.hpp
 	nestl/string.hpp
 	nestl/system_error.hpp
+	nestl/swap.hpp
 	nestl/type_traits.hpp
 	nestl/vector.hpp
 )

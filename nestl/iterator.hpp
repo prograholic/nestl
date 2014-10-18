@@ -382,7 +382,7 @@ public:
 #if NESTL_HAS_RVALUE_REF
     operation_error assign(container_value_type&& val) NESTL_NOEXCEPT_SPEC
     {
-        return m_container->push_back(std::move(val));
+        return m_container->push_back(nestl::move(val));
     }
 #endif /* NESTL_HAS_RVALUE_REF */
 
@@ -466,7 +466,7 @@ public:
 #if NESTL_HAS_RVALUE_REF
     operation_error assign(container_value_type&& val) NESTL_NOEXCEPT_SPEC
     {
-        auto err = m_container->insert(m_pos, std::move(val));
+        auto err = m_container->insert(m_pos, nestl::move(val));
         if (!err)
         {
             m_pos = err.value();

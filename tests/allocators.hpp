@@ -120,16 +120,20 @@ public:
     {
     }
 
+#if NESTL_HAS_RVALUE_REF
     allocator_with_state(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
         : m_allocated_storage(nestl::move(other.m_allocated_storage))
     {
     }
+#endif /* NESTL_HAS_RVALUE_REF */
 
+#if NESTL_HAS_RVALUE_REF
     template <typename Y>
     allocator_with_state(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
         : m_allocated_storage(nestl::move(other.m_allocated_storage))
     {
     }
+#endif /* NESTL_HAS_RVALUE_REF */
 
     allocator_with_state& operator=(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
     {
@@ -144,18 +148,22 @@ public:
         return *this;
     }
 
+#if NESTL_HAS_RVALUE_REF
     allocator_with_state& operator=(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
     {
         m_allocated_storage = nestl::move(other.m_allocated_storage);
         return *this;
     }
+#endif /* NESTL_HAS_RVALUE_REF */
 
+#if NESTL_HAS_RVALUE_REF
     template <typename Y>
     allocator_with_state& operator=(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
     {
         m_allocated_storage = nestl::move(other.m_allocated_storage);
         return *this;
     }
+#endif /* NESTL_HAS_RVALUE_REF */
 
     ~allocator_with_state() NESTL_NOEXCEPT_SPEC
     {

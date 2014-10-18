@@ -64,6 +64,8 @@ public:
 
     typedef nestl::list<value_type, allocator>             list_t;
     typedef typename list_t::operation_error               operation_error;
+    typedef typename list_t::const_iterator                const_iterator;
+    typedef typename list_t::iterator                      iterator;
     typedef typename list_t::iterator_with_operation_error iterator_with_operation_error;
 };
 

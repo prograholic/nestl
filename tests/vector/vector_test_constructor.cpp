@@ -92,7 +92,7 @@ TEST_F(VectorTestConstructorWithZeroAllocator, MoveConstructorFromEmptyVector)
 {
     nestl::vector<int, zero_allocator<int> > vec1;
 
-    nestl::vector<int, zero_allocator<int> > vec2(std::move(vec1));
+    nestl::vector<int, zero_allocator<int> > vec2(nestl::move(vec1));
 
     EXPECT_TRUE(CheckVectorSize(vec2, 0));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
@@ -133,7 +133,7 @@ TEST_F(VectorTestConstructorWithMinimalAllocator, MoveConstructorFromEmptyVector
 {
     nestl::vector<int, minimal_allocator<int> > vec1;
 
-    nestl::vector<int, minimal_allocator<int> > vec2(std::move(vec1));
+    nestl::vector<int, minimal_allocator<int> > vec2(nestl::move(vec1));
 
     EXPECT_TRUE(CheckVectorSize(vec2, 0));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
@@ -147,7 +147,7 @@ TEST_F(VectorTestConstructorWithMinimalAllocator, MoveConstructorFromNonEmptyVec
 
     ASSERT_OPERATION_SUCCESS(vec1.assign(10));
 
-    nestl::vector<int, minimal_allocator<int> > vec2(std::move(vec1));
+    nestl::vector<int, minimal_allocator<int> > vec2(nestl::move(vec1));
 
     EXPECT_TRUE(CheckVectorSize(vec2, 10));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
@@ -187,7 +187,7 @@ TEST_F(VectorTestConstructorWithStatefulAllocator, MoveConstructorFromEmptyVecto
 {
     nestl::vector<int, allocator_with_state<int> > vec1;
 
-    nestl::vector<int, allocator_with_state<int> > vec2(std::move(vec1));
+    nestl::vector<int, allocator_with_state<int> > vec2(nestl::move(vec1));
 
     EXPECT_TRUE(CheckVectorSize(vec2, 0));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
@@ -201,7 +201,7 @@ TEST_F(VectorTestConstructorWithStatefulAllocator, MoveConstructorFromNonEmptyVe
 
     ASSERT_OPERATION_SUCCESS(vec1.assign(10));
 
-    nestl::vector<int, allocator_with_state<int> > vec2(std::move(vec1));
+    nestl::vector<int, allocator_with_state<int> > vec2(nestl::move(vec1));
 
     EXPECT_TRUE(CheckVectorSize(vec2, 10));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));

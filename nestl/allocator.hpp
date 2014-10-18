@@ -6,10 +6,10 @@
 #include <nestl/memory.hpp>
 #include <nestl/type_traits.hpp>
 #include <nestl/assert.hpp>
+#include <nestl/numeric_limits.hpp>
 
 #if NESTL_USE_STD
 #include <new>
-#include <limits>
 #endif /* NESTL_USE_STD */
 
 
@@ -75,7 +75,7 @@ public:
 
     size_type max_size() const NESTL_NOEXCEPT_SPEC
     {
-        return std::numeric_limits<size_type>::max();
+        return nestl::numeric_limits<size_type>::max();
     }
 
 #if NESTL_HAS_VARIADIC_TEMPLATES
