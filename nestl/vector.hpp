@@ -931,7 +931,7 @@ vector<T, A>::do_resize(size_type count, Args&& ... args) NESTL_NOEXCEPT_SPEC
 
         while (m_finish < m_start + count)
         {
-            operation_error err = nestl::detail::construct<operation_error>(m_finish, m_allocator, std::forward<Args>(args) ...);
+            err = nestl::detail::construct<operation_error>(m_finish, m_allocator, std::forward<Args>(args) ...);
             if (err)
             {
                 return err;
@@ -965,7 +965,7 @@ vector<T, A>::do_resize(size_type count, const Arg& arg) NESTL_NOEXCEPT_SPEC
 
         while (m_finish < m_start + count)
         {
-            operation_error err = nestl::detail::construct<operation_error>(m_finish, m_allocator, arg);
+            err = nestl::detail::construct<operation_error>(m_finish, m_allocator, arg);
             if (err)
             {
                 return err;

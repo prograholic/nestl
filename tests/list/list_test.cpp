@@ -179,8 +179,8 @@ TYPED_TEST_P(ListTestNumeric, InsertOneElementBeforeBeginToNonEmptyList)
     typename TestFixture::iterator it = l.begin();
     for (size_t i = 0; i != expectedSize; ++i)
     {
-        EXPECT_EQ(i, *constIt);
-        EXPECT_EQ(i, *it);
+        EXPECT_EQ(static_cast<int>(i), *constIt);
+        EXPECT_EQ(static_cast<int>(i), *it);
 
         ++constIt;
         ++it;
@@ -206,8 +206,8 @@ TYPED_TEST_P(ListTestNumeric, InsertOneElementBeforeEndToNonEmptyList)
     typename TestFixture::iterator it = l.begin();
     for (size_t i = 0; i != expectedSize; ++i)
     {
-        EXPECT_EQ(i, *constIt);
-        EXPECT_EQ(i, *it);
+        EXPECT_EQ(static_cast<int>(i), *constIt);
+        EXPECT_EQ(static_cast<int>(i), *it);
 
         ++constIt;
         ++it;

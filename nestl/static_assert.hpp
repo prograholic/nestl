@@ -22,7 +22,7 @@ struct NESTL_ASSERTION_FAILURE<true> {enum {value = 1}; };
 
 
 #define NESTL_STATIC_ASSERT(x, msg) \
-    typedef unsigned char NESTL_JOIN(nestl_assertion_failure, __LINE__) [::nestl::NESTL_ASSERTION_FAILURE<static_cast<bool>(x)>::value];
+    typedef unsigned char NESTL_JOIN(nestl_assertion_failure, __LINE__) [::nestl::NESTL_ASSERTION_FAILURE<static_cast<bool>(x)>::value] NESTL_UNUSED
 
 
 #endif /* NESTL_HAS_STATIC_ASSERT */

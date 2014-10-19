@@ -9,6 +9,7 @@
 #include <nestl/alignment.hpp>
 #include <nestl/assert.hpp>
 #include <nestl/swap.hpp>
+#include <nestl/move.hpp>
 
 #include <nestl/detail/construct.hpp>
 

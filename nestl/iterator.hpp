@@ -5,6 +5,7 @@
 #include <nestl/noncopyable.hpp>
 #include <nestl/class_traits.hpp>
 #include <nestl/system_error.hpp>
+#include <nestl/move.hpp>
 
 #include <iterator>
 

@@ -45,8 +45,8 @@ public:
     {
     }
 
-    explicit error_condition(int value)
-        : m_value(value)
+    explicit error_condition(int val)
+        : m_value(val)
     {
     }
 

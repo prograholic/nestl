@@ -19,6 +19,8 @@
 #endif /* NESTL_ENABLE_CXX11 */
 
 
+#define NESTL_UNUSED
+
 /**
  * @note We unconditionally declare NESTL_DECLTYPE as C++-11 keyword decltype
  * because we cannot provide emulation of decltype.

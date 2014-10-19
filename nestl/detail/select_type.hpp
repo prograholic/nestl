@@ -19,9 +19,9 @@ namespace nestl
  */
 #   define NESTL_SELECT_NESTED_TYPE(Type, Nested, Default) \
     template<typename T> \
-    static typename T::NestedType NESTL_##NestedType##_helper(T*); \
-    static DefaultType NESTL_##NestedType##_helper(...); \
-    typedef NESTL_DECLTYPE(NESTL_##NestedType##_helper((Type*)0)) nestl_nested_type_##NestedType \
+    static typename T::Nested NESTL_##Nested##_helper(T*); \
+    static Default NESTL_##Nested##_helper(...); \
+    typedef NESTL_DECLTYPE(NESTL_##Nested##_helper((Type*)0)) nestl_nested_type_##Nested \
 
 
 
@@ -43,7 +43,7 @@ namespace nestl
             nestl::false_type \
         >::type type; \
     }; \
-    typedef typename has_ ## methodName ## _member_impl<Class>:type has_ ## methodName ## _member
+    typedef typename has_ ## methodName ## _member_impl<Class>::type has_ ## methodName ## _member \
 
 
 #elif NESTL_COMPILER == NESTL_COMPILER_MSVC
@@ -73,7 +73,7 @@ namespace nestl
 
 #else /* _MSC_EXTENSIONS */
 
-#   error "MSVC cannot select type without MS-specific extensions, please recompile with /Za
+#   error "MSVC cannot select type without MS-specific extensions, please recompile with /Za"
 
 #endif /* _MSC_EXTENSIONS */
 

@@ -4,6 +4,10 @@
 
 #define NESTL_COMPILER NESTL_COMPILER_GCC
 
+
+#define NESTL_UNUSED                         __attribute__((unused))
+
+
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
 
 #   if !defined (NESTL_ENABLE_CXX11)
