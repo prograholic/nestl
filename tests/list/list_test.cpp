@@ -345,11 +345,26 @@ TYPED_TEST_P(ListTestNumeric, SortListWithSeveralElements)
 }
 
 
+#if NESTL_HAS_INITIALIZER_LIST
+
 REGISTER_TYPED_TEST_CASE_P(ListTestNumeric,
                            CheckAssignFromIterators,
-#if NESTL_HAS_INITIALIZER_LIST
-                           CheckAssignFromInitializerList,
-#endif /* NESTL_HAS_INITIALIZER_LIST */
+                           InsertOneElementBeforeBeginToNonEmptyList,
+                           InsertOneElementBeforeEndToNonEmptyList,
+                           PopFrontFromListWith1Element,
+                           PopBackFromListWith1Element,
+                           PopFrontFromListWith2Elements,
+                           PopBackFromListWith2Elements,
+                           MergeTwoNonEmptyLists,
+                           SortEmptyList,
+                           SortListWithOneElement,
+                           SortListWithSeveralElements,
+                           CheckAssignFromInitializerList);
+
+#else /* NESTL_HAS_INITIALIZER_LIST */
+
+REGISTER_TYPED_TEST_CASE_P(ListTestNumeric,
+                           CheckAssignFromIterators,
                            InsertOneElementBeforeBeginToNonEmptyList,
                            InsertOneElementBeforeEndToNonEmptyList,
                            PopFrontFromListWith1Element,
@@ -360,6 +375,9 @@ REGISTER_TYPED_TEST_CASE_P(ListTestNumeric,
                            SortEmptyList,
                            SortListWithOneElement,
                            SortListWithSeveralElements);
+
+#endif /* NESTL_HAS_INITIALIZER_LIST */
+
 
 INSTANTIATE_TYPED_TEST_CASE_P(numeric_list_test, ListTestNumeric, ListNumericTypes);
 

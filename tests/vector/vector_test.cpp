@@ -212,14 +212,22 @@ TYPED_TEST_P(VectorTestNumeric, InsertOneElementBeforeEndToNonEmptyVector)
     EXPECT_EQ(4, vec[4]);
 }
 
+#if NESTL_HAS_INITIALIZER_LIST
 
 REGISTER_TYPED_TEST_CASE_P(VectorTestNumeric,
                            CheckAssignFromIterators,
-#if NESTL_HAS_INITIALIZER_LIST
                            CheckAssignFromInitializerList,
-#endif /* NESTL_HAS_INITIALIZER_LIST */
                            InsertOneElementBeforeBeginToNonEmptyVector,
                            InsertOneElementBeforeEndToNonEmptyVector);
+
+#else /* NESTL_HAS_INITIALIZER_LIST */
+
+REGISTER_TYPED_TEST_CASE_P(VectorTestNumeric,
+                           CheckAssignFromIterators,
+                           InsertOneElementBeforeBeginToNonEmptyVector,
+                           InsertOneElementBeforeEndToNonEmptyVector);
+
+#endif /* NESTL_HAS_INITIALIZER_LIST */
 
 INSTANTIATE_TYPED_TEST_CASE_P(numeric_vector_test, VectorTestNumeric, VectorNumericTypes);
 

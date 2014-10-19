@@ -211,10 +211,16 @@ public:
     bool unique() const NESTL_NOEXCEPT_SPEC;
 
 #if NESTL_HAS_EXPLICIT_OPERATOR
-    explicit operator bool() const NESTL_NOEXCEPT_SPEC;
+    explicit operator bool() const NESTL_NOEXCEPT_SPEC
+    {
+        return (use_count() > 0);
+    }
 #else /* NESTL_HAS_EXPLICIT_OPERATOR */
     typedef element_type* shared_ptr::*unspecified_bool_type;
-    operator unspecified_bool_type() const NESTL_NOEXCEPT_SPEC;
+    operator unspecified_bool_type() const NESTL_NOEXCEPT_SPEC
+    {
+        return use_count() == 0 ? 0 : &shared_ptr::m_ptr;
+    }
 #endif /* NESTL_HAS_EXPLICIT_OPERATOR */
 
 private:
@@ -550,21 +556,6 @@ bool shared_ptr<T>::unique() const NESTL_NOEXCEPT_SPEC
     return (use_count() == 1);
 }
 
-#if NESTL_HAS_EXPLICIT_OPERATOR
-template <typename T>
-shared_ptr<T>::operator bool() const NESTL_NOEXCEPT_SPEC
-{
-    return (use_count() > 0);
-}
-#else /* NESTL_HAS_EXPLICIT_OPERATOR */
-template <typename T>
-shared_ptr<T>::operator shared_ptr::unspecified_bool_type() const NESTL_NOEXCEPT_SPEC
-{
-    return use_count() == 0 ? 0 : &shared_ptr::m_ptr;
-}
-#endif /* NESTL_HAS_EXPLICIT_OPERATOR */
-
-
 #if NESTL_HAS_VARIADIC_TEMPLATES
 template <typename T, typename Allocator, typename Y, typename ... Args>
 typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, Args&& ... args)
@@ -619,7 +610,7 @@ typename shared_ptr<T>::operation_error make_shared(shared_ptr<T>& sp, Args&& ..
 
 
 template <typename T, typename Allocator, typename Y>
-typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc)
+typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& /* alloc */)
 {
     NESTL_STATIC_ASSERT(sizeof(T), "T must be complete type");
     typedef typename shared_ptr<T>::operation_error operation_error;

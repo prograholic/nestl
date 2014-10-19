@@ -21,6 +21,7 @@ using std::allocator_traits;
 #include <nestl/declval.hpp>
 #include <nestl/numeric_limits.hpp>
 #include <nestl/assert.hpp>
+#include <nestl/detail/select_type.hpp>
 
 namespace nestl
 {
@@ -32,60 +33,23 @@ struct allocator_traits
     typedef Allocator                           allocator_type;
     typedef typename allocator_type::value_type value_type;
 
-
-/**
- * @note This macro allows to use nested type of allocator (if it has corresponding type)
- * Otherwise it declares type usign default type
- *
- * @note This macro is taken from stdlibc++
- */
-#define NESTL_ALLOC_DECLARE_NESTED_TYPE(NestedType, DefaultType) \
-    private: \
-        template<typename T> \
-        static typename T::NestedType NESTL_##NestedType##_helper(T*); \
-        static DefaultType NESTL_##NestedType##_helper(...); \
-        typedef NESTL_DECLTYPE(NESTL_##NestedType##_helper((Allocator*)0)) nestl_nested_type_##NestedType; \
-    public:
-
-    NESTL_ALLOC_DECLARE_NESTED_TYPE(pointer, value_type*);
+    NESTL_SELECT_NESTED_TYPE(Allocator, pointer, value_type*);
     typedef nestl_nested_type_pointer pointer;
 
-    NESTL_ALLOC_DECLARE_NESTED_TYPE(const_pointer, const value_type*);
+    NESTL_SELECT_NESTED_TYPE(Allocator, const_pointer, const value_type*);
     typedef nestl_nested_type_const_pointer const_pointer;
 
-    NESTL_ALLOC_DECLARE_NESTED_TYPE(propagate_on_container_move_assignment, nestl::false_type);
+    NESTL_SELECT_NESTED_TYPE(Allocator, propagate_on_container_move_assignment, nestl::false_type);
     typedef nestl_nested_type_propagate_on_container_move_assignment propagate_on_container_move_assignment;
 
-    NESTL_ALLOC_DECLARE_NESTED_TYPE(size_type, size_t);
+    NESTL_SELECT_NESTED_TYPE(Allocator, size_type, size_t);
     typedef nestl_nested_type_size_type size_type;
 
 
-#undef NESTL_ALLOC_DECLARE_NESTED_TYPE
 
 
-/**
- * @note This macro allows to check whether Allocator has necessary member or not
- */
-#define NESTL_ALLOC_DECLARE_STATIC_METHOD(methodName) \
-    template <typename T> \
-    class has_ ## methodName ## _member_impl \
-    { \
-        typedef char has_method; \
-        typedef long does_not_has_method; \
-        NESTL_STATIC_ASSERT(sizeof(has_method) != sizeof(does_not_has_method), \
-                            "please, select types with different size"); \
-        template <typename C> static has_method test( NESTL_DECLTYPE(nestl::declval(&C::methodName)) ) ; \
-        template <typename C> static does_not_has_method test(...); \
-    public: \
-        typedef typename nestl::conditional \
-        < \
-            sizeof(test<T>(0)) == sizeof(has_method), \
-            nestl::true_type, \
-            nestl::false_type \
-        >::type type; \
-    } \
 
-    NESTL_ALLOC_DECLARE_STATIC_METHOD(destroy);
+    NESTL_HAS_METHOD(Allocator, destroy);
 
     template<typename U>
     static void destroy_helper(const nestl::true_type& /* trueVal */, Allocator& alloc, U* ptr)
@@ -102,12 +66,11 @@ struct allocator_traits
     template<typename U>
     static void destroy(Allocator& alloc, U* ptr)
     {
-        typedef typename has_destroy_member_impl<Allocator>::type has_destroy_member;
         destroy_helper(has_destroy_member(), alloc, ptr);
     }
 
 
-    NESTL_ALLOC_DECLARE_STATIC_METHOD(max_size);
+    NESTL_HAS_METHOD(Allocator, max_size);
 
     static size_type max_size_helper(const nestl::true_type& /* trueVal */, const Allocator& alloc)
     {
@@ -121,12 +84,11 @@ struct allocator_traits
 
     static size_type max_size(const Allocator& alloc)
     {
-        typedef typename has_max_size_member_impl<Allocator>::type has_max_size_member;
         return max_size_helper(has_max_size_member(), alloc);
     }
 
 
-    NESTL_ALLOC_DECLARE_STATIC_METHOD(construct);
+    NESTL_HAS_METHOD(Allocator, construct);
 
 #if NESTL_HAS_VARIADIC_TEMPLATES
 
@@ -146,7 +108,6 @@ struct allocator_traits
     template<typename U, typename ... Args>
     static size_type construct(Allocator& alloc, U* ptr)
     {
-        typedef typename has_construct_member_impl<Allocator>::type has_construct_member;
         return construct_helper(alloc, has_construct_member(), ptr, std::forward<Args>(args) ...);
     }
 
@@ -168,7 +129,6 @@ struct allocator_traits
     template<typename U>
     static void construct(Allocator& alloc, U* ptr)
     {
-        typedef typename has_construct_member_impl<Allocator>::type has_construct_member;
         construct_helper(alloc, has_construct_member(), ptr);
     }
 
@@ -188,7 +148,6 @@ struct allocator_traits
     template<typename U, typename Arg>
     static void construct(Allocator& alloc, U* ptr, const Arg& arg)
     {
-        typedef typename has_construct_member_impl<Allocator>::type has_construct_member;
         construct_helper(alloc, has_construct_member(), ptr, arg);
     }
 

@@ -27,7 +27,7 @@ void destroy(Allocator& alloc, ForwardIterator first, ForwardIterator last) NEST
 
 
 template <typename ForwardIterator, typename Allocator>
-struct destruction_scoped_guard
+struct destruction_scoped_guard : private nestl::noncopyable
 {
     destruction_scoped_guard(ForwardIterator first, ForwardIterator& last, Allocator& alloc) NESTL_NOEXCEPT_SPEC
         : m_first(first)
@@ -48,11 +48,12 @@ struct destruction_scoped_guard
     }
 
 private:
-
     ForwardIterator m_first;
     ForwardIterator* m_last;
     Allocator& m_alloc;
 
+    destruction_scoped_guard(const destruction_scoped_guard& );
+    destruction_scoped_guard& operator =(const destruction_scoped_guard& );
 };
 
 
@@ -80,6 +81,9 @@ private:
     Allocator& m_alloc;
     PointerType m_ptr;
     size_t m_size;
+
+    allocation_scoped_guard(const allocation_scoped_guard& );
+    allocation_scoped_guard& operator =(const allocation_scoped_guard& );
 };
 
 #if NESTL_HAS_VARIADIC_TEMPLATES

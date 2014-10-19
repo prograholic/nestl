@@ -40,12 +40,12 @@ public:
     {
     }
 
-    allocator(const allocator& other) NESTL_NOEXCEPT_SPEC
+    allocator(const allocator& /* other */) NESTL_NOEXCEPT_SPEC
     {
     }
 
     template <typename Y>
-    allocator(const allocator<Y>& other) NESTL_NOEXCEPT_SPEC
+    allocator(const allocator<Y>& /* other */) NESTL_NOEXCEPT_SPEC
     {
     }
 

@@ -29,12 +29,12 @@ public:
     {
     }
 
-    minimal_allocator(const minimal_allocator& other) NESTL_NOEXCEPT_SPEC
+    minimal_allocator(const minimal_allocator& /* other */) NESTL_NOEXCEPT_SPEC
     {
     }
 
     template <typename Y>
-    minimal_allocator(const minimal_allocator<Y>& other) NESTL_NOEXCEPT_SPEC
+    minimal_allocator(const minimal_allocator<Y>& /* other */) NESTL_NOEXCEPT_SPEC
     {
     }
 
@@ -64,12 +64,12 @@ public:
     {
     }
 
-    zero_allocator(const zero_allocator& other) NESTL_NOEXCEPT_SPEC
+    zero_allocator(const zero_allocator& /* other */) NESTL_NOEXCEPT_SPEC
     {
     }
 
     template <typename Y>
-    zero_allocator(const zero_allocator<Y>& other) NESTL_NOEXCEPT_SPEC
+    zero_allocator(const zero_allocator<Y>& /* other */) NESTL_NOEXCEPT_SPEC
     {
     }
 
@@ -77,7 +77,7 @@ public:
     {
     }
 
-    T* allocate(std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    T* allocate(std::size_t /* n */, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
         return 0;
     }

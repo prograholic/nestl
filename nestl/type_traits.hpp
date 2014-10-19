@@ -19,6 +19,38 @@ using std::add_rvalue_reference;
 namespace nestl
 {
 
+template <bool B, class T = void>
+struct enable_if_c
+{
+    typedef T type;
+};
+
+template <class T>
+struct enable_if_c<false, T>
+{
+};
+
+template <class Cond, class T = void>
+struct enable_if : public enable_if_c<Cond::value, T>
+{
+};
+
+template <bool B, class T = void>
+struct disable_if_c
+{
+    typedef T type;
+};
+
+template <class T>
+struct disable_if_c<true, T>
+{
+};
+
+template <class Cond, class T = void>
+struct disable_if : public disable_if_c<Cond::value, T>
+{
+};
+
 
 template <bool, typename TrueType, typename FalseType>
 struct conditional
@@ -94,44 +126,6 @@ struct add_rvalue_reference<T&&>
 } // namespace nestl
 
 #endif /* NESTL_ENABLE_CXX11 && NESTL_USE_STD */
-
-
-namespace nestl
-{
-
-namespace detail
-{
-
-template <typename T>
-class has_assign_copy_member_impl
-{
-    typedef char has_method;
-    typedef long does_not_has_method;
-
-    NESTL_STATIC_ASSERT(sizeof(has_method) != sizeof(does_not_has_method),
-                        "please, select types with different size");
-
-    template <typename C> static has_method test( NESTL_DECLTYPE(&C::assign_copy) ) ;
-    template <typename C> static does_not_has_method test(...);
-
-public:
-    typedef typename nestl::conditional
-    <
-        sizeof(test<T>(0)) == sizeof(has_method),
-        nestl::true_type,
-        nestl::false_type
-    >::type type;
-};
-
-}
-
-
-template <typename T>
-struct has_assign_copy_member : public detail::has_assign_copy_member_impl<T>::type
-{
-};
-
-} // namespace nestl
 
 
 #endif // NESTL_TYPE_TRAITS_HPP

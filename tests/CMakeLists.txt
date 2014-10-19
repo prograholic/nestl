@@ -6,6 +6,8 @@ include_directories(${NESTL_GOOGLEMOCK_DIR}/include)
 include_directories(${NESTL_GOOGLEMOCK_DIR}/gtest/include)
 
 
+config_compiler_and_linker()
+
 function(cxx_test2 name libs)
   cxx_test_with_flags("${name}" "${cxx_default}" "${libs}"
 	"${name}.cpp" ${ARGN})

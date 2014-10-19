@@ -17,4 +17,12 @@ Also it is possible to add definition **NESTL_ENABLE_CXX11** for using c++11 fea
 Compilers supported
 ===================
 
-Library has been tested on g++-4.9.1 on linux
+Library has been tested on following platforms and compilers:
+
+* Linux (32 bit):
+
+  - g++-4.9.1
+  
+* Windows (32 bit):
+
+  - msvc 2008
