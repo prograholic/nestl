@@ -1,14 +1,14 @@
-#ifndef NESTL_DETAIL_GCC_HPP
-#define NESTL_DETAIL_GCC_HPP
+#ifndef NESTL_DETAIL_CLANG_HPP
+#define NESTL_DETAIL_CLANG_HPP
 
 
-#define NESTL_COMPILER                       NESTL_COMPILER_GCC
+#define NESTL_COMPILER                       NESTL_COMPILER_CLANG
 
 
 #define NESTL_UNUSED                         __attribute__((unused))
 
 
-#if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#if __cplusplus >= 201103L
 
 #   if !defined (NESTL_ENABLE_CXX11)
 #       define NESTL_ENABLE_CXX11            1
@@ -37,7 +37,7 @@
 #   define NESTL_ALIGNOF(expr)               alignof(expr)
 
 
-#else /* __GXX_EXPERIMENTAL_CXX0X__ */
+#else /* __cplusplus >= 201103L */
 
 
 #   if !defined (NESTL_ENABLE_CXX11)
@@ -77,6 +77,6 @@
 #   define NESTL_ALIGNOF(expr)               __alignof__(expr)
 
 
-#endif /* __GXX_EXPERIMENTAL_CXX0X__ */
+#endif /* __cplusplus >= 201103L */
 
 #endif /* NESTL_DETAIL_GCC_HPP */

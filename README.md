@@ -20,9 +20,11 @@ Compilers supported
 Library has been tested on following platforms and compilers:
 
 * Linux (32 bit):
+    - g++-4.8.3 (C++-03 and C++-11)
+    - g++-4.9.1 (C++-03 and C++-11)
+    - g++-4.7.4 (C++-03 and C++-11)
+    - clang++-3.4 (C++-03 and C++-11)
+    - clang++-3.5 (C++-03 and C++-11)
 
-  - g++-4.9.1
-  
 * Windows (32 bit):
-
-  - msvc 2008
+    - msvc 2008

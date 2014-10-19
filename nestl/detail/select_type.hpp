@@ -12,7 +12,7 @@
 namespace nestl
 {
 
-#if NESTL_COMPILER == NESTL_COMPILER_GCC
+#if (NESTL_COMPILER == NESTL_COMPILER_GCC) || (NESTL_COMPILER == NESTL_COMPILER_CLANG)
 
 /**
  * @note This macro is taken from stdlibc++

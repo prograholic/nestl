@@ -40,26 +40,24 @@
 #   define NESTL_HAS_EXPLICIT_OPERATOR       0
 #   define NESTL_HAS_INITIALIZER_LIST_HEADER 0
 
-#   define NESTL_CONSTEXPR                   
+#   define NESTL_CONSTEXPR
 #   define NESTL_COMPILER_GENERATED_IMPL     {}
-#   define NESTL_DELETED_IMPL                
+#   define NESTL_DELETED_IMPL
 #   define NESTL_NOEXCEPT_OPERATOR(x)        true
-#   define NESTL_NOEXCEPT_SPEC               
+#   define NESTL_NOEXCEPT_SPEC
 #   define NESTL_ALIGNAS(expr, alignment)    expr
 #   define NESTL_ALIGNOF(expr)               __alignof(expr)
 
 #elif (MSC_VER <= NESTL_COMPILER_MSVC_2010)
+
 #elif (MSC_VER <= NESTL_COMPILER_MSVC_2012)
+
 #elif (MSC_VER <= NESTL_COMPILER_MSVC_2013)
+
 #else /* MSC_VER */
+
 #   error Unsupported compiler version, please update
+
 #endif /* _MSC_VER */
-
-
-
-
-
-
-
 
 #endif /* NESTL_DETAIL_MSVC_HPP */

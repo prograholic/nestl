@@ -12,3 +12,7 @@ tests/vector_test.cpp
 tests/tests.h
 nestl/shared_ptr.hpp
 tests/shared_ptr_test.cpp
+nestl/detail/clang.hpp
+nestl/detail/gcc.hpp
+nestl/detail/msvc.hpp
+nestl/detail/select_type.hpp
