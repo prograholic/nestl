@@ -27,21 +27,14 @@ Compilers supported
 
 Library has been tested on following platforms and compilers:
 
-+--------------------------+------+-------------+-----------+-------------+
-|Toolchain                 |C++-03|C++-03-no-std|C++-11     |C++-11-no-std|
-+==========================+======+=============+===========+=============+
-|i386-linux-gnu G++-4.7.4  |Yes   |Yes*         |Yes        |Yes*         |
-+--------------------------+------+-------------+-----------+-------------+
-|i386-linux-gnu G++-4.8.3  |Yes   |Yes*         |Yes        |Yes*         |
-+--------------------------+------+-------------+-----------+-------------+
-|i386-linux-gnu G++-4.9.1  |Yes   |Yes*         |Yes        |Yes*         |
-+--------------------------+------+-------------+-----------+-------------+
-|i386-linux-gnu clang++-3.4|Yes   |Yes*         |Yes        |Yes*         |
-+--------------------------+------+-------------+-----------+-------------+
-|i386-linux-gnu clang++-3.5|Yes   |Yes*         |Yes        |Yes          |
-+--------------------------+------+-------------+-----------+-------------+
-|i386-windows msvc-2008    |Yes   |Yes*         |Yes**      |Yes***       |
-+--------------------------+------+-------------+-----------+-------------+
+Toolchain                 |C++-03|C++-03-no-std|C++-11     |C++-11-no-std
+-------------------------- ------ ------------- ----------- -------------
+i386-linux-gnu G++-4.7.4  |Yes   |Yes*         |Yes        |Yes*
+i386-linux-gnu G++-4.8.3  |Yes   |Yes*         |Yes        |Yes*
+i386-linux-gnu G++-4.9.1  |Yes   |Yes*         |Yes        |Yes*
+i386-linux-gnu clang++-3.4|Yes   |Yes*         |Yes        |Yes*
+i386-linux-gnu clang++-3.5|Yes   |Yes*         |Yes        |Yes
+i386-windows msvc-2008    |Yes   |Yes*         |Yes**      |Yes***
 
 \* - Tests successfully compiles but not executed (because of gtest/gmock emulation)
 
