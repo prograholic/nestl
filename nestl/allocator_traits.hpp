@@ -2,6 +2,7 @@
 #define NESTL_ALLOCATOR_TRAITS_HPP
 
 #include <nestl/config.hpp>
+#include <nestl/cstddef.hpp>
 
 #if NESTL_USE_STD && NESTL_ENABLE_CXX11
 
@@ -22,6 +23,7 @@ using std::allocator_traits;
 #include <nestl/numeric_limits.hpp>
 #include <nestl/assert.hpp>
 #include <nestl/detail/select_type.hpp>
+#include <nestl/forward.hpp>
 
 namespace nestl
 {
@@ -42,7 +44,7 @@ struct allocator_traits
     NESTL_SELECT_NESTED_TYPE(Allocator, propagate_on_container_move_assignment, nestl::false_type);
     typedef nestl_nested_type_propagate_on_container_move_assignment propagate_on_container_move_assignment;
 
-    NESTL_SELECT_NESTED_TYPE(Allocator, size_type, size_t);
+    NESTL_SELECT_NESTED_TYPE(Allocator, size_type, nestl::size_t);
     typedef nestl_nested_type_size_type size_type;
 
 
@@ -93,22 +95,22 @@ struct allocator_traits
 #if NESTL_HAS_VARIADIC_TEMPLATES
 
     template<typename U, typename ... Args>
-    static void construct_helper(Allocator& alloc, const nestl::true_type& /* trueVal */, U* ptr)
+    static void construct_helper(Allocator& alloc, const nestl::true_type& /* trueVal */, U* ptr, Args&& ... args)
     {
-        return alloc.construct(ptr, std::forward<Args>(args) ...);
+        return alloc.construct(ptr, nestl::forward<Args>(args) ...);
     }
 
     template<typename U, typename ... Args>
-    static void construct_helper(Allocator& /* alloc */, const nestl::false_type& /* falseVal */, U* ptr)
+    static void construct_helper(Allocator& /* alloc */, const nestl::false_type& /* falseVal */, U* ptr, Args&& ... args)
     {
         NESTL_ASSERT(ptr);
-        ::new(static_cast<void*>(ptr)) U(std::forward<Args>(args) ...);
+        ::new(static_cast<void*>(ptr)) U(nestl::forward<Args>(args) ...);
     }
 
     template<typename U, typename ... Args>
-    static size_type construct(Allocator& alloc, U* ptr)
+    static size_type construct(Allocator& alloc, U* ptr, Args&& ... args)
     {
-        return construct_helper(alloc, has_construct_member(), ptr, std::forward<Args>(args) ...);
+        return construct_helper(alloc, has_construct_member(), ptr, nestl::forward<Args>(args) ...);
     }
 
 #else /* NESTL_HAS_VARIADIC_TEMPLATES */

@@ -20,7 +20,19 @@ using std::error_condition;
 
 #else /* NESTL_ENABLE_CXX11 && NESTL_USE_STD */
 
-#include <cerrno>
+#if NESTL_USE_STD
+
+#   include <cerrno>
+
+#   define NESTL_ENOMEM ENOMEM
+#   define NESTL_EINVAL EINVAL
+
+#else /* NESTL_USE_STD */
+
+#   define NESTL_ENOMEM 12
+#   define NESTL_EINVAL 22
+
+#endif /* NESTL_USE_STD */
 
 namespace nestl
 {
@@ -30,8 +42,8 @@ namespace errc
 
 enum
 {
-    invalid_argument  = EINVAL,
-    not_enough_memory = ENOMEM
+    invalid_argument  = NESTL_EINVAL,
+    not_enough_memory = NESTL_ENOMEM
 };
 
 } // namespace errc

@@ -1,2 +1,7 @@
 ./
 nestl/detail
+nestl
+tests
+tests/list
+tests/vector
+tests/shared_ptr

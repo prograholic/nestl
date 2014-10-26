@@ -7,10 +7,7 @@
 #include <nestl/type_traits.hpp>
 #include <nestl/assert.hpp>
 #include <nestl/numeric_limits.hpp>
-
-#if NESTL_USE_STD
-#include <new>
-#endif /* NESTL_USE_STD */
+#include <nestl/new.hpp>
 
 
 namespace nestl
@@ -84,7 +81,7 @@ public:
     void construct(U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
         NESTL_ASSERT(ptr);
-        ::new(static_cast<void*>(ptr)) U(std::forward<Args>(args)...);
+        ::new(static_cast<void*>(ptr)) U(nestl::forward<Args>(args)...);
     }
 
 #else /* NESTL_HAS_VARIADIC_TEMPLATES */

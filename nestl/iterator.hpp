@@ -7,8 +7,6 @@
 #include <nestl/system_error.hpp>
 #include <nestl/move.hpp>
 
-#include <iterator>
-
 namespace nestl
 {
 
@@ -423,7 +421,7 @@ struct class_traits<nestl::back_insert_iterator<Container> >
     template <typename OperationError, typename Y>
     static OperationError assign(nestl::back_insert_iterator<Container>& dest, Y&& src) NESTL_NOEXCEPT_SPEC
     {
-        return dest.assign(std::forward<Y>(src));
+        return dest.assign(nestl::forward<Y>(src));
     }
 #else /* NESTL_HAS_RVALUE_REF */
     template <typename OperationError, typename Y>
@@ -516,7 +514,7 @@ struct class_traits<nestl::insert_iterator<Container> >
     template <typename OperationError, typename Y>
     static OperationError assign(nestl::insert_iterator<Container>& dest, Y&& src) NESTL_NOEXCEPT_SPEC
     {
-        return dest.assign(std::forward<Y>(src));
+        return dest.assign(nestl::forward<Y>(src));
     }
 #else /* NESTL_HAS_RVALUE_REF */
     template <typename OperationError, typename Y>

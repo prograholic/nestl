@@ -8,6 +8,7 @@
 #include <nestl/noncopyable.hpp>
 #include <nestl/allocator_traits.hpp>
 #include <nestl/addressof.hpp>
+#include <nestl/forward.hpp>
 
 namespace nestl
 {
@@ -91,7 +92,7 @@ private:
 template<typename OperationError, typename T, typename Allocator, typename ... Args>
 OperationError construct_impl(T* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
 {
-    nestl::allocator_traits<Allocator>::construct(alloc, ptr, std::forward<Args>(args) ...);
+    nestl::allocator_traits<Allocator>::construct(alloc, ptr, nestl::forward<Args>(args) ...);
 
     return OperationError();
 }

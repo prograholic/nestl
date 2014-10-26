@@ -5,6 +5,7 @@
 
 #if NESTL_ENABLE_CXX11 && NESTL_USE_STD
 
+#include <type_traits>
 
 namespace nestl
 {
@@ -12,6 +13,8 @@ using std::conditional;
 using std::true_type;
 using std::false_type;
 using std::add_rvalue_reference;
+using std::remove_reference;
+using std::is_lvalue_reference;
 }
 
 #else /* NESTL_ENABLE_CXX11 && NESTL_USE_STD */
@@ -72,7 +75,7 @@ struct integral_constant
 
 #if NESTL_HAS_CONSTEXPR
 
-    static constexpr value_type    value;
+    static constexpr value_type value = val;
     constexpr operator value_type() const { return value; }
     constexpr value_type operator()() const { return value; }
 
@@ -109,19 +112,54 @@ struct add_rvalue_reference
     typedef T&& type;
 };
 
-template <>
+template <typename T>
 struct add_rvalue_reference<T&>
 {
     typedef T& type;
 };
 
-template <>
+template <typename T>
 struct add_rvalue_reference<T&&>
 {
     typedef T&& type;
 };
 
 #endif /* NESTL_HAS_RVALUE_REF */
+
+
+template<typename T>
+struct remove_reference
+{
+    typedef T type;
+};
+
+template<typename T>
+struct remove_reference<T&>
+{
+    typedef T type;
+};
+
+#if NESTL_HAS_RVALUE_REF
+
+template<typename T>
+struct remove_reference<T&&>
+{
+    typedef T type;
+};
+
+#endif /* NESTL_HAS_RVALUE_REF */
+
+
+template<typename>
+struct is_lvalue_reference : public false_type
+{
+};
+
+template<typename T>
+struct is_lvalue_reference<T&> : public true_type
+{
+};
+
 
 } // namespace nestl
 

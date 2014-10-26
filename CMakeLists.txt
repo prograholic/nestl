@@ -12,6 +12,12 @@ else()
   message(STATUS "Using nestl with c++ 03 features")
 endif()
 
+if (NESTL_DISABLE_STD)
+  message(STATUS "Using nestl without standard library")
+  add_definitions(-DNESTL_NO_STD)
+else()
+  message(STATUS "Using nestl with standard library")
+endif()
 
 set (nestl_sources
 	nestl/nestl.cpp

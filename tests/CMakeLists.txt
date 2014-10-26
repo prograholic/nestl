@@ -8,6 +8,12 @@ include_directories(${NESTL_GOOGLEMOCK_DIR}/gtest/include)
 
 config_compiler_and_linker()
 
+if (NESTL_DISABLE_STD)
+  add_definitions(-DNESTL_PLATFORM_HEADER="tests/sample_test_platform.hpp")
+  add_compile_options(-nostdinc)
+  add_compile_options(-nostdinc++)
+endif()
+
 function(cxx_test2 name libs)
   cxx_test_with_flags("${name}" "${cxx_default}" "${libs}"
 	"${name}.cpp" ${ARGN})

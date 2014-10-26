@@ -17,8 +17,17 @@ using std::numeric_limits;
 namespace nestl
 {
 
-template <typename T
+template <typename T>
 struct numeric_limits;
+
+template <>
+struct numeric_limits<unsigned int>
+{
+    static unsigned int max() NESTL_NOEXCEPT_SPEC
+    {
+        return ~static_cast<unsigned int>(0);
+    }
+};
 
 }
 

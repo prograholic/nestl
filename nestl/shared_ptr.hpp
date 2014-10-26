@@ -126,7 +126,7 @@ public:
     template <typename ... Args>
     operation_error initialize(Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
-        operation_error err = nestl::detail::construct<operation_error>(get(), m_allocator, std::forward<Args>(args) ...);
+        operation_error err = nestl::detail::construct<operation_error>(get(), m_allocator, nestl::forward<Args>(args) ...);
         return err;
     }
 
@@ -571,7 +571,7 @@ typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allo
     shared_count_t* ptr = sharedCountAlloc.allocate(1);
     if (!ptr)
     {
-        return operation_error(std::errc::not_enough_memory);
+        return operation_error(nestl::errc::not_enough_memory);
     }
     detail::allocation_scoped_guard<shared_count_t*, SharedCountAllocator> allocationGuard(sharedCountAlloc, ptr, 1);
 
@@ -581,7 +581,7 @@ typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allo
         return err;
     }
 
-    err = ptr->initialize(std::forward<Args>(args) ...);
+    err = ptr->initialize(nestl::forward<Args>(args) ...);
     if (err)
     {
         return err;
@@ -598,13 +598,13 @@ template <typename T, typename Y, typename ... Args>
 typename shared_ptr<T>::operation_error make_shared_ex(shared_ptr<Y>& sp, Args&& ... args)
 {
     nestl::allocator<T> alloc;
-    return make_shared_ex_a<T>(sp, alloc, std::forward<Args>(args) ...);
+    return make_shared_ex_a<T>(sp, alloc, nestl::forward<Args>(args) ...);
 }
 
 template <typename T, typename ... Args>
 typename shared_ptr<T>::operation_error make_shared(shared_ptr<T>& sp, Args&& ... args)
 {
-    return make_shared_ex<T>(sp, std::forward<Args>(args) ...);
+    return make_shared_ex<T>(sp, nestl::forward<Args>(args) ...);
 }
 
 #else /* NESTL_HAS_VARIADIC_TEMPLATES */

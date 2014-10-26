@@ -2,10 +2,13 @@
 #define NESTL_TESTS_NESTL_PRINTERS_HPP
 
 #include <nestl/system_error.hpp>
-#include <ostream>
-
 #include <nestl/noncopyable.hpp>
 #include <nestl/operation_error.hpp>
+
+#if NESTL_USE_STD
+
+#include <ostream>
+
 
 inline std::ostream& operator <<(std::ostream& strm, const nestl::error_condition& ec)
 {
@@ -21,5 +24,6 @@ inline std::ostream& operator <<(std::ostream& strm, const nestl::result_with_op
     return strm;
 }
 
+#endif /* NESTL_USE_STD */
 
 #endif /* NESTL_TESTS_NESTL_PRINTERS_HPP */

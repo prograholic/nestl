@@ -3,7 +3,7 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_ENABLE_CXX11
+#if NESTL_ENABLE_CXX11 && NESTL_USE_STD
 
 #include <memory>
 

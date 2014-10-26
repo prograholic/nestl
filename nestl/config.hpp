@@ -24,10 +24,28 @@
 
 
 #if !defined(NESTL_NO_STD)
+
 #   define NESTL_USE_STD              1
+
 #else /* NESTL_NO_STD */
+
 #   define NESTL_USE_STD              0
+#   if !defined NESTL_PLATFORM_HEADER
+#       error "NESTL is not usable without platform-specific header, see nestl/platform.hpp.sample for details"
+#   endif /* NESTL_PLATFORM_HEADER */
+
+#   include NESTL_PLATFORM_HEADER
+
 #endif /* NESTL_NO_STD */
+
+
+#if NESTL_ENABLE_CXX11
+#   define NESTL_THROW_SPEC(x)
+#   define NESTL_NOEXCEPT_OR_THROW_SPEC NESTL_NOEXCEPT_SPEC
+#else /* NESTL_ENABLE_CXX11 */
+#   define NESTL_THROW_SPEC(x)          throw(x)
+#   define NESTL_NOEXCEPT_OR_THROW_SPEC throw()
+#endif /* NESTL_ENABLE_CXX11 */
 
 
 
@@ -40,7 +58,5 @@
 
 
 #define NESTL_JOIN(x, y) x ## y
-
-#include <cstddef>
 
 #endif /* NESTL_CONFIG_HPP */

@@ -4,10 +4,9 @@
 #include <nestl/allocator.hpp>
 #include <nestl/shared_ptr.hpp>
 #include <nestl/move.hpp>
+#include <nestl/set.hpp>
 
-#include <set>
-
-#include <gtest/gtest.h>
+#include "tests/gtest_gmock_emulation.hpp"
 
 namespace nestl
 {
@@ -38,12 +37,12 @@ public:
     {
     }
 
-    T* allocate(std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    T* allocate(nestl::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
         return static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
     }
 
-    void deallocate(T* p, std::size_t /* n */) NESTL_NOEXCEPT_SPEC
+    void deallocate(T* p, nestl::size_t /* n */) NESTL_NOEXCEPT_SPEC
     {
         ::operator delete(p);
     }
@@ -77,17 +76,19 @@ public:
     {
     }
 
-    T* allocate(std::size_t /* n */, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    T* allocate(nestl::size_t /* n */, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
         return 0;
     }
 
-    void deallocate(T* p, std::size_t /* n */) NESTL_NOEXCEPT_SPEC
+    void deallocate(T* p, nestl::size_t /* n */) NESTL_NOEXCEPT_SPEC
     {
         ::operator delete(p);
     }
 };
 
+
+#if NESTL_HAS_SET
 
 /**
  * Allocator which has its own state (remember who allocate memory)
@@ -233,6 +234,10 @@ bool operator != (const allocator_with_state<T>& left, const allocator_with_stat
 {
     return left.m_allocated_storage != right.m_allocated_storage;
 }
+
+#define NESTL_TEST_HAS_ALLOCATOR_WITH_STATE 1
+
+#endif /* NESTL_HAS_SET */
 
 
 } // namespace test
