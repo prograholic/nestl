@@ -28,7 +28,7 @@ Compilers supported
 Library has been tested on following platforms and compilers:
 
 Toolchain                 |C++-03|C++-03-no-std|C++-11     |C++-11-no-std
--------------------------- ------ ------------- ----------- -------------
+--------------------------|------|-------------|-----------|-------------
 i386-linux-gnu G++-4.7.4  |Yes   |Yes*         |Yes        |Yes*
 i386-linux-gnu G++-4.8.3  |Yes   |Yes*         |Yes        |Yes*
 i386-linux-gnu G++-4.9.1  |Yes   |Yes*         |Yes        |Yes*
