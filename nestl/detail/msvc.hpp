@@ -12,7 +12,7 @@
 
 /**
  * @note MSVC by default supports c++-11.
- * But different versions have different features, so explic
+ * But different versions have different features, so we disable C++11 by default
  */
 #if !defined(NESTL_ENABLE_CXX11)
 #   define NESTL_ENABLE_CXX11                    0
@@ -31,8 +31,8 @@
 
 #if (MSC_VER <= NESTL_COMPILER_MSVC_2008)
 
-#   define NESTL_HAS_NOEXCEPT                    1
-#   define NESTL_HAS_DECLTYPE                    1
+#   define NESTL_HAS_NOEXCEPT                    0
+#   define NESTL_HAS_DECLTYPE                    0
 #   define NESTL_HAS_STATIC_ASSERT               0
 #   define NESTL_HAS_CONSTEXPR                   0
 #   define NESTL_HAS_VARIADIC_TEMPLATES          0
@@ -72,6 +72,18 @@
 
 #endif /* NESTL_HAS_CXX11_ALIGNMENT_SUPPORT */
 
+
+#if NESTL_ENABLE_CXX11
+#   define NESTL_THROW_SPEC(x)
+#   define NESTL_NOEXCEPT_OR_THROW_SPEC          NESTL_NOEXCEPT_SPEC
+#else /* NESTL_ENABLE_CXX11 */
+
+/**
+ * @note MSVC ignores any exception specification except throw()
+ */
+#   define NESTL_THROW_SPEC(x)
+#   define NESTL_NOEXCEPT_OR_THROW_SPEC          throw()
+#endif /* NESTL_ENABLE_CXX11 */
 
 
 #endif /* NESTL_DETAIL_MSVC_HPP */

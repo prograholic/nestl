@@ -11,24 +11,24 @@ inline void gcc_x86_assert(bool x)
     }
 }
 
-#   define NESTL_PLATFORM_ASSERT(x) gcc_x86_assert(x)
+#   define NESTL_PLATFORM_ASSERT(x) gcc_x86_assert(!!(x))
 
 #endif /* __GNUC__ */
 
 
 #if defined(_MSC_VER)
 
-#   pragma intrinsic(debugbreak);
+#   pragma intrinsic(__debugbreak)
 
 inline void msvc_assert(bool x)
 {
     if (!x)
     {
-        debugbreak();
+        __debugbreak();
     }
 }
 
-#   define NESTL_PLATFORM_ASSERT(x) msvc_assert(x)
+#   define NESTL_PLATFORM_ASSERT(x) msvc_assert(!!(x))
 
 #endif /* _MSC_VER */
 

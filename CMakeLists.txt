@@ -1,13 +1,15 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
-project(nestl)
+project(nestl CXX)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 
 if (NESTL_ENABLE_CXX11)
   message(STATUS "Using nestl with c++ 11 features")
-  add_compile_options(-std=c++11)
+  if (CMAKE_COMPILER_IS_GNUCXX)
+    add_compile_options(-std=c++11)
+  endif()
 else()
   message(STATUS "Using nestl with c++ 03 features")
 endif()

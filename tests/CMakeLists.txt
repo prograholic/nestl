@@ -10,8 +10,13 @@ config_compiler_and_linker()
 
 if (NESTL_DISABLE_STD)
   add_definitions(-DNESTL_PLATFORM_HEADER="tests/sample_test_platform.hpp")
-  add_compile_options(-nostdinc)
-  add_compile_options(-nostdinc++)
+  if (CMAKE_COMPILER_IS_GNUCXX)
+    add_compile_options(-nostdinc)
+    add_compile_options(-nostdinc++)
+  else()
+    # assume MSVC compiler
+	add_compile_options(/X)
+  endif()
 endif()
 
 function(cxx_test2 name libs)

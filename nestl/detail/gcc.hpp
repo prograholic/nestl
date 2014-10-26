@@ -48,6 +48,8 @@
 #   define NESTL_NOEXCEPT_OPERATOR(x)            noexcept(x)
 #   define NESTL_NOEXCEPT_SPEC                   noexcept
 #   define NESTL_DECLTYPE(x)                     decltype(x)
+#   define NESTL_THROW_SPEC(x)
+#   define NESTL_NOEXCEPT_OR_THROW_SPEC          NESTL_NOEXCEPT_SPEC
 
 #else /* __GXX_EXPERIMENTAL_CXX0X__ */
 
@@ -85,6 +87,9 @@
  * @note GCC's typeof is different from c++11 decltype
  */
 #   define NESTL_DECLTYPE(x)                     typeof(x)
+
+#   define NESTL_THROW_SPEC(x)                   throw(x)
+#   define NESTL_NOEXCEPT_OR_THROW_SPEC          throw()
 
 #endif /* __GXX_EXPERIMENTAL_CXX0X__ */
 
