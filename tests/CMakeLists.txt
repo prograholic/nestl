@@ -1,4 +1,12 @@
 
+if (MSVC)
+  # msvc-2012 lacks variadic template support
+  if (MSVC_VERSION EQUAL 1700) # mcvc-2012
+    message(STATUS "msvc lacks variadic template support")
+    add_definitions(-D_VARIADIC_MAX=10)   
+  endif()
+endif(MSVC)
+
 
 add_subdirectory(${NESTL_GOOGLEMOCK_DIR} ${CMAKE_CURRENT_BINARY_DIR}/googlemock)
 

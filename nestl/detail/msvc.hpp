@@ -29,7 +29,7 @@
  */
 #define NESTL_DECLTYPE(x)                        delctype(x)
 
-#if (MSC_VER <= NESTL_COMPILER_MSVC_2008)
+#if (_MSC_VER <= NESTL_COMPILER_MSVC_2008)
 
 #   define NESTL_HAS_NOEXCEPT                    0
 #   define NESTL_HAS_DECLTYPE                    0
@@ -47,11 +47,31 @@
 #   define NESTL_NOEXCEPT_OPERATOR(x)            true
 #   define NESTL_NOEXCEPT_SPEC
 
-#elif (MSC_VER <= NESTL_COMPILER_MSVC_2010)
+#elif (_MSC_VER <= NESTL_COMPILER_MSVC_2010)
 
-#elif (MSC_VER <= NESTL_COMPILER_MSVC_2012)
+#   error msvc 2010 support is not implemented yet
 
-#elif (MSC_VER <= NESTL_COMPILER_MSVC_2013)
+#elif (_MSC_VER <= NESTL_COMPILER_MSVC_2012)
+#   define NESTL_HAS_NOEXCEPT                    1
+#   define NESTL_HAS_DECLTYPE                    1
+#   define NESTL_HAS_STATIC_ASSERT               1
+#   define NESTL_HAS_CONSTEXPR                   0
+#   define NESTL_HAS_VARIADIC_TEMPLATES          0
+#   define NESTL_HAS_RVALUE_REF                  1
+#   define NESTL_HAS_EXPLICIT_OPERATOR           0
+#   define NESTL_HAS_INITIALIZER_LIST_HEADER     0
+#   define NESTL_HAS_CXX11_ALIGNMENT_SUPPORT     0
+
+#   define NESTL_CONSTEXPR                       
+#   define NESTL_COMPILER_GENERATED_IMPL         {}
+#   define NESTL_DELETED_IMPL                    
+#   define NESTL_NOEXCEPT_OPERATOR(x)            true
+#   define NESTL_NOEXCEPT_SPEC
+
+
+#elif (_MSC_VER <= NESTL_COMPILER_MSVC_2013)
+
+#   error msvc 2013 support is not implemented yet
 
 #else /* MSC_VER */
 
