@@ -70,7 +70,7 @@ struct allocation_scoped_guard : private nestl::noncopyable
 
     ~allocation_scoped_guard() NESTL_NOEXCEPT_SPEC
     {
-        m_alloc.deallocate(m_ptr, m_size);
+        nestl::allocator_traits<Allocator>::deallocate(m_alloc, m_ptr, m_size);
     }
 
     void release()

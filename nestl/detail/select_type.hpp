@@ -24,6 +24,13 @@ namespace nestl
     typedef NESTL_DECLTYPE(NESTL_##Nested##_helper((Type*)0)) nestl_nested_type_##Nested \
 
 
+#   define NESTL_SELECT_NESTED_TYPE_TEMPLATE(Type, NestedType, ResultType, Default) \
+    template<typename T> \
+    static typename T::template NestedType NESTL_##ResultType##_helper(T*); \
+    static Default NESTL_##ResultType##helper(...); \
+    typedef NESTL_DECLTYPE(NESTL_##ResultType##_helper((Type*)0)) nestl_nested_type_##ResultType \
+
+
 
 #   define NESTL_HAS_METHOD(Class, methodName) \
     template <typename T> \

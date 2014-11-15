@@ -24,13 +24,15 @@ using std::error_condition;
 
 #   include <cerrno>
 
-#   define NESTL_ENOMEM ENOMEM
-#   define NESTL_EINVAL EINVAL
+#   define NESTL_ENOMEM    ENOMEM
+#   define NESTL_EINVAL    EINVAL
+#   define NESTL_EOVERFLOW EOVERFLOW
 
 #else /* NESTL_USE_STD */
 
-#   define NESTL_ENOMEM 12
-#   define NESTL_EINVAL 22
+#   define NESTL_ENOMEM    12
+#   define NESTL_EINVAL    22
+#   define NESTL_EOVERFLOW 75
 
 #endif /* NESTL_USE_STD */
 
@@ -43,7 +45,8 @@ namespace errc
 enum
 {
     invalid_argument  = NESTL_EINVAL,
-    not_enough_memory = NESTL_ENOMEM
+    not_enough_memory = NESTL_ENOMEM,
+    value_too_large   = NESTL_EOVERFLOW
 };
 
 } // namespace errc

@@ -31,8 +31,8 @@ public:
 
     typedef T                                                               value_type;
     typedef Allocator                                                       allocator_type;
-    typedef size_t                                                          size_type;
-    typedef ptrdiff_t                                                       difference_type;
+    typedef nestl::size_t                                                   size_type;
+    typedef nestl::ptrdiff_t                                                difference_type;
     typedef T&                                                              reference;
     typedef const T&                                                        const_reference;
     typedef typename nestl::allocator_traits<allocator_type>::pointer       pointer;
@@ -597,8 +597,7 @@ vector<T, A>::reserve(size_type new_cap) NESTL_NOEXCEPT_SPEC
     {
         if (new_cap > max_size())
         {
-            /// @todo add support for value_too_large
-            return operation_error(nestl::errc::invalid_argument);
+            return operation_error(nestl::errc::value_too_large);
         }
     }
 

@@ -92,7 +92,9 @@ REGISTER_TYPED_TEST_CASE_P(VectorTestCommon,
                            CheckAssignWithSize1024,
                            CheckInsertIntoEmptyVector);
 
-INSTANTIATE_TYPED_TEST_CASE_P(common_vector_test, VectorTestCommon, VectorCommonTypesWithDefaultAllocator);
+INSTANTIATE_TYPED_TEST_CASE_P(common_vector_test,
+                              VectorTestCommon,
+                              VectorCommonTypesWithDefaultAllocator);
 
 
 ////////////////////////////////////////////////////////////////////////////////

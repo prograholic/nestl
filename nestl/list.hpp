@@ -164,7 +164,7 @@ struct list_node_base
 template <typename T>
 struct list_node : public list_node_base
 {
-    typename nestl::aligned_storage<sizeof(T), nestl::alignment_of<T>::value>::type m_value;
+    nestl::aligned_buffer<T> m_value;
 
     list_node() NESTL_NOEXCEPT_SPEC
         : list_node_base()
@@ -228,7 +228,7 @@ struct list_node : public list_node_base
 template <typename T, typename OperationError>
 struct list_iterator
 {
-    typedef ptrdiff_t                         difference_type;
+    typedef nestl::ptrdiff_t                  difference_type;
     typedef nestl::bidirectional_iterator_tag iterator_category;
     typedef T                                 value_type;
     typedef T*                                pointer;
@@ -334,7 +334,7 @@ private:
 template <typename T, typename OperationError>
 struct list_const_iterator
 {
-    typedef ptrdiff_t                         difference_type;
+    typedef nestl::ptrdiff_t                  difference_type;
     typedef nestl::bidirectional_iterator_tag iterator_category;
     typedef T                                 value_type;
     typedef const T*                          pointer;
@@ -452,8 +452,8 @@ class list : private nestl::noncopyable
 public:
     typedef T                                                               value_type;
     typedef Allocator                                                       allocator_type;
-    typedef size_t                                                          size_type;
-    typedef ptrdiff_t                                                       difference_type;
+    typedef nestl::size_t                                                   size_type;
+    typedef nestl::ptrdiff_t                                                difference_type;
     typedef T&                                                              reference;
     typedef const T&                                                        const_reference;
     typedef typename nestl::allocator_traits<allocator_type>::pointer       pointer;
@@ -1430,7 +1430,7 @@ list<T, A>::splice(const_iterator pos, list
 #else /* NESTL_HAS_RVALUE_REF */
                    &
 #endif /* NESTL_HAS_RVALUE_REF */
-                   other, const_iterator first, const_iterator last) NESTL_NOEXCEPT_SPEC
+                   /* other */, const_iterator first, const_iterator last) NESTL_NOEXCEPT_SPEC
 {
     if (first != last)
     {

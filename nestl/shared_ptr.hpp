@@ -148,7 +148,7 @@ public:
 #endif /* NESTL_HAS_VARIADIC_TEMPLATES */
 
 private:
-    typename nestl::aligned_storage<sizeof(T), nestl::alignment_of<T>::value>::type m_value;
+    nestl::aligned_buffer<T> m_value;
     allocator_type m_allocator;
 };
 
@@ -559,7 +559,7 @@ bool shared_ptr<T>::unique() const NESTL_NOEXCEPT_SPEC
 
 #if NESTL_HAS_VARIADIC_TEMPLATES
 template <typename T, typename Allocator, typename Y, typename ... Args>
-typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, Args&& ... args)
+typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& /* alloc */, Args&& ... args)
 {
     NESTL_STATIC_ASSERT(sizeof(T), "T must be complete type");
     typedef typename shared_ptr<T>::operation_error operation_error;
@@ -646,7 +646,7 @@ typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allo
 }
 
 template <typename T, typename Allocator, typename Y, typename Arg>
-typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, const Arg& arg)
+typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& /* alloc */, const Arg& arg)
 {
     NESTL_STATIC_ASSERT(sizeof(T), "T must be complete type");
     typedef typename shared_ptr<T>::operation_error operation_error;

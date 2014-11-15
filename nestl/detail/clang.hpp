@@ -1,9 +1,7 @@
 #ifndef NESTL_DETAIL_CLANG_HPP
 #define NESTL_DETAIL_CLANG_HPP
 
-
 #define NESTL_COMPILER                           NESTL_COMPILER_CLANG
-
 
 #define NESTL_UNUSED                             __attribute__((unused))
 

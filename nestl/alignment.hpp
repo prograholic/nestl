@@ -40,4 +40,28 @@ struct alignment_of : public nestl::integral_constant<size_t, NESTL_ALIGNOF(T)>
 
 #endif /* NESTL_ENABLE_CXX11 && NESTL_USE_STD */
 
+
+namespace nestl
+{
+
+template <typename T>
+struct aligned_buffer : public nestl::aligned_storage<sizeof(T), nestl::alignment_of<T>::value>
+{
+    typedef typename nestl::aligned_storage<sizeof(T), nestl::alignment_of<T>::value>::type storage_type;
+
+    storage_type m_storage;
+
+    void* address() NESTL_NOEXCEPT_SPEC
+    {
+        return static_cast<void*>(&m_storage);
+    }
+
+    const void* address() const NESTL_NOEXCEPT_SPEC
+    {
+        return static_cast<const void*>(&m_storage);
+    }
+};
+
+}
+
 #endif /* NESTL_ALIGNMENT_HPP */

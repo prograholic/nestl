@@ -57,6 +57,19 @@ struct Types
 };
 
 
+
+struct FailureTracer
+{
+    template <typename T>
+    FailureTracer& operator <<(const T& /* t */)
+    {
+        return *this;
+    }
+};
+
+
+#define ADD_FAILURE() ::testing::FailureTracer()
+
 #define EXPECT_TRUE(x)
 
 
