@@ -3,7 +3,7 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if NESTL_HAS_RVALUE_REF
 
 #   if NESTL_USE_STD
 
@@ -46,10 +46,10 @@ forward(typename nestl::remove_reference<T>::type&& t) NESTL_NOEXCEPT_SPEC
 #   endif  /* NESTL_USE_STD */
 
 
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* NESTL_HAS_RVALUE_REF */
 
 /// forward is not available
 
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* NESTL_HAS_RVALUE_REF */
 
 #endif /* NESTL_FORWARD_HPP */
