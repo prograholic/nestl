@@ -4,6 +4,7 @@ echo off
 if [%1] == [] goto usage
 
 if %1 == 2008 set OUT_DIR=msvc-2008
+if %1 == 2010 set OUT_DIR=msvc-2010
 if %1 == 2012 set OUT_DIR=msvc-2012
 
 if [%OUT_DIR%] == [] goto usage
