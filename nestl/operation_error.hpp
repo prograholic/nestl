@@ -65,14 +65,14 @@ public:
         return m_val;
     }
 
-#if NESTL_HAS_EXPLICIT_OPERATOR
+#if defined(NESTL_CONFIG_HAS_EXPLICIT_OPERATOR)
 
     explicit operator bool() const NESTL_NOEXCEPT_SPEC
     {
         return m_error ? true : false;
     }
 
-#else /* NESTL_HAS_EXPLICIT_OPERATOR */
+#else /* defined(NESTL_CONFIG_HAS_EXPLICIT_OPERATOR) */
 
     typedef OperationError result_with_operation_error::*unspecified_bool_type;
 
@@ -81,7 +81,7 @@ public:
         return m_error ? &result_with_operation_error::m_error : 0;
     }
 
-#endif /* NESTL_HAS_EXPLICIT_OPERATOR */
+#endif /* defined(NESTL_CONFIG_HAS_EXPLICIT_OPERATOR) */
 
 private:
     Type m_val;

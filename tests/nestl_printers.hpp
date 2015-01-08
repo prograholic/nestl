@@ -5,7 +5,7 @@
 #include <nestl/noncopyable.hpp>
 #include <nestl/operation_error.hpp>
 
-#if NESTL_USE_STD
+#if defined(NESTL_CONFIG_HAS_STD_INCLUDES)
 
 #include <ostream>
 
@@ -24,6 +24,6 @@ inline std::ostream& operator <<(std::ostream& strm, const nestl::result_with_op
     return strm;
 }
 
-#endif /* NESTL_USE_STD */
+#endif /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #endif /* NESTL_TESTS_NESTL_PRINTERS_HPP */

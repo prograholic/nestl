@@ -3,7 +3,7 @@
 
 #include <nestl/config.hpp>
 
-#if defined(NESTL_USE_STD)
+#if defined(NESTL_CONFIG_HAS_STD_INCLUDES)
 
 #include <string>
 
@@ -14,7 +14,7 @@ using std::char_traits;
 
 } // namespace nestl
 
-#else /* NESTL_USE_STD */
+#else /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 namespace nestl
 {
@@ -27,6 +27,6 @@ struct char_traits
 
 } // namespace nestl
 
-#endif /* NESTL_USE_STD */
+#endif /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #endif /* NESTL_CHAR_TRAITS_HPP */

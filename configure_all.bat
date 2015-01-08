@@ -28,8 +28,8 @@ goto end
 cd %NESTL_BUILD_ROOT%
 mkdir %1
 cd %1
-cmake %NESTL_SRC% -DNESTL_GOOGLEMOCK_DIR=%GMOCK_DIR% -G %2 -DNESTL_ENABLE_CXX11=%3 -DNESTL_DISABLE_STD=%4
-
+cmake %NESTL_SRC% -DNESTL_GOOGLEMOCK_DIR=%GMOCK_DIR% -G %2 -DNESTL_CONFIG_HAS_CXX11=%3 -DNESTL_DISABLE_STD=%4
+goto end
 
 :usage
 echo %0 ^<msvc_ver^> {gmock_dir}

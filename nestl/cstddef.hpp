@@ -3,7 +3,7 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_USE_STD
+#if defined(NESTL_CONFIG_HAS_STD_INCLUDES)
 
 #   include <cstddef>
 
@@ -13,7 +13,7 @@ using std::size_t;
 using std::ptrdiff_t;
 } // namespace nestl
 
-#else /* NESTL_USE_STD */
+#else /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 /**
  * @note nestl::platform::* types should be declared in header NESTL_PLATFORM_HEADER
@@ -27,6 +27,6 @@ using nestl::platform::ptrdiff_t;
 } // namespace nestl
 
 
-#endif /* NESTL_USE_STD */
+#endif /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #endif /* NESTL_CSTDDEF_HPP */

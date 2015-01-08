@@ -16,7 +16,7 @@ class VectorTestAssignWithDefaultAllocator : public VectorTestAssignBase
 };
 
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
 
 TEST_F(VectorTestAssignWithDefaultAllocator, MoveAssignEmptyVectorToEmptyVector)
 {
@@ -67,7 +67,7 @@ TEST_F(VectorTestAssignWithDefaultAllocator, MoveAssignNonEmptyVectorToNonEmptyV
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
 }
 
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
 } // namespace test
 

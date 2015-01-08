@@ -3,12 +3,12 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_USE_STD
+#if defined(NESTL_CONFIG_HAS_STD_INCLUDES)
 
 #   include <gtest/gtest.h>
 #   include <gmock/gmock.h>
 
-#else /* NESTL_USE_STD */
+#else /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 namespace testing
 {
@@ -89,6 +89,6 @@ struct Types
 
 } // namespace testing
 
-#endif /* NESTL_USE_STD */
+#endif /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #endif /* NESTL_TESTS_GTEST_GMOCK_EMULATION_HPP */

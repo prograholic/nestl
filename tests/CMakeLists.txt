@@ -8,6 +8,7 @@ if (MSVC)
 endif(MSVC)
 
 
+set(gtest_disable_pthreads YES)
 add_subdirectory(${NESTL_GOOGLEMOCK_DIR} ${CMAKE_CURRENT_BINARY_DIR}/googlemock)
 
 include_directories(${NESTL_GOOGLEMOCK_DIR}/include)

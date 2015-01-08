@@ -75,7 +75,7 @@ public:
         return nestl::numeric_limits<size_type>::max();
     }
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
 
     template<typename U, typename ... Args>
     void construct(U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
@@ -84,7 +84,7 @@ public:
         ::new(static_cast<void*>(ptr)) U(nestl::forward<Args>(args)...);
     }
 
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
     template<typename U>
     void construct(U* ptr) NESTL_NOEXCEPT_SPEC
@@ -100,7 +100,7 @@ public:
         ::new(static_cast<void*>(ptr)) U(arg);
     }
 
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
     template<typename U>
     void destroy(U* ptr)

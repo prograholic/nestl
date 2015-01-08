@@ -9,7 +9,7 @@ Design and implementation of some of stl containers and smart pointers without e
 How to build
 ============
 Library is header-only. Library detects version of c++ (03, 11) and configures itself according to c++ version.
-Also it is possible to add definition **NESTL_ENABLE_CXX11** for using c++11 features
+Also it is possible to add definition **NESTL_CONFIG_HAS_CXX11** for using c++11 features
 
 
 How to use NESTL without standard library

@@ -4,11 +4,11 @@
 #include <nestl/config.hpp>
 #include <nestl/cstddef.hpp>
 
-#if NESTL_USE_STD
+#if defined(NESTL_CONFIG_HAS_STD_INCLUDES)
 
 #   include <new>
 
-#else /* NESTL_USE_STD */
+#else /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 /**
  * @note We declare nothrow_t and nothrow in std namespace
@@ -64,6 +64,6 @@ inline void operator delete[](void*, void*) NESTL_NOEXCEPT_SPEC
 {
 }
 
-#endif /* NESTL_USE_STD */
+#endif /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #endif /* NESTL_NEW_HPP */

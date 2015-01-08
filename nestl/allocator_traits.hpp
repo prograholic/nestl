@@ -4,7 +4,7 @@
 #include <nestl/config.hpp>
 #include <nestl/cstddef.hpp>
 
-#if NESTL_USE_STD && NESTL_ENABLE_CXX11
+#if defined(NESTL_CONFIG_HAS_STD) && defined(NESTL_CONFIG_HAS_CXX11)
 
 #include <memory>
 
@@ -17,7 +17,7 @@ using std::allocator_traits;
 
 
 
-#else /* NESTL_USE_STD && NESTL_ENABLE_CXX11 */
+#else /* defined(NESTL_CONFIG_HAS_STD) && defined(NESTL_CONFIG_HAS_CXX11) */
 
 #include <nestl/declval.hpp>
 #include <nestl/numeric_limits.hpp>
@@ -51,7 +51,7 @@ struct allocator_traits
 
 
 
-    NESTL_HAS_METHOD(Allocator, destroy);
+    NESTL_METHOD_CHECKER(Allocator, destroy);
 
     template<typename U>
     static void destroy_helper(const nestl::true_type& /* trueVal */, Allocator& alloc, U* ptr)
@@ -72,7 +72,7 @@ struct allocator_traits
     }
 
 
-    NESTL_HAS_METHOD(Allocator, max_size);
+    NESTL_METHOD_CHECKER(Allocator, max_size);
 
     static size_type max_size_helper(const nestl::true_type& /* trueVal */, const Allocator& alloc)
     {
@@ -90,9 +90,9 @@ struct allocator_traits
     }
 
 
-    NESTL_HAS_METHOD(Allocator, construct);
+    NESTL_METHOD_CHECKER(Allocator, construct);
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
 
     template<typename U, typename ... Args>
     static void construct_helper(Allocator& alloc, const nestl::true_type& /* trueVal */, U* ptr, Args&& ... args)
@@ -113,7 +113,7 @@ struct allocator_traits
         return construct_helper(alloc, has_construct_member(), ptr, nestl::forward<Args>(args) ...);
     }
 
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
     template<typename U>
     static void construct_helper(Allocator& alloc, const nestl::true_type& /* trueVal */, U* ptr)
@@ -153,7 +153,7 @@ struct allocator_traits
         construct_helper(alloc, has_construct_member(), ptr, arg);
     }
 
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
 
 #undef NESTL_ALLOC_DECLARE_STATIC_METHOD
@@ -161,7 +161,7 @@ struct allocator_traits
 
 } // namespace nestl
 
-#endif /* NESTL_USE_STD && NESTL_ENABLE_CXX11 */
+#endif /* defined(NESTL_CONFIG_HAS_STD) && defined(NESTL_CONFIG_HAS_CXX11) */
 
 
 

@@ -3,7 +3,7 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_USE_STD && NESTL_HAS_CXX11
+#if defined(NESTL_CONFIG_HAS_STD) && defined(NESTL_CONFIG_HAS_CXX11)
 
 #include <utility>
 
@@ -16,23 +16,23 @@ using std::declval
 
 
 
-#else /* NESTL_USE_STD && NESTL_HAS_CXX11 */
+#else /* defined(NESTL_CONFIG_HAS_STD) && defined(NESTL_CONFIG_HAS_CXX11) */
 
 #include <nestl/type_traits.hpp>
 
 namespace nestl
 {
 template <typename T>
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
 nestl::add_rvalue_reference<T>
-#else /* NESTL_HAS_RVALUE_REF */
+#else /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 T
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 declval();
 
 } // namespace nestl
 
-#endif /* NESTL_USE_STD && NESTL_HAS_CXX11 */
+#endif /* defined(NESTL_CONFIG_HAS_STD) && defined(NESTL_CONFIG_HAS_CXX11) */
 
 
 

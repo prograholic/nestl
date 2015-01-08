@@ -88,7 +88,7 @@ public:
 };
 
 
-#if NESTL_HAS_SET
+#if defined(NESTL_CONFIG_HAS_SET)
 
 /**
  * Allocator which has its own state (remember who allocate memory)
@@ -121,20 +121,20 @@ public:
     {
     }
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     allocator_with_state(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
         : m_allocated_storage(nestl::move(other.m_allocated_storage))
     {
     }
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     template <typename Y>
     allocator_with_state(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
         : m_allocated_storage(nestl::move(other.m_allocated_storage))
     {
     }
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
     allocator_with_state& operator=(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
     {
@@ -149,22 +149,22 @@ public:
         return *this;
     }
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     allocator_with_state& operator=(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
     {
         m_allocated_storage = nestl::move(other.m_allocated_storage);
         return *this;
     }
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     template <typename Y>
     allocator_with_state& operator=(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
     {
         m_allocated_storage = nestl::move(other.m_allocated_storage);
         return *this;
     }
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
     ~allocator_with_state() NESTL_NOEXCEPT_SPEC
     {
@@ -235,9 +235,9 @@ bool operator != (const allocator_with_state<T>& left, const allocator_with_stat
     return left.m_allocated_storage != right.m_allocated_storage;
 }
 
-#define NESTL_TEST_HAS_ALLOCATOR_WITH_STATE 1
+#define NESTL_CONFIG_HAS_TEST_ALLOCATOR_WITH_STATE 1
 
-#endif /* NESTL_HAS_SET */
+#endif /* defined(NESTL_CONFIG_HAS_SET) */
 
 
 } // namespace test

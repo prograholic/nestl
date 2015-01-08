@@ -178,14 +178,14 @@ struct list_node : public list_node_base
         nestl::detail::destroy(a, value, value + 1);
     }
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
     template <typename OperationError, typename Allocator, typename ... Args>
     OperationError initialize(Allocator& a, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
         auto err = nestl::detail::construct<OperationError>(get_pointer(), a, nestl::forward<Args>(args) ...);
         return err;
     }
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
     template <typename OperationError, typename Allocator>
     OperationError initialize(Allocator& a) NESTL_NOEXCEPT_SPEC
     {
@@ -199,7 +199,7 @@ struct list_node : public list_node_base
         OperationError err = nestl::detail::construct<OperationError>(get_pointer(), a, arg);
         return err;
     }
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
 
     T* get_pointer() NESTL_NOEXCEPT_SPEC
@@ -471,9 +471,9 @@ public:
     // constructors
     explicit list(const allocator_type& alloc = allocator_type()) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     explicit list(list&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
     // destructor
     ~list() NESTL_NOEXCEPT_SPEC;
@@ -482,9 +482,9 @@ public:
     allocator_type get_allocator() const NESTL_NOEXCEPT_SPEC;
 
     // assignment operators and functions
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     list& operator=(list&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
     operation_error assign_copy(const list& other) NESTL_NOEXCEPT_SPEC;
 
@@ -493,9 +493,9 @@ public:
     template <typename InputIterator>
     operation_error assign(InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_INITIALIZER_LIST
+#if defined(NESTL_CONFIG_HAS_INITIALIZER_LIST)
     operation_error assign(nestl::initializer_list<value_type> ilist) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_INITIALIZER_LIST */
+#endif /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
 
     // element access
     reference front() NESTL_NOEXCEPT_SPEC;
@@ -546,28 +546,28 @@ public:
 
     iterator_with_operation_error insert(const_iterator pos, const value_type& value) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     iterator_with_operation_error insert(const_iterator pos, value_type&& value) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
     operation_error insert(const_iterator pos, size_type count, const value_type& value) NESTL_NOEXCEPT_SPEC;
 
     template<typename InputIterator>
     operation_error insert(const_iterator pos, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_INITIALIZER_LIST
+#if defined(NESTL_CONFIG_HAS_INITIALIZER_LIST)
     iterator_with_operation_error insert(const_iterator pos, nestl::initializer_list<T> ilist) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_INITIALIZER_LIST */
+#endif /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
     template<typename ... Args>
     iterator_with_operation_error emplace(const_iterator pos, Args&&... args) NESTL_NOEXCEPT_SPEC;
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
     iterator_with_operation_error emplace(const_iterator pos) NESTL_NOEXCEPT_SPEC;
 
     template<typename Arg>
     iterator_with_operation_error emplace(const_iterator pos, const Arg& arg) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
     iterator erase(const_iterator pos) NESTL_NOEXCEPT_SPEC;
 
@@ -575,37 +575,37 @@ public:
 
     operation_error push_back(const value_type& value) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     operation_error push_back(value_type&& value) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
     template<typename ... Args>
     operation_error emplace_back(Args&& ... args) NESTL_NOEXCEPT_SPEC;
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
     operation_error emplace_back() NESTL_NOEXCEPT_SPEC;
 
     template<typename Arg>
     operation_error emplace_back(const Arg& arg) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
     void pop_back() NESTL_NOEXCEPT_SPEC;
 
     operation_error push_front(const value_type& value) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     operation_error push_front(value_type&& value) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
     template<typename ... Args>
     operation_error emplace_front(Args&& ... args) NESTL_NOEXCEPT_SPEC;
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
     operation_error emplace_front() NESTL_NOEXCEPT_SPEC;
 
     template<typename Arg>
     operation_error emplace_front(const Arg& arg) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
     void pop_front() NESTL_NOEXCEPT_SPEC;
 
@@ -618,35 +618,35 @@ public:
     // operations
     void merge(list& other) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     void merge(list&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
     template <typename Compare>
     void merge(list& other, Compare comp) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     template <typename Compare>
     void merge(list&& other, Compare comp) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
     void splice(const_iterator pos, list& other) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     void splice(const_iterator pos, list&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
     void splice(const_iterator pos, list& other, const_iterator it) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     void splice(const_iterator pos, list&& other, const_iterator it) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
     void splice(const_iterator pos, list& other, const_iterator first, const_iterator last) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     void splice(const_iterator pos, list&& other, const_iterator first, const_iterator last) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
     void remove(const value_type& value) NESTL_NOEXCEPT_SPEC;
 
@@ -681,19 +681,19 @@ private:
 
     void swap_data(list& other) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     void move_assign(const nestl::true_type& /* true_val */, list&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
     template <typename ... Args>
     operation_error create_node(node_type*& node, Args&& ... args) NESTL_NOEXCEPT_SPEC;
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
     operation_error create_node(node_type*& node) NESTL_NOEXCEPT_SPEC;
 
     template <typename Arg>
     operation_error create_node(node_type*& node, const Arg& arg) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
     template <typename ListIterator1, typename ListIterator2, typename ListIterator3>
     void transfer(ListIterator1 pos, ListIterator2 first, ListIterator3 last) NESTL_NOEXCEPT_SPEC;
@@ -719,7 +719,7 @@ struct class_traits <nestl::list<T, ListAllocator> >
         return OperationError();
     }
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     template <typename OperationError, typename Allocator>
     static OperationError construct(list_t* ptr, Allocator& alloc, list_t&& other) NESTL_NOEXCEPT_SPEC
     {
@@ -727,7 +727,7 @@ struct class_traits <nestl::list<T, ListAllocator> >
 
         return OperationError();
     }
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
     template <typename OperationError, typename Allocator>
     static OperationError construct(list_t* ptr, Allocator& alloc, const list_t& other) NESTL_NOEXCEPT_SPEC
@@ -791,7 +791,7 @@ list<T, A>::list(const allocator_type& alloc) NESTL_NOEXCEPT_SPEC
     init_empty_list();
 }
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
 template <typename T, typename A>
 list<T, A>::list(list&& other) NESTL_NOEXCEPT_SPEC
     : m_node_allocator(nestl::move(other.m_node_allocator))
@@ -800,7 +800,7 @@ list<T, A>::list(list&& other) NESTL_NOEXCEPT_SPEC
     init_empty_list();
     swap_data(other);
 }
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
 template <typename T, typename A>
 list<T, A>::~list() NESTL_NOEXCEPT_SPEC
@@ -814,7 +814,7 @@ typename list<T, A>::allocator_type list<T, A>::get_allocator() const NESTL_NOEX
     return allocator_type(m_node_allocator);
 }
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
 template <typename T, typename A>
 list<T, A>& list<T, A>::operator=(list&& other) NESTL_NOEXCEPT_SPEC
 {
@@ -822,7 +822,7 @@ list<T, A>& list<T, A>::operator=(list&& other) NESTL_NOEXCEPT_SPEC
 
     return *this;
 }
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
 template <typename T, typename A>
 typename list<T, A>::operation_error list<T, A>::assign_copy(const list& other) NESTL_NOEXCEPT_SPEC
@@ -871,14 +871,14 @@ list<T, A>::assign(InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC
     return operation_error();
 }
 
-#if NESTL_HAS_INITIALIZER_LIST
+#if defined(NESTL_CONFIG_HAS_INITIALIZER_LIST)
 template <typename T, typename A>
 typename list<T, A>::operation_error
 list<T, A>::assign(nestl::initializer_list<value_type> ilist) NESTL_NOEXCEPT_SPEC
 {
     return this->assign(ilist.begin(), ilist.end());
 }
-#endif /* NESTL_HAS_INITIALIZER_LIST */
+#endif /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
 
 
 template <typename T, typename A>
@@ -1036,14 +1036,14 @@ list<T, A>::insert(const_iterator pos, const value_type& value) NESTL_NOEXCEPT_S
     return emplace(pos, value);
 }
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
 template <typename T, typename A>
 typename list<T, A>::iterator_with_operation_error
 list<T, A>::insert(const_iterator pos, value_type&& value) NESTL_NOEXCEPT_SPEC
 {
     return emplace(pos, nestl::move(value));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
 template <typename T, typename A>
 typename list<T, A>::operation_error
@@ -1084,16 +1084,16 @@ list<T, A>::insert(const_iterator pos, InputIterator first, InputIterator last) 
     return operation_error();
 }
 
-#if NESTL_HAS_INITIALIZER_LIST
+#if defined(NESTL_CONFIG_HAS_INITIALIZER_LIST)
 template <typename T, typename A>
 typename list<T, A>::iterator_with_operation_error
 list<T, A>::insert(const_iterator pos, nestl::initializer_list<T> ilist) NESTL_NOEXCEPT_SPEC
 {
     return insert(pos, ilist.begin(), ilist.end());
 }
-#endif /* NESTL_HAS_INITIALIZER_LIST */
+#endif /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
 template <typename T, typename A>
 template<typename ... Args>
 typename list<T, A>::iterator_with_operation_error
@@ -1112,7 +1112,7 @@ list<T, A>::emplace(const_iterator pos, Args&&... args) NESTL_NOEXCEPT_SPEC
 
     return nestl::make_result_with_operation_error(iterator(newNode), err);
 }
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 template <typename T, typename A>
 typename list<T, A>::iterator_with_operation_error
 list<T, A>::emplace(const_iterator pos) NESTL_NOEXCEPT_SPEC
@@ -1150,7 +1150,7 @@ list<T, A>::emplace(const_iterator pos, const Arg& arg) NESTL_NOEXCEPT_SPEC
     return nestl::make_result_with_operation_error(iterator(newNode), err);
 }
 
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
 template <typename T, typename A>
 typename list<T, A>::iterator
@@ -1187,17 +1187,17 @@ list<T, A>::push_back(const value_type& value) NESTL_NOEXCEPT_SPEC
     return insert(cend(), value).error();
 }
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
 template <typename T, typename A>
 typename list<T, A>::operation_error
 list<T, A>::push_back(value_type&& value) NESTL_NOEXCEPT_SPEC
 {
     return insert(cend(), nestl::move(value)).error();
 }
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
 template <typename T, typename A>
 template<typename ... Args>
 typename list<T, A>::operation_error
@@ -1205,7 +1205,7 @@ list<T, A>::emplace_back(Args&& ... args) NESTL_NOEXCEPT_SPEC
 {
     return emplace(cend(), nestl::forward<Args>(args) ...).error();
 }
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 template <typename T, typename A>
 typename list<T, A>::operation_error
 list<T, A>::emplace_back() NESTL_NOEXCEPT_SPEC
@@ -1220,7 +1220,7 @@ list<T, A>::emplace_back(const Arg& arg) NESTL_NOEXCEPT_SPEC
 {
     return emplace(cend(), arg).error();
 }
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
 template <typename T, typename A>
 void
@@ -1236,16 +1236,16 @@ list<T, A>::push_front(const value_type& value) NESTL_NOEXCEPT_SPEC
     return insert(cbegin(), value).error();
 }
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
 template <typename T, typename A>
 typename list<T, A>::operation_error
 list<T, A>::push_front(value_type&& value) NESTL_NOEXCEPT_SPEC
 {
     return insert(cbegin(), nestl::move(value)).error();
 }
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
 template <typename T, typename A>
 template<typename ... Args>
 typename list<T, A>::operation_error
@@ -1253,7 +1253,7 @@ list<T, A>::emplace_front(Args&& ... args) NESTL_NOEXCEPT_SPEC
 {
     return emplace(cbegin(), nestl::forward<Args>(args) ...).error();
 }
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 template <typename T, typename A>
 typename list<T, A>::operation_error
 list<T, A>::emplace_front() NESTL_NOEXCEPT_SPEC
@@ -1268,7 +1268,7 @@ list<T, A>::emplace_front(const Arg& arg) NESTL_NOEXCEPT_SPEC
 {
     return emplace(cbegin(), arg).error();
 }
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
 template <typename T, typename A>
 void
@@ -1286,7 +1286,7 @@ list<T, A>::swap(list& other) NESTL_NOEXCEPT_SPEC
 }
 
 /// Operations
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
 template <typename T, typename A>
 void
 list<T, A>::merge(list& other) NESTL_NOEXCEPT_SPEC
@@ -1309,7 +1309,7 @@ list<T, A>::merge(list& other, Compare comp) NESTL_NOEXCEPT_SPEC
     merge(nestl::move(other), comp);
 }
 
-#else /* NESTL_HAS_RVALUE_REF */
+#else /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
 template <typename T, typename A>
 void
@@ -1318,17 +1318,17 @@ list<T, A>::merge(list& other) NESTL_NOEXCEPT_SPEC
     merge(other, nestl::less<T>());
 }
 
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
 template <typename T, typename A>
 template <typename Compare>
 void
 list<T, A>::merge(list
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
                   &&
-#else /* NESTL_HAS_RVALUE_REF */
+#else /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
                   &
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
                   other, Compare comp) NESTL_NOEXCEPT_SPEC
 {
     NESTL_ASSERT(this != &other);
@@ -1359,23 +1359,23 @@ list<T, A>::merge(list
     }
 }
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
 template <typename T, typename A>
 void
 list<T, A>::splice(const_iterator pos, list& other) NESTL_NOEXCEPT_SPEC
 {
     splice(pos, nestl::move(other));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
 template <typename T, typename A>
 void
 list<T, A>::splice(const_iterator pos, list
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
                    &&
-#else /* NESTL_HAS_RVALUE_REF */
+#else /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
                    &
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
                    other) NESTL_NOEXCEPT_SPEC
 {
     if (!other.empty())
@@ -1384,23 +1384,23 @@ list<T, A>::splice(const_iterator pos, list
     }
 }
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
 template <typename T, typename A>
 void
 list<T, A>::splice(const_iterator pos, list& other, const_iterator it) NESTL_NOEXCEPT_SPEC
 {
     splice(pos, nestl::move(other), it);
 }
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
 template <typename T, typename A>
 void
 list<T, A>::splice(const_iterator pos, list
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
                    &&
-#else /* NESTL_HAS_RVALUE_REF */
+#else /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
                    &
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
                    /* other */, const_iterator it) NESTL_NOEXCEPT_SPEC
 {
     iterator j = iterator(it.get_list_node());
@@ -1413,23 +1413,23 @@ list<T, A>::splice(const_iterator pos, list
     this->transfer(pos, it, j);
 }
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
 template <typename T, typename A>
 void
 list<T, A>::splice(const_iterator pos, list& other, const_iterator first, const_iterator last) NESTL_NOEXCEPT_SPEC
 {
     splice(pos, nestl::move(other), first, last);
 }
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
 template <typename T, typename A>
 void
 list<T, A>::splice(const_iterator pos, list
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
                    &&
-#else /* NESTL_HAS_RVALUE_REF */
+#else /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
                    &
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
                    other, const_iterator first, const_iterator last) NESTL_NOEXCEPT_SPEC
 {
     if (first != last)
@@ -1523,7 +1523,7 @@ list<T, A>::swap_data(list& other) NESTL_NOEXCEPT_SPEC
     nestl::detail::list_node_base::swap(other.m_node, m_node);
 }
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
 template <typename T, typename A>
 void
 list<T, A>::move_assign(const nestl::true_type& /* true_val */, list&& other) NESTL_NOEXCEPT_SPEC
@@ -1531,9 +1531,9 @@ list<T, A>::move_assign(const nestl::true_type& /* true_val */, list&& other) NE
     const list tmp(nestl::move(*this));
     this->swap_data(other);
 }
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
 template <typename T, typename A>
 template <typename ... Args>
 typename list<T, A>::operation_error
@@ -1559,7 +1559,7 @@ list<T, A>::create_node(node_type*& node, Args&& ... args) NESTL_NOEXCEPT_SPEC
 
     return err;
 }
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 template <typename T, typename A>
 typename list<T, A>::operation_error
 list<T, A>::create_node(node_type*& node) NESTL_NOEXCEPT_SPEC
@@ -1610,7 +1610,7 @@ list<T, A>::create_node(node_type*& node, const Arg& arg) NESTL_NOEXCEPT_SPEC
 
     return err;
 }
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
 template <typename T, typename A>
 template <typename ListIterator1, typename ListIterator2, typename ListIterator3>

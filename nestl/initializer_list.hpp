@@ -3,7 +3,7 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_HAS_INITIALIZER_LIST
+#if defined(NESTL_CONFIG_HAS_INITIALIZER_LIST)
 
 #include <initializer_list>
 
@@ -14,7 +14,7 @@ using std::initializer_list;
 
 } // namespace nestl
 
-#else /* NESTL_HAS_INITIALIZER_LIST */
+#else /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
 
 namespace nestl
 {
@@ -25,7 +25,7 @@ namespace nestl
 
 } // namespace nestl
 
-#endif /* NESTL_HAS_INITIALIZER_LIST */
+#endif /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
 
 
 

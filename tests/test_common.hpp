@@ -83,7 +83,7 @@ bool operator == (const non_copyable& left, const non_copyable& right)
     return left.v == right.v;
 }
 
-#if NESTL_USE_STD
+#if defined(NESTL_CONFIG_HAS_STD_INCLUDES)
 
 inline std::ostream& operator << (std::ostream& strm, const non_copyable& val)
 {
@@ -91,7 +91,7 @@ inline std::ostream& operator << (std::ostream& strm, const non_copyable& val)
     return strm;
 }
 
-#endif /* NESTL_USE_STD */
+#endif /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 
 } // namespace test

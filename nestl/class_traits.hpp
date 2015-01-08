@@ -18,7 +18,7 @@ template <typename T>
 struct class_traits
 {
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
 
     template <typename OperationError, typename Allocator, typename ... Args>
     static OperationError construct(T* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
@@ -26,7 +26,7 @@ struct class_traits
         return nestl::detail::construct_impl<OperationError>(ptr, alloc, nestl::forward<Args>(args) ...);
     }
 
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
     template <typename OperationError, typename Allocator>
     static OperationError construct(T* ptr, Allocator& alloc) NESTL_NOEXCEPT_SPEC
@@ -40,11 +40,11 @@ struct class_traits
         return nestl::detail::construct_impl<OperationError>(ptr, alloc, arg);
     }
 
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
 
 
-#if NESTL_HAS_RVALUE_REF
+#if defined(NESTL_CONFIG_HAS_PERFECT_FWD)
 
     template <typename OperationError, typename Y>
     static OperationError assign(T& dest, Y&& src) NESTL_NOEXCEPT_SPEC
@@ -54,7 +54,7 @@ struct class_traits
         return OperationError();
     }
 
-#else /* NESTL_HAS_RVALUE_REF */
+#else /* defined(NESTL_CONFIG_HAS_PERFECT_FWD) */
 
     template <typename OperationError, typename Y>
     static OperationError assign(T& dest, const Y& src) NESTL_NOEXCEPT_SPEC
@@ -64,7 +64,7 @@ struct class_traits
         return OperationError();
     }
 
-#endif /* NESTL_HAS_RVALUE_REF */
+#endif /* defined(NESTL_CONFIG_HAS_PERFECT_FWD) */
 
 };
 
@@ -72,7 +72,7 @@ struct class_traits
 namespace detail
 {
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
 
 template<typename OperationError, typename T, typename Allocator, typename ... Args>
 OperationError construct(T* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
@@ -104,7 +104,7 @@ OperationError assign(T& dest, Args&& ... args) noexcept
 #undef NESTL_CALL_CLASS_TRAITS_ASSIGN
 }
 
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
 template<typename OperationError, typename T, typename Allocator>
 OperationError construct(T* ptr, Allocator& alloc) NESTL_NOEXCEPT_SPEC
@@ -151,7 +151,7 @@ OperationError assign(T& dest, const Arg& arg) NESTL_NOEXCEPT_SPEC
 #undef NESTL_CALL_CLASS_TRAITS_ASSIGN
 }
 
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
 
 

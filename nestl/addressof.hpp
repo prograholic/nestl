@@ -3,7 +3,7 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_ENABLE_CXX11 && NESTL_USE_STD
+#if defined(NESTL_CONFIG_HAS_CXX11) && defined(NESTL_CONFIG_HAS_STD_INCLUDES)
 
 #include <memory>
 
@@ -14,7 +14,7 @@ using std::addressof;
 
 } // namespace nestl
 
-#else /* NESTL_ENABLE_CXX11 */
+#else /* defined(NESTL_CONFIG_HAS_CXX11) && defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 namespace nestl
 {
@@ -30,7 +30,7 @@ T* addressof(T& arg)
 } // namespace nestl
 
 
-#endif /* NESTL_ENABLE_CXX11 */
+#endif /* defined(NESTL_CONFIG_HAS_CXX11) && defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 
 #endif /* NESTL_ADDRESSOF_HPP */

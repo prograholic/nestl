@@ -87,7 +87,7 @@ private:
     allocation_scoped_guard& operator =(const allocation_scoped_guard& );
 };
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
+#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
 
 template<typename OperationError, typename T, typename Allocator, typename ... Args>
 OperationError construct_impl(T* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
@@ -97,7 +97,7 @@ OperationError construct_impl(T* ptr, Allocator& alloc, Args&& ... args) NESTL_N
     return OperationError();
 }
 
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
 template<typename OperationError, typename T, typename Allocator>
 OperationError construct_impl(T* ptr, Allocator& alloc) NESTL_NOEXCEPT_SPEC
@@ -115,7 +115,7 @@ OperationError construct_impl(T* ptr, Allocator& alloc, const Arg& arg) NESTL_NO
     return OperationError();
 }
 
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
 }
 

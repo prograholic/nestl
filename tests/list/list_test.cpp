@@ -131,7 +131,7 @@ TYPED_TEST_P(ListTestNumeric, CheckAssignFromIterators)
     }
 }
 
-#if NESTL_HAS_INITIALIZER_LIST
+#if defined(NESTL_CONFIG_HAS_INITIALIZER_LIST)
 
 TYPED_TEST_P(ListTestNumeric, CheckAssignFromInitializerList)
 {
@@ -159,7 +159,7 @@ TYPED_TEST_P(ListTestNumeric, CheckAssignFromInitializerList)
     #undef INITIALIZER_LIST_VALUES
 }
 
-#endif /* NESTL_HAS_INITIALIZER_LIST */
+#endif /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
 
 TYPED_TEST_P(ListTestNumeric, InsertOneElementBeforeBeginToNonEmptyList)
 {
@@ -345,7 +345,7 @@ TYPED_TEST_P(ListTestNumeric, SortListWithSeveralElements)
 }
 
 
-#if NESTL_HAS_INITIALIZER_LIST
+#if defined(NESTL_CONFIG_HAS_INITIALIZER_LIST)
 
 REGISTER_TYPED_TEST_CASE_P(ListTestNumeric,
                            CheckAssignFromIterators,
@@ -361,7 +361,7 @@ REGISTER_TYPED_TEST_CASE_P(ListTestNumeric,
                            SortListWithSeveralElements,
                            CheckAssignFromInitializerList);
 
-#else /* NESTL_HAS_INITIALIZER_LIST */
+#else /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
 
 REGISTER_TYPED_TEST_CASE_P(ListTestNumeric,
                            CheckAssignFromIterators,
@@ -376,7 +376,7 @@ REGISTER_TYPED_TEST_CASE_P(ListTestNumeric,
                            SortListWithOneElement,
                            SortListWithSeveralElements);
 
-#endif /* NESTL_HAS_INITIALIZER_LIST */
+#endif /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
 
 
 INSTANTIATE_TYPED_TEST_CASE_P(numeric_list_test, ListTestNumeric, ListNumericTypes);

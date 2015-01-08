@@ -13,7 +13,7 @@ configure()
 {
   mkdir -p $1
   cd $1
-  CC=$2 CXX=$3 cmake ../../../src -DCMAKE_BUILD_TYPE=Debug -DNESTL_GOOGLEMOCK_DIR=/usr/src/projects/googlecode/googlemock -DNESTL_DISABLE_STD=$4 -DNESTL_ENABLE_CXX11=$5
+  CC=$2 CXX=$3 cmake ../../../src -DCMAKE_BUILD_TYPE=Debug -DNESTL_GOOGLEMOCK_DIR=/usr/src/projects/googlecode/googlemock -DNESTL_DISABLE_STD=$4 -DNESTL_CONFIG_HAS_CXX11=$5
   cd ../../
 }
 

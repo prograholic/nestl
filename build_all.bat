@@ -1,11 +1,7 @@
 echo off
 
 
-if [%1] == [] goto usage
-
-if %1 == 2008 set OUT_DIR=msvc-2008
-if %1 == 2010 set OUT_DIR=msvc-2010
-if %1 == 2012 set OUT_DIR=msvc-2012
+set OUT_DIR=%1
 
 if [%OUT_DIR%] == [] goto usage
 
@@ -24,9 +20,9 @@ goto end
 
 :build
 cmake --build %1
-
+goto end
 
 :usage
-echo %0 ^<mcvc_ver^>
+echo %0 ^<toolchain_dir^>
 
 :end

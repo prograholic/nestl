@@ -3,7 +3,7 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_USE_STD
+#if defined(NESTL_CONFIG_HAS_STD_INCLUDES)
 
 #include <limits>
 
@@ -12,7 +12,7 @@ namespace nestl
 using std::numeric_limits;
 } // namespace nestl
 
-#else /* NESTL_USE_STD */
+#else /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 namespace nestl
 {
@@ -31,6 +31,6 @@ struct numeric_limits<unsigned int>
 
 }
 
-#endif /* NESTL_USE_STD */
+#endif /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #endif /* NESTL_NUMERIC_LIMITS_HPP */

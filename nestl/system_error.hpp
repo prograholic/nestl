@@ -3,7 +3,7 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_ENABLE_CXX11 && NESTL_USE_STD
+#if defined(NESTL_CONFIG_HAS_CXX11) && defined(NESTL_CONFIG_HAS_STD_INCLUDES)
 
 #   include <system_error>
 
@@ -18,21 +18,21 @@ using std::error_condition;
 } // namespace nestl
 
 
-#else /* NESTL_ENABLE_CXX11 && NESTL_USE_STD */
+#else /* defined(NESTL_CONFIG_HAS_CXX11) && defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
-#if NESTL_USE_STD
+#if defined(NESTL_CONFIG_HAS_STD_INCLUDES)
 
 #   include <cerrno>
 
 #   define NESTL_ENOMEM ENOMEM
 #   define NESTL_EINVAL EINVAL
 
-#else /* NESTL_USE_STD */
+#else /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #   define NESTL_ENOMEM 12
 #   define NESTL_EINVAL 22
 
-#endif /* NESTL_USE_STD */
+#endif /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 namespace nestl
 {
@@ -72,18 +72,18 @@ public:
         return m_value;
     }
 
-#if NESTL_HAS_EXPLICIT_OPERATOR
+#if defined(NESTL_CONFIG_HAS_EXPLICIT_OPERATOR)
     explicit operator bool() const NESTL_NOEXCEPT_SPEC
     {
         return m_value != 0;
     }
-#else /* NESTL_HAS_EXPLICIT_OPERATOR */
+#else /* defined(NESTL_CONFIG_HAS_EXPLICIT_OPERATOR) */
     typedef int error_condition::*unspecified_bool_type;
     operator unspecified_bool_type() const NESTL_NOEXCEPT_SPEC
     {
         return m_value == 0 ? 0 : &error_condition::m_value;
     }
-#endif /* NESTL_HAS_EXPLICIT_OPERATOR */
+#endif /* defined(NESTL_CONFIG_HAS_EXPLICIT_OPERATOR) */
 private:
     int m_value;
 };
@@ -91,6 +91,6 @@ private:
 }
 
 
-#endif /* NESTL_ENABLE_CXX11 && NESTL_USE_STD */
+#endif /* defined(NESTL_CONFIG_HAS_CXX11) && defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #endif /* NESTL_SYSTEM_ERROR_HPP */

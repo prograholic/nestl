@@ -5,7 +5,7 @@ project(nestl CXX)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 
-if (NESTL_ENABLE_CXX11)
+if (NESTL_CONFIG_HAS_CXX11)
   message(STATUS "Using nestl with c++ 11 features")
   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	add_compile_options(-std=c++11)

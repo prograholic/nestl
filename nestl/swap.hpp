@@ -3,13 +3,13 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_USE_STD
+#if defined(NESTL_CONFIG_HAS_STD_INCLUDES)
 
-#if NESTL_ENABLE_CXX11
+#if defined(NESTL_CONFIG_HAS_CXX11)
 #   include <utility>
-#else /* NESTL_ENABLE_CXX11 */
+#else /* defined(NESTL_CONFIG_HAS_CXX11) */
 #   include <algorithm>
-#endif /* NESTL_ENABLE_CXX11 */
+#endif /* defined(NESTL_CONFIG_HAS_CXX11) */
 
 namespace nestl
 {
@@ -18,7 +18,7 @@ using std::swap;
 
 } // namespace nestl
 
-#else /* NESTL_USE_STD */
+#else /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #include <nestl/move.hpp>
 
@@ -35,6 +35,6 @@ swap(T& a, T& b)
   }
 } // namespace nestl
 
-#endif /* NESTL_USE_STD */
+#endif /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #endif /* NESTL_SWAP_HPP */

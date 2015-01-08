@@ -5,7 +5,7 @@
 
 #include <nestl/type_traits.hpp>
 
-#if NESTL_ENABLE_CXX11 && NESTL_USE_STD
+#if defined(NESTL_CONFIG_HAS_CXX11) && defined(NESTL_CONFIG_HAS_STD_INCLUDES)
 
 namespace nestl
 {
@@ -16,7 +16,7 @@ using std::alignment_of;
 } // namespace nestl
 
 
-#else /* NESTL_ENABLE_CXX11 && NESTL_USE_STD */
+#else /* defined(NESTL_CONFIG_HAS_CXX11) && defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 namespace nestl
 {
@@ -38,6 +38,6 @@ struct alignment_of : public nestl::integral_constant<size_t, NESTL_ALIGNOF(T)>
 
 } // namespace nestl
 
-#endif /* NESTL_ENABLE_CXX11 && NESTL_USE_STD */
+#endif /* defined(NESTL_CONFIG_HAS_CXX11) && defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #endif /* NESTL_ALIGNMENT_HPP */

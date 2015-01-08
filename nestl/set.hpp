@@ -3,7 +3,7 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_USE_STD
+#if defined(NESTL_CONFIG_HAS_STD_INCLUDES)
 #   include <set>
 
 namespace nestl
@@ -11,11 +11,11 @@ namespace nestl
 
 using std::set;
 
-#define NESTL_HAS_SET 1
+#define NESTL_CONFIG_HAS_SET 1
 
 } // nestl_not_implemented_yet
 
-#else /* NESTL_USE_STD */
+#else /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #include <nestl/functional.hpp>
 
@@ -25,10 +25,10 @@ namespace nestl
 template<typename Key, typename Compare = nestl::less<Key>, typename Alloc = nestl::allocator<Key> >
 class set;
 
-#define NESTL_HAS_SET 0
+#define NESTL_CONFIG_HAS_SET 0
 
 } // namespace nestl
 
-#endif /* NESTL_USE_STD */
+#endif /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #endif /* NESTL_SET_HPP */
