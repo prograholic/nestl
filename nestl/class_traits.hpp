@@ -4,8 +4,8 @@
 #include <nestl/config.hpp>
 
 #include <nestl/static_assert.hpp>
-
-#include <nestl/detail/construct.hpp>
+#include <nestl/allocator_traits.hpp>
+#include <nestl/forward.hpp>
 
 /**
  * @file implementation of class_traits template
@@ -23,7 +23,9 @@ struct class_traits
     template <typename OperationError, typename Allocator, typename ... Args>
     static OperationError construct(T* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
-        return nestl::detail::construct_impl<OperationError>(ptr, alloc, nestl::forward<Args>(args) ...);
+        nestl::allocator_traits<Allocator>::construct(alloc, ptr, nestl::forward<Args>(args) ...);
+
+        return OperationError();
     }
 
 #else /* NESTL_HAS_VARIADIC_TEMPLATES */
@@ -31,13 +33,17 @@ struct class_traits
     template <typename OperationError, typename Allocator>
     static OperationError construct(T* ptr, Allocator& alloc) NESTL_NOEXCEPT_SPEC
     {
-        return nestl::detail::construct_impl<OperationError>(ptr, alloc);
+        nestl::allocator_traits<Allocator>::construct(alloc, ptr);
+
+        return OperationError();
     }
 
     template <typename OperationError, typename Allocator, typename Arg>
     static OperationError construct(T* ptr, Allocator& alloc, const Arg& arg) NESTL_NOEXCEPT_SPEC
     {
-        return nestl::detail::construct_impl<OperationError>(ptr, alloc, arg);
+        nestl::allocator_traits<Allocator>::construct(alloc, ptr, arg);
+
+        return OperationError();
     }
 
 #endif /* NESTL_HAS_VARIADIC_TEMPLATES */

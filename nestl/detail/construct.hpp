@@ -87,36 +87,6 @@ private:
     allocation_scoped_guard& operator =(const allocation_scoped_guard& );
 };
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
-
-template<typename OperationError, typename T, typename Allocator, typename ... Args>
-OperationError construct_impl(T* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
-{
-    nestl::allocator_traits<Allocator>::construct(alloc, ptr, nestl::forward<Args>(args) ...);
-
-    return OperationError();
-}
-
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
-
-template<typename OperationError, typename T, typename Allocator>
-OperationError construct_impl(T* ptr, Allocator& alloc) NESTL_NOEXCEPT_SPEC
-{
-    nestl::allocator_traits<Allocator>::construct(alloc, ptr);
-
-    return OperationError();
-}
-
-template<typename OperationError, typename T, typename Allocator, typename Arg>
-OperationError construct_impl(T* ptr, Allocator& alloc, const Arg& arg) NESTL_NOEXCEPT_SPEC
-{
-    nestl::allocator_traits<Allocator>::construct(alloc, ptr, arg);
-
-    return OperationError();
-}
-
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
-
 }
 
 } // namespace nestl

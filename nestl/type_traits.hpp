@@ -10,6 +10,7 @@
 namespace nestl
 {
 using std::conditional;
+using std::integral_constant;
 using std::true_type;
 using std::false_type;
 using std::add_rvalue_reference;

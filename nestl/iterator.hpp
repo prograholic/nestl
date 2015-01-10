@@ -525,6 +525,21 @@ struct class_traits<nestl::insert_iterator<Container> >
 #endif /* NESTL_HAS_RVALUE_REF */
 };
 
+
+template <typename Iterator>
+struct move_iterator
+{
+
+};
+
+
+template <typename Iterator>
+move_iterator<Iterator> make_move_iterator(Iterator i)
+{
+    return move_iterator<Iterator>(i);
+}
+
+
 } // namespace nestl
 
 #endif /* NESTL_ITERATOR_HPP */

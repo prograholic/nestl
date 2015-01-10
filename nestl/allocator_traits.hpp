@@ -3,6 +3,9 @@
 
 #include <nestl/config.hpp>
 #include <nestl/cstddef.hpp>
+#include <nestl/type_traits.hpp>
+#include <nestl/move.hpp>
+#include <nestl/class_traits.hpp>
 
 #if NESTL_USE_STD && NESTL_ENABLE_CXX11
 
@@ -48,7 +51,14 @@ struct allocator_traits
     typedef nestl_nested_type_size_type size_type;
 
 
-
+    /**
+     * @note Each allocator should provide method deallocate
+     */
+    template<typename U>
+    static void deallocate(Allocator& alloc, U* ptr, size_type n)
+    {
+        alloc.deallocate(ptr, n);
+    }
 
 
     NESTL_HAS_METHOD(Allocator, destroy);
@@ -162,66 +172,6 @@ struct allocator_traits
 } // namespace nestl
 
 #endif /* NESTL_USE_STD && NESTL_ENABLE_CXX11 */
-
-
-namespace nestl
-{
-
-#if NESTL_HAS_VARIADIC_TEMPLATES
-
-template <template <typename, typename ...> class Alloc, typename T1, typename T2, typename ... Args>
-struct allocator_rebind_helper
-{
-    typedef Alloc<T2, Args...> T2Alloc;
-    typedef Alloc<T1, Args...> T1Alloc;
-
-    NESTL_SELECT_NESTED_TYPE_TEMPLATE(T2Alloc, rebind<T1>::other, other, T1Alloc);
-
-    //template<typename T>
-    //static typename T::template rebind<T1>::other NESTL_other_helper(T*);
-    //static T1Alloc NESTL_other_helper(...);
-    //typedef NESTL_DECLTYPE(NESTL_other_helper((T2Alloc*)0)) nestl_nested_type_other;
-
-
-    typedef nestl_nested_type_other other;
-
-};
-
-template <typename Alloc, typename T>
-struct allocator_rebind;
-
-
-template <template <typename, typename ...> class Alloc, typename T, typename U, typename ... Args>
-struct allocator_rebind<Alloc<U, Args...>, T>
-{
-    typedef typename allocator_rebind_helper<Alloc, T, U, Args...>::other other;
-};
-
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
-
-template <template <typename> class Alloc, typename T1, typename T2>
-struct allocator_rebind_helper
-{
-    typedef Alloc<T2> T2Alloc;
-    typedef Alloc<T1> T1Alloc;
-
-    NESTL_SELECT_NESTED_TYPE_TEMPLATE(T2Alloc, rebind<T1>::other, other, T1Alloc);
-};
-
-template <typename Alloc, typename T>
-struct allocator_rebind;
-
-
-template <template <typename> class Alloc, typename T, typename U>
-struct allocator_rebind<Alloc<U>, T>
-{
-    typedef typename allocator_rebind_helper<Alloc, T, U>::other other;
-};
-
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
-
-} // namespace nestl
-
 
 
 #endif /* NESTL_ALLOCATOR_TRAITS_HPP */

@@ -4,6 +4,7 @@
 #include <nestl/config.hpp>
 
 #include <nestl/class_traits.hpp>
+#include <nestl/detail/construct.hpp>
 
 
 

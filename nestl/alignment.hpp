@@ -60,6 +60,17 @@ struct aligned_buffer : public nestl::aligned_storage<sizeof(T), nestl::alignmen
     {
         return static_cast<const void*>(&m_storage);
     }
+
+    T* ptr() NESTL_NOEXCEPT_SPEC
+    {
+        return static_cast<T*>(address());
+    }
+
+    const T* ptr() const NESTL_NOEXCEPT_SPEC
+    {
+        return static_cast<const T*>(address());
+    }
+
 };
 
 }

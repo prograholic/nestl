@@ -105,3 +105,4 @@ nestl/detail/red_black_tree.hpp
 nestl/pair.hpp
 tests/set/CMakeLists.txt
 tests/vector/CMakeLists.txt
+nestl/allocator_traits_helper.hpp

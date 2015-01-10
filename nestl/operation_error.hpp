@@ -65,6 +65,11 @@ public:
         return m_val;
     }
 
+    Type& result() NESTL_NOEXCEPT_SPEC
+    {
+        return m_val;
+    }
+
 #if NESTL_HAS_EXPLICIT_OPERATOR
 
     explicit operator bool() const NESTL_NOEXCEPT_SPEC

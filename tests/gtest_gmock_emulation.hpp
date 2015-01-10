@@ -73,9 +73,9 @@ struct FailureTracer
 #define EXPECT_TRUE(x)
 
 
-#define TYPED_TEST_CASE_P(x)
-#define REGISTER_TYPED_TEST_CASE_P(x, ...)
-#define INSTANTIATE_TYPED_TEST_CASE_P(x, ...)
+#define TYPED_TEST_CASE_P(x) struct gtest_typed_test_case
+#define REGISTER_TYPED_TEST_CASE_P(x, ...) struct gtest_typed_test_case_reg
+#define INSTANTIATE_TYPED_TEST_CASE_P(x, ...) struct gtest_typed_test_case_inst
 
 #define TYPED_TEST_P(fixture, name) \
     template <typename T> \
