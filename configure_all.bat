@@ -6,6 +6,7 @@ set NESTL_BUILD_ROOT=%NESTL_SRC%\..
 if [%1] == [] goto usage
 
 if %1 == 2008 set MSVC_GENERATOR="Visual Studio 9 2008"&& set OUT_DIR=msvc-2008
+if %1 == 2010 set MSVC_GENERATOR="Visual Studio 10 2010"&& set OUT_DIR=msvc-2010
 if %1 == 2012 set MSVC_GENERATOR="Visual Studio 11 2012"&& set OUT_DIR=msvc-2012
 
 
