@@ -2,8 +2,8 @@
 if (MSVC)
   # msvc-2012 lacks variadic template support
   if (MSVC_VERSION EQUAL 1700) # mcvc-2012
-    message(STATUS "msvc lacks variadic template support")
-    add_definitions(-D_VARIADIC_MAX=10)   
+	message(STATUS "msvc lacks variadic template support")
+	add_definitions(-D_VARIADIC_MAX=10)
   endif()
 endif(MSVC)
 
@@ -40,12 +40,6 @@ endif()
 
 if (NESTL_DISABLE_STD)
   add_definitions(-DNESTL_PLATFORM_HEADER="tests/sample_test_platform.hpp")
-  if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	add_compile_options(-nostdinc)
-	add_compile_options(-nostdinc++)
-  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	add_compile_options(/X)
-  endif()
 endif()
 
 function(cxx_test2 name libs)

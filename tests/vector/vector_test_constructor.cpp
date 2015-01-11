@@ -159,8 +159,6 @@ TEST_F(VectorTestConstructorWithMinimalAllocator, MoveConstructorFromNonEmptyVec
 /// Now check with stateful allocator
 ////////////////////////////////////////////////////////////////////////////////
 
-#if NESTL_TEST_HAS_ALLOCATOR_WITH_STATE
-
 class VectorTestConstructorWithStatefulAllocator : public VectorTestConstructorBase
 {
 };
@@ -207,8 +205,6 @@ TEST_F(VectorTestConstructorWithStatefulAllocator, MoveConstructorFromNonEmptyVe
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
 }
 #endif /* NESTL_HAS_RVALUE_REF */
-
-#endif /* #if NESTL_TEST_HAS_ALLOCATOR_WITH_STATE */
 
 } // namespace test
 

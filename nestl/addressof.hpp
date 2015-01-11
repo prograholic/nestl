@@ -3,19 +3,6 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_ENABLE_CXX11 && NESTL_USE_STD
-
-#include <memory>
-
-namespace nestl
-{
-
-using std::addressof;
-
-} // namespace nestl
-
-#else /* NESTL_ENABLE_CXX11 */
-
 namespace nestl
 {
 
@@ -28,9 +15,5 @@ T* addressof(T& arg)
 }
 
 } // namespace nestl
-
-
-#endif /* NESTL_ENABLE_CXX11 */
-
 
 #endif /* NESTL_ADDRESSOF_HPP */

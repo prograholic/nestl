@@ -25,25 +25,17 @@
 
 #if !defined(NESTL_NO_STD)
 
-#   define NESTL_USE_STD              1
+#   define NESTL_PLATFORM_HEADER <nestl/std_platform.hpp>
 
-#else /* NESTL_NO_STD */
+#endif /* !defined(NESTL_NO_STD) */
 
-#   define NESTL_USE_STD              0
+
+
 #   if !defined NESTL_PLATFORM_HEADER
 #       error "NESTL is not usable without platform-specific header, see nestl/platform.hpp.sample for details"
 #   endif /* NESTL_PLATFORM_HEADER */
 
 #   include NESTL_PLATFORM_HEADER
-
-#endif /* NESTL_NO_STD */
-
-
-#if NESTL_HAS_INITIALIZER_LIST_HEADER && NESTL_USE_STD
-#   define NESTL_HAS_INITIALIZER_LIST 1
-#else /* NESTL_HAS_INITIALIZER_LIST_HEADER && NESTL_USE_STD */
-#   define NESTL_HAS_INITIALIZER_LIST 0
-#endif /* NESTL_HAS_INITIALIZER_LIST_HEADER && NESTL_USE_STD */
 
 
 #define NESTL_JOIN(x, y) x ## y

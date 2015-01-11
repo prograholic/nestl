@@ -6,7 +6,8 @@
 #include <nestl/move.hpp>
 #include <nestl/set.hpp>
 
-#include "tests/gtest_gmock_emulation.hpp"
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 namespace nestl
 {
@@ -119,6 +120,7 @@ public:
     {
     }
 
+
 #if NESTL_HAS_RVALUE_REF
     allocator_with_state(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
         : m_allocated_storage(nestl::move(other.m_allocated_storage))
@@ -209,13 +211,9 @@ public:
         else
         {
             m_allocated_storage->erase(pos);
-
             ::operator delete(p);
         }
     }
-
-
-private:
 
     nestl::shared_ptr<nestl::set<void*> > m_allocated_storage;
 };
@@ -232,9 +230,6 @@ bool operator != (const allocator_with_state<T>& left, const allocator_with_stat
 {
     return left.m_allocated_storage != right.m_allocated_storage;
 }
-
-#define NESTL_TEST_HAS_ALLOCATOR_WITH_STATE 1
-
 
 } // namespace test
 

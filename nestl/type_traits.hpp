@@ -3,23 +3,6 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_ENABLE_CXX11 && NESTL_USE_STD
-
-#include <type_traits>
-
-namespace nestl
-{
-using std::conditional;
-using std::integral_constant;
-using std::true_type;
-using std::false_type;
-using std::add_rvalue_reference;
-using std::remove_reference;
-using std::is_lvalue_reference;
-}
-
-#else /* NESTL_ENABLE_CXX11 && NESTL_USE_STD */
-
 namespace nestl
 {
 
@@ -161,10 +144,6 @@ struct is_lvalue_reference<T&> : public true_type
 {
 };
 
-
 } // namespace nestl
-
-#endif /* NESTL_ENABLE_CXX11 && NESTL_USE_STD */
-
 
 #endif // NESTL_TYPE_TRAITS_HPP

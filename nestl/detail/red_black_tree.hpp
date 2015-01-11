@@ -104,9 +104,45 @@ struct rb_tree_node : public rb_tree_node_base
     }
 };
 
+} // namespace detail
 
-template <typename node_base_ptr>
-node_base_ptr rb_tree_increment_ex(node_base_ptr x) NESTL_NOEXCEPT_SPEC
+template <typename Val>
+struct class_traits<detail::rb_tree_node<Val> >
+{
+    typedef detail::rb_tree_node<Val> link_type;
+
+#if NESTL_HAS_VARIADIC_TEMPLATES
+
+    template <typename OperationError, typename Allocator, typename ... Args>
+    static OperationError construct(link_type* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    {
+        return nestl::detail::construct<OperationError>(ptr->m_valptr(), alloc, nestl::forward<Args>(args) ...);
+    }
+
+#else /* NESTL_HAS_VARIADIC_TEMPLATES */
+
+    template <typename OperationError, typename Allocator>
+    static OperationError construct(link_type* ptr, Allocator& alloc) NESTL_NOEXCEPT_SPEC
+    {
+        return nestl::detail::construct<OperationError>(ptr->m_valptr(), alloc);
+    }
+
+    template <typename OperationError, typename Allocator, typename Arg>
+    static OperationError construct(link_type* ptr, Allocator& alloc, const Arg& arg) NESTL_NOEXCEPT_SPEC
+    {
+        return nestl::detail::construct<OperationError>(ptr->m_valptr(), alloc, arg);
+    }
+
+#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
+
+};
+
+
+namespace detail
+{
+
+template <typename RbTreeNodeBasePtr>
+RbTreeNodeBasePtr rb_tree_increment(RbTreeNodeBasePtr x) NESTL_NOEXCEPT_SPEC
 {
     if (x->m_right != 0)
     {
@@ -118,7 +154,7 @@ node_base_ptr rb_tree_increment_ex(node_base_ptr x) NESTL_NOEXCEPT_SPEC
     }
     else
     {
-        node_base_ptr y = x->m_parent;
+        RbTreeNodeBasePtr y = x->m_parent;
         while (x == y->m_right)
         {
             x = y;
@@ -132,20 +168,31 @@ node_base_ptr rb_tree_increment_ex(node_base_ptr x) NESTL_NOEXCEPT_SPEC
     return x;
 }
 
-
-inline rb_tree_node_base* rb_tree_increment(rb_tree_node_base* x) NESTL_NOEXCEPT_SPEC
+template <typename RbTreeNodeBasePtr>
+RbTreeNodeBasePtr rb_tree_decrement(RbTreeNodeBasePtr x) NESTL_NOEXCEPT_SPEC
 {
-    return rb_tree_increment_ex(x);
+    if (x->m_color == rb_red && x->m_parent->m_parent == x)
+        x = x->m_right;
+    else if (x->m_left != 0)
+    {
+        RbTreeNodeBasePtr y = x->m_left;
+        while (y->m_right != 0)
+            y = y->m_right;
+        x = y;
+    }
+    else
+    {
+        RbTreeNodeBasePtr y = x->m_parent;
+        while (x == y->m_left)
+        {
+            x = y;
+            y = y->m_parent;
+        }
+        x = y;
+    }
+    return x;
 }
 
-inline const rb_tree_node_base* rb_tree_increment(const rb_tree_node_base* x) NESTL_NOEXCEPT_SPEC
-{
-    return rb_tree_increment_ex(x);
-}
-
-rb_tree_node_base* rb_tree_decrement(rb_tree_node_base* x) NESTL_NOEXCEPT_SPEC;
-
-const rb_tree_node_base* rb_tree_decrement(const rb_tree_node_base* x) NESTL_NOEXCEPT_SPEC;
 
 template <typename T, typename OperationError>
 struct rb_tree_iterator
@@ -317,26 +364,21 @@ struct rb_tree_const_iterator
   };
 
 template<typename Val, typename OperationError>
-  inline bool
-  operator==(const rb_tree_iterator<Val, OperationError>& x,
-             const rb_tree_const_iterator<Val, OperationError>& y) NESTL_NOEXCEPT_SPEC
-  {
-      return x.m_node == y.m_node;
-  }
+inline bool
+operator==(const rb_tree_iterator<Val, OperationError>& x,
+           const rb_tree_const_iterator<Val, OperationError>& y) NESTL_NOEXCEPT_SPEC
+{
+    return x.m_node == y.m_node;
+}
 
 template<typename Val, typename OperationError>
-  inline bool
-  operator!=(const rb_tree_iterator<Val, OperationError>& x,
-             const rb_tree_const_iterator<Val, OperationError>& y) NESTL_NOEXCEPT_SPEC
-  {
-      return x.m_node != y.m_node;
-  }
+inline bool
+operator!=(const rb_tree_iterator<Val, OperationError>& x,
+           const rb_tree_const_iterator<Val, OperationError>& y) NESTL_NOEXCEPT_SPEC
+{
+    return x.m_node != y.m_node;
+}
 
-void
-rb_tree_insert_and_rebalance(const bool insert_left,
-                             rb_tree_node_base* x,
-                             rb_tree_node_base* p,
-                             rb_tree_node_base& header) NESTL_NOEXCEPT_SPEC;
 
 inline void local_rb_tree_rotate_left(rb_tree_node_base* const x, rb_tree_node_base*& root)
 {
@@ -374,10 +416,99 @@ inline void local_rb_tree_rotate_right(rb_tree_node_base* const x, rb_tree_node_
         x->m_parent->m_left = y;
     y->m_right = x;
     x->m_parent = y;
-  }
+}
 
-inline
-rb_tree_node_base*
+
+inline void rb_tree_insert_and_rebalance(const bool insert_left,
+                                         rb_tree_node_base* x,
+                                         rb_tree_node_base* p,
+                                         rb_tree_node_base& header) NESTL_NOEXCEPT_SPEC
+{
+    rb_tree_node_base *& root = header.m_parent;
+
+    // Initialize fields in new node to insert.
+    x->m_parent = p;
+    x->m_left = 0;
+    x->m_right = 0;
+    x->m_color = rb_red;
+
+    // Insert.
+    // Make new node child of parent and maintain root, leftmost and
+    // rightmost nodes.
+    // N.B. First node is always inserted left.
+    if (insert_left)
+    {
+        p->m_left = x; // also makes leftmost = x when p == &header
+
+        if (p == &header)
+        {
+            header.m_parent = x;
+            header.m_right = x;
+        }
+        else if (p == header.m_left)
+            header.m_left = x; // maintain leftmost pointing to min node
+    }
+    else
+    {
+        p->m_right = x;
+
+        if (p == header.m_right)
+            header.m_right = x; // maintain rightmost pointing to max node
+    }
+    // Rebalance.
+    while (x != root && x->m_parent->m_color == rb_red)
+    {
+        rb_tree_node_base* const xpp = x->m_parent->m_parent;
+
+        if (x->m_parent == xpp->m_left)
+        {
+            rb_tree_node_base* const y = xpp->m_right;
+            if (y && y->m_color == rb_red)
+            {
+                x->m_parent->m_color = rb_black;
+                y->m_color = rb_black;
+                xpp->m_color = rb_red;
+                x = xpp;
+            }
+            else
+            {
+                if (x == x->m_parent->m_right)
+                {
+                    x = x->m_parent;
+                    local_rb_tree_rotate_left(x, root);
+                }
+                x->m_parent->m_color = rb_black;
+                xpp->m_color = rb_red;
+                local_rb_tree_rotate_right(xpp, root);
+            }
+        }
+        else
+        {
+            rb_tree_node_base* const y = xpp->m_left;
+            if (y && y->m_color == rb_red)
+            {
+                x->m_parent->m_color = rb_black;
+                y->m_color = rb_black;
+                xpp->m_color = rb_red;
+                x = xpp;
+            }
+            else
+            {
+                if (x == x->m_parent->m_left)
+                {
+                    x = x->m_parent;
+                    local_rb_tree_rotate_right(x, root);
+                }
+                x->m_parent->m_color = rb_black;
+                xpp->m_color = rb_red;
+                local_rb_tree_rotate_left(xpp, root);
+            }
+        }
+    }
+    root->m_color = rb_black;
+}
+
+inline rb_tree_node_base*
 rb_tree_rebalance_for_erase(rb_tree_node_base* const z,
                             rb_tree_node_base& header) NESTL_NOEXCEPT_SPEC
 {
@@ -389,73 +520,73 @@ rb_tree_rebalance_for_erase(rb_tree_node_base* const z,
     rb_tree_node_base* x_parent = 0;
 
     if (y->m_left == 0)     // z has at most one non-null child. y == z.
-      x = y->m_right;     // x might be null.
+        x = y->m_right;     // x might be null.
     else
-      if (y->m_right == 0)  // z has exactly one non-null child. y == z.
-    x = y->m_left;    // x is not null.
-      else
-    {
-      // z has two non-null children.  Set y to
-      y = y->m_right;   //   z's successor.  x might be null.
-      while (y->m_left != 0)
-        y = y->m_left;
-      x = y->m_right;
-    }
-    if (y != z)
-      {
-    // relink y in place of z.  y is z's successor
-    z->m_left->m_parent = y;
-    y->m_left = z->m_left;
-    if (y != z->m_right)
-      {
-        x_parent = y->m_parent;
-        if (x) x->m_parent = y->m_parent;
-        y->m_parent->m_left = x;   // y must be a child of m_left
-        y->m_right = z->m_right;
-        z->m_right->m_parent = y;
-      }
-    else
-      x_parent = y;
-    if (root == z)
-      root = y;
-    else if (z->m_parent->m_left == z)
-      z->m_parent->m_left = y;
-    else
-      z->m_parent->m_right = y;
-    y->m_parent = z->m_parent;
-    nestl::swap(y->m_color, z->m_color);
-    y = z;
-    // y now points to node to be actually deleted
-      }
-    else
-      {                        // y == z
-    x_parent = y->m_parent;
-    if (x)
-      x->m_parent = y->m_parent;
-    if (root == z)
-      root = x;
-    else
-      if (z->m_parent->m_left == z)
-        z->m_parent->m_left = x;
-      else
-        z->m_parent->m_right = x;
-    if (leftmost == z)
-      {
-        if (z->m_right == 0)        // z->m_left must be null also
-          leftmost = z->m_parent;
-        // makes leftmost == _M_header if z == root
+        if (y->m_right == 0)  // z has exactly one non-null child. y == z.
+            x = y->m_left;    // x is not null.
         else
-          leftmost = rb_tree_node_base::s_minimum(x);
-      }
-    if (rightmost == z)
-      {
-        if (z->m_left == 0)         // z->m_right must be null also
-          rightmost = z->m_parent;
-        // makes rightmost == _M_header if z == root
-        else                      // x == z->m_left
-          rightmost = rb_tree_node_base::s_maximum(x);
-      }
-      }
+        {
+            // z has two non-null children.  Set y to
+            y = y->m_right;   //   z's successor.  x might be null.
+            while (y->m_left != 0)
+                y = y->m_left;
+            x = y->m_right;
+        }
+    if (y != z)
+    {
+        // relink y in place of z.  y is z's successor
+        z->m_left->m_parent = y;
+        y->m_left = z->m_left;
+        if (y != z->m_right)
+        {
+            x_parent = y->m_parent;
+            if (x) x->m_parent = y->m_parent;
+            y->m_parent->m_left = x;   // y must be a child of m_left
+            y->m_right = z->m_right;
+            z->m_right->m_parent = y;
+        }
+        else
+            x_parent = y;
+        if (root == z)
+            root = y;
+        else if (z->m_parent->m_left == z)
+            z->m_parent->m_left = y;
+        else
+            z->m_parent->m_right = y;
+        y->m_parent = z->m_parent;
+        nestl::swap(y->m_color, z->m_color);
+        y = z;
+        // y now points to node to be actually deleted
+    }
+    else
+    {                        // y == z
+        x_parent = y->m_parent;
+        if (x)
+            x->m_parent = y->m_parent;
+        if (root == z)
+            root = x;
+        else
+            if (z->m_parent->m_left == z)
+                z->m_parent->m_left = x;
+            else
+                z->m_parent->m_right = x;
+        if (leftmost == z)
+        {
+            if (z->m_right == 0)        // z->m_left must be null also
+                leftmost = z->m_parent;
+            // makes leftmost == _M_header if z == root
+            else
+                leftmost = rb_tree_node_base::s_minimum(x);
+        }
+        if (rightmost == z)
+        {
+            if (z->m_left == 0)         // z->m_right must be null also
+                rightmost = z->m_parent;
+            // makes rightmost == _M_header if z == root
+            else                      // x == z->m_left
+                rightmost = rb_tree_node_base::s_maximum(x);
+        }
+    }
     if (y->m_color != rb_red)
       {
     while (x != root && (x == 0 || x->m_color == rb_black))
@@ -536,7 +667,7 @@ rb_tree_rebalance_for_erase(rb_tree_node_base* const z,
     if (x) x->m_color = rb_black;
       }
     return y;
-}
+  }
 
 
 #if NESTL_HAS_RVALUE_REF
@@ -638,7 +769,7 @@ protected:
 
         nestl::detail::allocation_scoped_guard<link_type, node_allocator> guard(node_alloc, l, 1);
 
-        operation_error error = nestl::detail::construct<operation_error>(l, nestl::forward<Args>(args)...);
+        operation_error error = nestl::detail::construct<operation_error>(l, node_alloc, nestl::forward<Args>(args)...);
         if (error)
         {
             return make_result_with_operation_error(l, error);
@@ -657,12 +788,12 @@ protected:
         link_type l = node_allocator_traits::allocate(node_alloc, 1);
         if (!l)
         {
-            return make_result_with_operation_error(l, nestl::errc::not_enough_memory);
+            return make_result_with_operation_error(l, operation_error(nestl::errc::not_enough_memory));
         }
 
         nestl::detail::allocation_scoped_guard<link_type, node_allocator> guard(node_alloc, l, 1);
 
-        operation_error error = nestl::detail::construct<operation_error>(l, x);
+        operation_error error = nestl::detail::construct<operation_error>(l, node_alloc, x);
         if (error)
         {
             return make_result_with_operation_error(l, error);

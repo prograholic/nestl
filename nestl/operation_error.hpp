@@ -55,6 +55,13 @@ public:
     {
     }
 
+    template <typename ErrorCode>
+    result_with_operation_error(const Type& val, const ErrorCode& ec) NESTL_NOEXCEPT_SPEC
+        : m_val(val)
+        , m_error(ec)
+    {
+    }
+
     const OperationError& error() const NESTL_NOEXCEPT_SPEC
     {
         return m_error;

@@ -3,39 +3,6 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_ENABLE_CXX11 && NESTL_USE_STD
-
-#   include <system_error>
-
-namespace nestl
-{
-
-
-using std::errc;
-
-using std::error_condition;
-
-} // namespace nestl
-
-
-#else /* NESTL_ENABLE_CXX11 && NESTL_USE_STD */
-
-#if NESTL_USE_STD
-
-#   include <cerrno>
-
-#   define NESTL_ENOMEM    ENOMEM
-#   define NESTL_EINVAL    EINVAL
-#   define NESTL_EOVERFLOW EOVERFLOW
-
-#else /* NESTL_USE_STD */
-
-#   define NESTL_ENOMEM    12
-#   define NESTL_EINVAL    22
-#   define NESTL_EOVERFLOW 75
-
-#endif /* NESTL_USE_STD */
-
 namespace nestl
 {
 
@@ -92,8 +59,5 @@ private:
 };
 
 }
-
-
-#endif /* NESTL_ENABLE_CXX11 && NESTL_USE_STD */
 
 #endif /* NESTL_SYSTEM_ERROR_HPP */

@@ -3,19 +3,6 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_HAS_INITIALIZER_LIST
-
-#include <initializer_list>
-
-namespace nestl
-{
-
-using std::initializer_list;
-
-} // namespace nestl
-
-#else /* NESTL_HAS_INITIALIZER_LIST */
-
 namespace nestl
 {
 
@@ -24,9 +11,5 @@ namespace nestl
  */
 
 } // namespace nestl
-
-#endif /* NESTL_HAS_INITIALIZER_LIST */
-
-
 
 #endif /* NESTL_INITIALIZER_LIST_HPP */

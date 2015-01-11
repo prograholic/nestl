@@ -2,24 +2,10 @@
 #define NESTL_FORWARD_HPP
 
 #include <nestl/config.hpp>
+#include <nestl/type_traits.hpp>
+#include <nestl/static_assert.hpp>
 
 #if NESTL_HAS_RVALUE_REF
-
-#   if NESTL_USE_STD
-
-#       include <utility>
-
-namespace nestl
-{
-
-using std::forward;
-
-} // namespace nestl
-
-#   else /* NESTL_USE_STD */
-
-#       include <nestl/type_traits.hpp>
-#       include <nestl/static_assert.hpp>
 
 namespace nestl
 {
@@ -42,9 +28,6 @@ forward(typename nestl::remove_reference<T>::type&& t) NESTL_NOEXCEPT_SPEC
 
 
 } // namespace nestl
-
-#   endif  /* NESTL_USE_STD */
-
 
 #else /* NESTL_HAS_RVALUE_REF */
 

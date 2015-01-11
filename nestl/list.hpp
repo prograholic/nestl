@@ -493,10 +493,6 @@ public:
     template <typename InputIterator>
     operation_error assign(InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_INITIALIZER_LIST
-    operation_error assign(nestl::initializer_list<value_type> ilist) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_INITIALIZER_LIST */
-
     // element access
     reference front() NESTL_NOEXCEPT_SPEC;
 
@@ -554,10 +550,6 @@ public:
 
     template<typename InputIterator>
     operation_error insert(const_iterator pos, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
-
-#if NESTL_HAS_INITIALIZER_LIST
-    iterator_with_operation_error insert(const_iterator pos, nestl::initializer_list<T> ilist) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_INITIALIZER_LIST */
 
 #if NESTL_HAS_VARIADIC_TEMPLATES
     template<typename ... Args>
@@ -871,16 +863,6 @@ list<T, A>::assign(InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC
     return operation_error();
 }
 
-#if NESTL_HAS_INITIALIZER_LIST
-template <typename T, typename A>
-typename list<T, A>::operation_error
-list<T, A>::assign(nestl::initializer_list<value_type> ilist) NESTL_NOEXCEPT_SPEC
-{
-    return this->assign(ilist.begin(), ilist.end());
-}
-#endif /* NESTL_HAS_INITIALIZER_LIST */
-
-
 template <typename T, typename A>
 typename list<T, A>::reference
 list<T, A>::front() NESTL_NOEXCEPT_SPEC
@@ -1083,15 +1065,6 @@ list<T, A>::insert(const_iterator pos, InputIterator first, InputIterator last) 
 
     return operation_error();
 }
-
-#if NESTL_HAS_INITIALIZER_LIST
-template <typename T, typename A>
-typename list<T, A>::iterator_with_operation_error
-list<T, A>::insert(const_iterator pos, nestl::initializer_list<T> ilist) NESTL_NOEXCEPT_SPEC
-{
-    return insert(pos, ilist.begin(), ilist.end());
-}
-#endif /* NESTL_HAS_INITIALIZER_LIST */
 
 #if NESTL_HAS_VARIADIC_TEMPLATES
 template <typename T, typename A>

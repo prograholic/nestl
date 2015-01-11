@@ -3,21 +3,6 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_USE_STD
-
-#   include <functional>
-
-namespace nestl
-{
-
-using std::less;
-using std::unary_function;
-
-} // namespace nestl
-
-#else /* NESTL_USE_STD */
-
-
 namespace nestl
 {
 
@@ -56,12 +41,7 @@ struct equal_to : public binary_function<T, T, bool>
     }
 };
 
-
 } // namespace nestl
-
-
-#endif /* NESTL_USE_STD */
-
 
 namespace nestl
 {
@@ -84,7 +64,6 @@ struct identity : public nestl::unary_function<T, T>
 };
 
 } // namespace detail
-
 
 } // namespace nestl
 

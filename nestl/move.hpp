@@ -11,18 +11,6 @@
 
 #include <nestl/config.hpp>
 
-
-#if NESTL_ENABLE_CXX11 && NESTL_USE_STD
-
-#include <utility>
-
-namespace nestl
-{
-using std::move;
-}
-
-#else /* NESTL_ENABLE_CXX11 && NESTL_USE_STD */
-
 #if NESTL_HAS_RVALUE_REF
 
 #include <nestl/type_traits.hpp>
@@ -40,9 +28,6 @@ move(T&& t) NESTL_NOEXCEPT_SPEC
 }
 
 #endif /* NESTL_HAS_RVALUE_REF */
-
-#endif /* NESTL_ENABLE_CXX11 && NESTL_USE_STD */
-
 
 #if NESTL_HAS_RVALUE_REF
 #   define NESTL_MOVE_IF_SUPPORTED(x) nestl::move(x)

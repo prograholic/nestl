@@ -326,7 +326,7 @@ template <typename T, typename C, typename A>
 typename set<T, C, A>::iterator_with_flag_with_operation_error
 set<T, C, A>::insert(value_type&& val) NESTL_NOEXCEPT_SPEC
 {
-    return m_impl.m_insert_unique(nestl::move(val));
+    return m_impl.m_insert_unique(nestl::forward<value_type>(val));
 }
 #endif /* NESTL_HAS_RVALUE_REF */
 

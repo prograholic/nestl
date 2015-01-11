@@ -35,6 +35,8 @@ public:
     typedef nestl::ptrdiff_t                                                difference_type;
     typedef T&                                                              reference;
     typedef const T&                                                        const_reference;
+    //typedef value_type* pointer;
+    //typedef const value_type* const_pointer;
     typedef typename nestl::allocator_traits<allocator_type>::pointer       pointer;
     typedef typename nestl::allocator_traits<allocator_type>::const_pointer const_pointer;
 
@@ -72,10 +74,6 @@ public:
 
     template <typename InputIterator>
     operation_error assign(InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
-
-#if NESTL_HAS_INITIALIZER_LIST
-    operation_error assign(nestl::initializer_list<value_type> ilist) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_INITIALIZER_LIST */
 
 
 // element access
@@ -146,10 +144,6 @@ public:
 
     template<typename InputIterator>
     operation_error insert(const_iterator pos, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
-
-#if NESTL_HAS_INITIALIZER_LIST
-    iterator_with_operation_error insert(const_iterator pos, nestl::initializer_list<T> ilist) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_INITIALIZER_LIST */
 
 #if NESTL_HAS_VARIADIC_TEMPLATES
     template<typename ... Args>
@@ -408,15 +402,6 @@ vector<T, A>::assign(InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPE
     return assign_iterator(typename nestl::iterator_traits<InputIterator>::iterator_category(), first, last);
 }
 
-#if NESTL_HAS_INITIALIZER_LIST
-template <typename T, typename A>
-typename vector<T, A>::operation_error
-vector<T, A>::assign(nestl::initializer_list<typename vector<T, A>::value_type> ilist) NESTL_NOEXCEPT_SPEC
-{
-    return this->assign(ilist.begin(), ilist.end());
-}
-#endif /* NESTL_HAS_INITIALIZER_LIST */
-
 template <typename T, typename A>
 typename vector<T, A>::reference
 vector<T, A>::operator[](typename vector<T, A>::size_type pos) NESTL_NOEXCEPT_SPEC
@@ -655,15 +640,6 @@ typename vector<T, A>::operation_error vector<T, A>::insert(const_iterator pos,
 {
     return this->insert_range(pos, first, last).error();
 }
-
-#if NESTL_HAS_INITIALIZER_LIST
-template <typename T, typename A>
-typename vector<T, A>::iterator_with_operation_error
-vector<T, A>::insert(const_iterator pos, nestl::initializer_list<T> ilist) NESTL_NOEXCEPT_SPEC
-{
-    return this->insert_range(pos, std::begin(ilist), std::end(ilist));
-}
-#endif /* NESTL_HAS_INITIALIZER_LIST */
 
 
 template <typename T, typename A>

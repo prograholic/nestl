@@ -23,7 +23,6 @@
 #   define NESTL_HAS_VARIADIC_TEMPLATES          1
 #   define NESTL_HAS_RVALUE_REF                  1
 #   define NESTL_HAS_EXPLICIT_OPERATOR           1
-#   define NESTL_HAS_INITIALIZER_LIST_HEADER     1
 #   define NESTL_HAS_CXX11_ALIGNMENT_SUPPORT     1
 
 #   define NESTL_CONSTEXPR                       constexpr
@@ -55,7 +54,6 @@
 #   define NESTL_HAS_VARIADIC_TEMPLATES          0
 #   define NESTL_HAS_RVALUE_REF                  0
 #   define NESTL_HAS_EXPLICIT_OPERATOR           0
-#   define NESTL_HAS_INITIALIZER_LIST_HEADER     0
 #   define NESTL_HAS_CXX11_ALIGNMENT_SUPPORT     0
 
 #   define NESTL_CONSTEXPR

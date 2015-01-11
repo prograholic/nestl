@@ -6,22 +6,6 @@
 #include <nestl/type_traits.hpp>
 #include <nestl/move.hpp>
 #include <nestl/class_traits.hpp>
-
-#if NESTL_USE_STD && NESTL_ENABLE_CXX11
-
-#include <memory>
-
-namespace nestl
-{
-
-using std::allocator_traits;
-
-} // namespace nestl
-
-
-
-#else /* NESTL_USE_STD && NESTL_ENABLE_CXX11 */
-
 #include <nestl/declval.hpp>
 #include <nestl/numeric_limits.hpp>
 #include <nestl/assert.hpp>
@@ -50,6 +34,14 @@ struct allocator_traits
     NESTL_SELECT_NESTED_TYPE(Allocator, size_type, nestl::size_t);
     typedef nestl_nested_type_size_type size_type;
 
+
+    /**
+     * @note Each allocator should provide method allocate
+     */
+    static pointer allocate(Allocator& alloc, size_type n, void* hint = 0)
+    {
+        return alloc.allocate(n, hint);
+    }
 
     /**
      * @note Each allocator should provide method deallocate
@@ -170,8 +162,5 @@ struct allocator_traits
 };
 
 } // namespace nestl
-
-#endif /* NESTL_USE_STD && NESTL_ENABLE_CXX11 */
-
 
 #endif /* NESTL_ALLOCATOR_TRAITS_HPP */

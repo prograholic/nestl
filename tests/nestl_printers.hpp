@@ -5,8 +5,6 @@
 #include <nestl/noncopyable.hpp>
 #include <nestl/operation_error.hpp>
 
-#if NESTL_USE_STD
-
 #include <ostream>
 
 
@@ -23,7 +21,5 @@ inline std::ostream& operator <<(std::ostream& strm, const nestl::result_with_op
     strm << "result_with_operation_error { message : " << ec.error().message() << ", value: " << ec.error().value() << " };";
     return strm;
 }
-
-#endif /* NESTL_USE_STD */
 
 #endif /* NESTL_TESTS_NESTL_PRINTERS_HPP */

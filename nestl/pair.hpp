@@ -3,20 +3,6 @@
 
 #include <nestl/config.hpp>
 
-#if NESTL_USE_STD
-
-#include <utility>
-
-namespace nestl
-{
-
-using std::pair;
-using std::make_pair;
-
-} // namespace nestl
-
-#else /* NESTL_USE_STD */
-
 namespace nestl
 {
 
@@ -52,10 +38,6 @@ struct pair
 
 };
 
-
 } // namespace nestl
-
-#endif /* NESTL_USE_STD */
-
 
 #endif /* NESTL_PAIR_HPP */
