@@ -10,7 +10,15 @@
 
 #define NESTL_ENOMEM          ENOMEM
 #define NESTL_EINVAL          EINVAL
-#define NESTL_EOVERFLOW       EOVERFLOW
+
+#if defined(EOVERFLOW)
+#   define NESTL_EOVERFLOW    EOVERFLOW
+#else /* defined(EOVERFLOW) */
+/**
+ * @note msvc-2008 (maybe other too) does not have EOVERFLOW constant
+ */
+#   define NESTL_EOVERFLOW    75
+#endif /* defined(EOVERFLOW) */
 
 namespace nestl
 {
