@@ -83,7 +83,7 @@ struct allocator_traits
 
     static size_type max_size_helper(const nestl::false_type& /* falseVal */, const Allocator& /* alloc */)
     {
-        return nestl::numeric_limits<size_type>::max();
+        return nestl::numeric_limits<size_type>::max_value();
     }
 
     static size_type max_size(const Allocator& alloc)

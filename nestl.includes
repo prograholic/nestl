@@ -6,3 +6,4 @@ tests/list
 tests/vector
 tests/shared_ptr
 tests/set
+nestl/numeric

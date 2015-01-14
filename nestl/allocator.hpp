@@ -72,7 +72,7 @@ public:
 
     size_type max_size() const NESTL_NOEXCEPT_SPEC
     {
-        return nestl::numeric_limits<size_type>::max();
+        return nestl::numeric_limits<size_type>::max_value();
     }
 
 #if NESTL_HAS_VARIADIC_TEMPLATES

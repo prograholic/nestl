@@ -12,7 +12,10 @@ struct numeric_limits;
 template <>
 struct numeric_limits<unsigned int>
 {
-    static unsigned int max() NESTL_NOEXCEPT_SPEC
+    /**
+     * @note differ from std::numeric_limits::max, because of weird macro max
+     */
+    static NESTL_CONSTEXPR unsigned int max_value() NESTL_NOEXCEPT_SPEC
     {
         return ~static_cast<unsigned int>(0);
     }
