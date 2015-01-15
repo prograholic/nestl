@@ -144,6 +144,58 @@ struct is_lvalue_reference<T&> : public true_type
 {
 };
 
+template <typename T>
+struct is_unsigned : public nestl::false_type
+{
+};
+
+template <>
+struct is_unsigned<unsigned char> : public nestl::true_type
+{
+};
+
+template <>
+struct is_unsigned<unsigned short> : public nestl::true_type
+{
+};
+
+template <>
+struct is_unsigned<unsigned int> : public nestl::true_type
+{
+};
+
+template <>
+struct is_unsigned<unsigned long> : public nestl::true_type
+{
+};
+
+
+template <typename T>
+struct is_signed : public nestl::false_type
+{
+};
+
+template <>
+struct is_signed<signed char> : public nestl::true_type
+{
+};
+
+template <>
+struct is_signed<signed short> : public nestl::true_type
+{
+};
+
+template <>
+struct is_signed<signed int> : public nestl::true_type
+{
+};
+
+template <>
+struct is_signed<signed long> : public nestl::true_type
+{
+};
+
+
 } // namespace nestl
 
 #endif // NESTL_TYPE_TRAITS_HPP

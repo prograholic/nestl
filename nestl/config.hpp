@@ -38,6 +38,7 @@
 #   include NESTL_PLATFORM_HEADER
 
 
-#define NESTL_JOIN(x, y) x ## y
+#define NESTL_JOIN_(x, y) x ## y
+#define NESTL_JOIN(x, y) NESTL_JOIN_(x, y)
 
 #endif /* NESTL_CONFIG_HPP */

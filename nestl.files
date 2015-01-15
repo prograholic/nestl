@@ -117,3 +117,4 @@ tests/nestl_printers.hpp
 tests/sample_test_platform.hpp
 tests/test_common.hpp
 nestl/numeric/casting.hpp
+tests/numeric/numeric_cast_test.cpp

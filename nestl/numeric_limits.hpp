@@ -12,12 +12,28 @@ struct numeric_limits;
 template <>
 struct numeric_limits<unsigned int>
 {
+    typedef unsigned int value_type;
     /**
      * @note differ from std::numeric_limits::max, because of weird macro max
      */
-    static NESTL_CONSTEXPR unsigned int max_value() NESTL_NOEXCEPT_SPEC
+    static NESTL_CONSTEXPR value_type max_value() NESTL_NOEXCEPT_SPEC
     {
-        return ~static_cast<unsigned int>(0);
+        return ~static_cast<value_type>(0);
+    }
+};
+
+
+
+template <>
+struct numeric_limits<unsigned short>
+{
+    typedef unsigned short value_type;
+    /**
+     * @note differ from std::numeric_limits::max, because of weird macro max
+     */
+    static NESTL_CONSTEXPR value_type max_value() NESTL_NOEXCEPT_SPEC
+    {
+        return ~static_cast<value_type>(0);
     }
 };
 
