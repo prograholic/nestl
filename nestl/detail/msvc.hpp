@@ -39,9 +39,9 @@
 #   define NESTL_HAS_RVALUE_REF                  0
 #   define NESTL_HAS_EXPLICIT_OPERATOR           0
 #   define NESTL_HAS_CXX11_ALIGNMENT_SUPPORT     0
-#   define NESTL_HAS_NATIVE_CHAR16_TYPE          1
-#   define NESTL_HAS_NATIVE_CHAR32_TYPE          1
-#   define NESTL_CONFIG_HAS_STATIC_ASSERT        1
+#   define NESTL_HAS_NATIVE_CHAR16_TYPE          0
+#   define NESTL_HAS_NATIVE_CHAR32_TYPE          0
+#   define NESTL_CONFIG_HAS_STATIC_ASSERT        0
 
 #   define NESTL_CONSTEXPR
 #   define NESTL_COMPILER_GENERATED_IMPL         {}

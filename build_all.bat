@@ -1,6 +1,5 @@
 echo off
 
-
 set OUT_DIR=%1
 
 if [%OUT_DIR%] == [] goto usage
@@ -20,6 +19,10 @@ goto end
 
 :build
 cmake --build %1
+cd %1
+ctest
+cd %NESTL_SRC%
+
 goto end
 
 :usage
