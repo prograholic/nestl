@@ -131,36 +131,6 @@ TYPED_TEST_P(ListTestNumeric, CheckAssignFromIterators)
     }
 }
 
-#if defined(NESTL_CONFIG_HAS_INITIALIZER_LIST)
-
-TYPED_TEST_P(ListTestNumeric, CheckAssignFromInitializerList)
-{
-    #define INITIALIZER_LIST_VALUES {0, 1, 2, 3, 4, 5}
-
-    typename TestFixture::list_t l;
-    typename TestFixture::value_type values [] = INITIALIZER_LIST_VALUES;
-    const size_t expectedSize = nestl::distance(nestl::begin(values), nestl::end(values));
-
-    ASSERT_OPERATION_SUCCESS(l.assign(INITIALIZER_LIST_VALUES));
-
-    ASSERT_TRUE(CheckListSize(l, expectedSize));
-
-    typename TestFixture::const_iterator constIt = l.cbegin();
-    typename TestFixture::iterator it = l.begin();
-    for (size_t i = 0; i != expectedSize; ++i)
-    {
-        EXPECT_EQ(values[i], *constIt);
-        EXPECT_EQ(values[i], *it);
-
-        ++constIt;
-        ++it;
-    }
-
-    #undef INITIALIZER_LIST_VALUES
-}
-
-#endif /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
-
 TYPED_TEST_P(ListTestNumeric, InsertOneElementBeforeBeginToNonEmptyList)
 {
     typename TestFixture::list_t l;
@@ -345,24 +315,6 @@ TYPED_TEST_P(ListTestNumeric, SortListWithSeveralElements)
 }
 
 
-#if defined(NESTL_CONFIG_HAS_INITIALIZER_LIST)
-
-REGISTER_TYPED_TEST_CASE_P(ListTestNumeric,
-                           CheckAssignFromIterators,
-                           InsertOneElementBeforeBeginToNonEmptyList,
-                           InsertOneElementBeforeEndToNonEmptyList,
-                           PopFrontFromListWith1Element,
-                           PopBackFromListWith1Element,
-                           PopFrontFromListWith2Elements,
-                           PopBackFromListWith2Elements,
-                           MergeTwoNonEmptyLists,
-                           SortEmptyList,
-                           SortListWithOneElement,
-                           SortListWithSeveralElements,
-                           CheckAssignFromInitializerList);
-
-#else /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
-
 REGISTER_TYPED_TEST_CASE_P(ListTestNumeric,
                            CheckAssignFromIterators,
                            InsertOneElementBeforeBeginToNonEmptyList,
@@ -375,8 +327,6 @@ REGISTER_TYPED_TEST_CASE_P(ListTestNumeric,
                            SortEmptyList,
                            SortListWithOneElement,
                            SortListWithSeveralElements);
-
-#endif /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
 
 
 INSTANTIATE_TYPED_TEST_CASE_P(numeric_list_test, ListTestNumeric, ListNumericTypes);

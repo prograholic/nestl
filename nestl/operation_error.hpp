@@ -55,6 +55,13 @@ public:
     {
     }
 
+    template <typename ErrorCode>
+    result_with_operation_error(const Type& val, const ErrorCode& ec) NESTL_NOEXCEPT_SPEC
+        : m_val(val)
+        , m_error(ec)
+    {
+    }
+
     const OperationError& error() const NESTL_NOEXCEPT_SPEC
     {
         return m_error;
@@ -65,14 +72,19 @@ public:
         return m_val;
     }
 
-#if defined(NESTL_CONFIG_HAS_EXPLICIT_OPERATOR)
+    Type& result() NESTL_NOEXCEPT_SPEC
+    {
+        return m_val;
+    }
+
+#if NESTL_HAS_EXPLICIT_OPERATOR
 
     explicit operator bool() const NESTL_NOEXCEPT_SPEC
     {
         return m_error ? true : false;
     }
 
-#else /* defined(NESTL_CONFIG_HAS_EXPLICIT_OPERATOR) */
+#else /* NESTL_HAS_EXPLICIT_OPERATOR */
 
     typedef OperationError result_with_operation_error::*unspecified_bool_type;
 
@@ -81,7 +93,7 @@ public:
         return m_error ? &result_with_operation_error::m_error : 0;
     }
 
-#endif /* defined(NESTL_CONFIG_HAS_EXPLICIT_OPERATOR) */
+#endif /* NESTL_HAS_EXPLICIT_OPERATOR */
 
 private:
     Type m_val;

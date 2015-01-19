@@ -378,10 +378,12 @@ public:
         return m_container->push_back(val);
     }
 
-    operation_error assign(move_from<container_value_type> val) NESTL_NOEXCEPT_SPEC
+#if NESTL_HAS_RVALUE_REF
+    operation_error assign(container_value_type&& val) NESTL_NOEXCEPT_SPEC
     {
         return m_container->push_back(nestl::move(val));
     }
+#endif /* NESTL_HAS_RVALUE_REF */
 
     back_insert_iterator& operator*() NESTL_NOEXCEPT_SPEC
     {
@@ -416,11 +418,13 @@ template <typename Container>
 struct class_traits<nestl::back_insert_iterator<Container> >
 {
 
+#if NESTL_HAS_RVALUE_REF
     template <typename OperationError, typename Y>
-    static OperationError assign(nestl::back_insert_iterator<Container>& dest, move_from<Y> src) NESTL_NOEXCEPT_SPEC
+    static OperationError assign(nestl::back_insert_iterator<Container>& dest, Y&& src) NESTL_NOEXCEPT_SPEC
     {
         return dest.assign(src);
     }
+#endif /* NESTL_HAS_RVALUE_REF */
 
     template <typename OperationError, typename Y>
     static OperationError assign(nestl::back_insert_iterator<Container>& dest, const Y& src) NESTL_NOEXCEPT_SPEC
@@ -459,9 +463,10 @@ public:
         return err.error();
     }
 
-    operation_error assign(move_from<container_value_type> val) NESTL_NOEXCEPT_SPEC
+#if NESTL_HAS_RVALUE_REF
+    operation_error assign(container_value_type&& val) NESTL_NOEXCEPT_SPEC
     {
-        auto err = m_container->insert(m_pos, nestl::move(val));
+        operation_error err = m_container->insert(m_pos, nestl::move(val));
         if (!err)
         {
             m_pos = err.value();
@@ -470,6 +475,7 @@ public:
         }
         return err.error();
     }
+#endif /* NESTL_HAS_RVALUE_REF */
 
     insert_iterator& operator*() NESTL_NOEXCEPT_SPEC
     {
@@ -519,6 +525,21 @@ struct class_traits<nestl::insert_iterator<Container> >
     }
 #endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 };
+
+
+template <typename Iterator>
+struct move_iterator
+{
+
+};
+
+
+template <typename Iterator>
+move_iterator<Iterator> make_move_iterator(Iterator i)
+{
+    return move_iterator<Iterator>(i);
+}
+
 
 } // namespace nestl
 

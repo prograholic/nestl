@@ -3,8 +3,9 @@
 
 #include "tests/nestl_printers.hpp"
 #include "tests/allocators.hpp"
-#include "tests/gtest_gmock_emulation.hpp"
 
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 namespace nestl
 {
@@ -83,16 +84,11 @@ bool operator == (const non_copyable& left, const non_copyable& right)
     return left.v == right.v;
 }
 
-#if defined(NESTL_CONFIG_HAS_STD_INCLUDES)
-
 inline std::ostream& operator << (std::ostream& strm, const non_copyable& val)
 {
     strm << "non_copyable { v : " << val.v << " };";
     return strm;
 }
-
-#endif /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
-
 
 } // namespace test
 

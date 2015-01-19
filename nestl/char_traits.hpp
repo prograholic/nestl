@@ -3,19 +3,6 @@
 
 #include <nestl/config.hpp>
 
-#if defined(NESTL_CONFIG_HAS_STD_INCLUDES)
-
-#include <string>
-
-namespace nestl
-{
-
-using std::char_traits;
-
-} // namespace nestl
-
-#else /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
-
 namespace nestl
 {
 
@@ -26,7 +13,5 @@ struct char_traits
 };
 
 } // namespace nestl
-
-#endif /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #endif /* NESTL_CHAR_TRAITS_HPP */

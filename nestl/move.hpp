@@ -12,7 +12,31 @@
 
 #include <nestl/detail/select_type.hpp>
 #include <nestl/type_traits.hpp>
-#include <nestl/mpl.hpp>
+
+#if NESTL_HAS_RVALUE_REF
+
+namespace nestl
+{
+
+template<typename T>
+NESTL_CONSTEXPR typename nestl::remove_reference<T>::type&&
+move(T&& t) NESTL_NOEXCEPT_SPEC
+{
+    return static_cast<typename nestl::remove_reference<T>::type&&>(t);
+}
+
+
+} // namespace nestl
+
+#define NESTL_MOVE_IF_SUPPORTED(x) nestl::move(x)
+
+#else /* NESTL_HAS_RVALUE_REF */
+
+#define NESTL_MOVE_IF_SUPPORTED(x) x
+
+#endif /* NESTL_HAS_RVALUE_REF */
+
+#if 0
 
 namespace nestl
 {
@@ -25,9 +49,14 @@ namespace detail
 template <typename T>
 struct class_has_move_assign
 {
-    NESTL_METHOD_CHECKER_EX(T, operator=, assign_operator);
+    NESTL_HAS_METHOD_EX(T, operator=, assign_operator);
+
+    //typedef nestl::class_traits<T> class_traits_type;
+
+    //NESTL_HAS_METHOD(T, move_assign);
 
     typedef has_assign_operator_member type;
+    //typedef has_move_assign_member type;
 
     enum
     {
@@ -58,6 +87,9 @@ struct move_from
 
     T& source;
 };
+
+
+#define NESTL_RV_REF(Type) nestl::move_from<Type>
 
 
 template <typename T>
@@ -97,6 +129,8 @@ struct move_sink : nestl::enable_if<
 };
 
 
+#if 0
+
 template <typename T>
 T move(T& x, typename move_sink<T>::type = 0)
 {
@@ -110,7 +144,15 @@ T& move(T& x, typename copy_sink<T>::type = 0)
     return x;
 }
 
+#endif //0
+
+template <typename T>
+T& move(T& x)
+{
+    return x;
+}
+
 } // namespace nestl
 
-
+#endif //0
 #endif /* NESTL_MOVE_HPP */

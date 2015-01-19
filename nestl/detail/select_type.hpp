@@ -8,6 +8,8 @@
 
 #include <nestl/config.hpp>
 
+#include <nestl/declval.hpp>
+#include <nestl/static_assert.hpp>
 
 namespace nestl
 {
@@ -20,55 +22,47 @@ namespace nestl
 #   define NESTL_SELECT_NESTED_TYPE(Type, Nested, Default) \
     template<typename T> \
     static typename T::Nested NESTL_##Nested##_helper(T*); \
-    static Default NESTL_##Nested##_helper(...); \
+    static Default            NESTL_##Nested##_helper(...); \
     typedef NESTL_DECLTYPE(NESTL_##Nested##_helper((Type*)0)) nestl_nested_type_##Nested \
 
 
+#   define NESTL_SELECT_NESTED_TYPE_TEMPLATE(Type, NestedType, ResultType, Default) \
+    template<typename T> \
+    static typename T::template NestedType NESTL_##ResultType##_helper(T*); \
+    static Default                         NESTL_##ResultType##_helper(...); \
+    typedef NESTL_DECLTYPE(NESTL_##ResultType##_helper((Type*)0)) nestl_nested_type_##ResultType \
 
-#   define NESTL_METHOD_CHECKER_EX(Class, actualMethodName, strMethodName) \
-    template <typename TypeToCheck> \
-    class has_ ## strMethodName ## _member_impl \
-    { \
-        typedef char has_method; \
-        typedef long does_not_has_method; \
-        NESTL_STATIC_ASSERT(sizeof(has_method) != sizeof(does_not_has_method), \
-                            "please, select types with different size"); \
-        template <typename C> static has_method test( NESTL_DECLTYPE(nestl::declval(&C::actualMethodName)) ) ; \
-        template <typename C> static does_not_has_method test(...); \
-    public: \
-        typedef typename nestl::conditional \
-        < \
-            sizeof(test<TypeToCheck>(0)) == sizeof(has_method), \
-            nestl::true_type, \
-            nestl::false_type \
-        >::type type; \
-    }; \
-    typedef typename has_ ## strMethodName ## _member_impl<Class>::type has_ ## strMethodName ## _member \
+
 
 #elif NESTL_COMPILER == NESTL_COMPILER_MSVC
 
 #   if defined(_MSC_EXTENSIONS)
 
 #       define NESTL_SELECT_NESTED_TYPE(Type, Nested, Default) \
-        __if_exists(Type::Nested) \
-        { \
-            typedef typename Type::Nested nestl_nested_type_ ## Nested; \
-        }; \
-        __if_not_exists(Type::Nested) \
-        { \
-            typedef Default nestl_nested_type_ ## Nested; \
-        } \
+    __if_exists(Type::Nested) \
+    { \
+        typedef typename Type::Nested nestl_nested_type_ ## Nested; \
+    }; \
+    __if_not_exists(Type::Nested) \
+    { \
+        typedef Default nestl_nested_type_ ## Nested; \
+    } \
 
+#       define NESTL_SELECT_NESTED_TYPE_TEMPLATE(Type, NestedType, ResultType, Default) typedef Default nestl_nested_type_ ## ResultType
 
-#       define NESTL_METHOD_CHECKER_EX(Class, actualMethodName, strMethodName) \
-        __if_exists(Class::actualMethodName) \
-        { \
-            typedef nestl::true_type has_ ## strMethodName ## _member; \
-        }; \
-        __if_not_exists(Class::actualMethodName) \
-        { \
-            typedef nestl::false_type has_ ## strMethodName ## _member; \
-        } \
+/// @bug msvc-2008 does not compile following type selector (maybe there is my bug)
+#if 0
+    __if_exists(Type::template NestedType) \
+    { \
+        typedef typename Type::template NestedType nestl_nested_type_ ## ResultType; \
+    }; \
+    __if_not_exists(Type::template NestedType) \
+    { \
+        typedef Default nestl_nested_type_ ## ResultType; \
+    } \
+
+#endif //0
+
 
 #else /* _MSC_EXTENSIONS */
 
@@ -81,7 +75,21 @@ namespace nestl
 #endif /* NESTL_COMPILER */
 
 
-#define NESTL_METHOD_CHECKER(Class, methodName) NESTL_METHOD_CHECKER_EX(Class, methodName, methodName)
+
+#define NESTL_CHECK_METHOD_WITH_SIGNATURE(Type, method) \
+template<typename TypeWithSignatureOrNot, typename Signature> \
+struct has_ ## method ## _impl \
+{ \
+    template <typename U, U> struct type_check; \
+    template <typename TypeWithSignatureOrNot2> \
+    static char test(type_check<Signature, &TypeWithSignatureOrNot2::method>*); \
+    template <typename> \
+    static long test(...); \
+    enum \
+    { \
+        value = sizeof(test<TypeWithSignatureOrNot>(0)) == sizeof(char) \
+    }; \
+} \
 
 }
 

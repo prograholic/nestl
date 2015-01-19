@@ -5,8 +5,6 @@
 #include <nestl/noncopyable.hpp>
 #include <nestl/operation_error.hpp>
 
-#if defined(NESTL_CONFIG_HAS_STD_INCLUDES)
-
 #include <ostream>
 
 
@@ -23,7 +21,5 @@ inline std::ostream& operator <<(std::ostream& strm, const nestl::result_with_op
     strm << "result_with_operation_error { message : " << ec.error().message() << ", value: " << ec.error().value() << " };";
     return strm;
 }
-
-#endif /* defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
 
 #endif /* NESTL_TESTS_NESTL_PRINTERS_HPP */

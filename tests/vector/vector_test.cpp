@@ -8,6 +8,9 @@ namespace test
 {
 
 
+
+
+
 template <typename TypeWithAllocator>
 class VectorTestCommon : public VectorTestBase<TypeWithAllocator>
 {
@@ -89,7 +92,9 @@ REGISTER_TYPED_TEST_CASE_P(VectorTestCommon,
                            CheckAssignWithSize1024,
                            CheckInsertIntoEmptyVector);
 
-INSTANTIATE_TYPED_TEST_CASE_P(common_vector_test, VectorTestCommon, VectorCommonTypesWithDefaultAllocator);
+INSTANTIATE_TYPED_TEST_CASE_P(common_vector_test,
+                              VectorTestCommon,
+                              VectorCommonTypesWithDefaultAllocator);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,40 +132,6 @@ TYPED_TEST_P(VectorTestNumeric, CheckAssignFromIterators)
         ++it;
     }
 }
-
-#if defined(NESTL_CONFIG_HAS_INITIALIZER_LIST)
-
-TYPED_TEST_P(VectorTestNumeric, CheckAssignFromInitializerList)
-{
-    typedef typename TestFixture::vector_t::const_iterator const_iterator;
-    typedef typename TestFixture::vector_t::iterator       iterator;
-
-    #define INITIALIZER_LIST_VALUES {0, 1, 2, 3, 4, 5}
-
-    typename TestFixture::vector_t vec;
-    typename TestFixture::value_type values [] = INITIALIZER_LIST_VALUES;
-    const size_t expectedSize = nestl::distance(nestl::begin(values), nestl::end(values));
-
-    ASSERT_OPERATION_SUCCESS(vec.assign(INITIALIZER_LIST_VALUES));
-
-    ASSERT_TRUE(CheckVectorSize(vec, expectedSize));
-
-    const_iterator constIt = vec.cbegin();
-    iterator it = vec.begin();
-    for (size_t i = 0; i != expectedSize; ++i)
-    {
-        EXPECT_EQ(values[i], *constIt);
-        EXPECT_EQ(values[i], *it);
-        EXPECT_EQ(values[i], vec[i]);
-
-        ++constIt;
-        ++it;
-    }
-
-    #undef INITIALIZER_LIST_VALUES
-}
-
-#endif /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
 
 
 TYPED_TEST_P(VectorTestNumeric, InsertOneElementBeforeBeginToNonEmptyVector)
@@ -209,22 +180,10 @@ TYPED_TEST_P(VectorTestNumeric, InsertOneElementBeforeEndToNonEmptyVector)
     EXPECT_EQ(4, vec[4]);
 }
 
-#if defined(NESTL_CONFIG_HAS_INITIALIZER_LIST)
-
-REGISTER_TYPED_TEST_CASE_P(VectorTestNumeric,
-                           CheckAssignFromIterators,
-                           CheckAssignFromInitializerList,
-                           InsertOneElementBeforeBeginToNonEmptyVector,
-                           InsertOneElementBeforeEndToNonEmptyVector);
-
-#else /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
-
 REGISTER_TYPED_TEST_CASE_P(VectorTestNumeric,
                            CheckAssignFromIterators,
                            InsertOneElementBeforeBeginToNonEmptyVector,
                            InsertOneElementBeforeEndToNonEmptyVector);
-
-#endif /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST) */
 
 INSTANTIATE_TYPED_TEST_CASE_P(numeric_vector_test, VectorTestNumeric, VectorNumericTypes);
 

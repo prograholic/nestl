@@ -148,7 +148,7 @@ public:
 #endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
 private:
-    typename nestl::aligned_storage<sizeof(T), nestl::alignment_of<T>::value>::type m_value;
+    nestl::aligned_buffer<T> m_value;
     allocator_type m_allocator;
 };
 
@@ -174,9 +174,9 @@ public:
     template <typename Y>
     shared_ptr(const shared_ptr<Y>& other) NESTL_NOEXCEPT_SPEC;
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
     shared_ptr(shared_ptr&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
     /// destructor
     ~shared_ptr() NESTL_NOEXCEPT_SPEC;
@@ -187,10 +187,10 @@ public:
     template <typename Y>
     shared_ptr& operator=(const shared_ptr<Y>& other) NESTL_NOEXCEPT_SPEC;
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
     template <typename Y>
     shared_ptr& operator=(shared_ptr<Y>&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
     /// assign_copy
     template <typename Y>
@@ -211,18 +211,18 @@ public:
 
     bool unique() const NESTL_NOEXCEPT_SPEC;
 
-#if defined(NESTL_CONFIG_HAS_EXPLICIT_OPERATOR)
+#if NESTL_HAS_EXPLICIT_OPERATOR
     explicit operator bool() const NESTL_NOEXCEPT_SPEC
     {
         return (use_count() > 0);
     }
-#else /* defined(NESTL_CONFIG_HAS_EXPLICIT_OPERATOR) */
+#else /* NESTL_HAS_EXPLICIT_OPERATOR */
     typedef element_type* shared_ptr::*unspecified_bool_type;
     operator unspecified_bool_type() const NESTL_NOEXCEPT_SPEC
     {
         return use_count() == 0 ? 0 : &shared_ptr::m_ptr;
     }
-#endif /* defined(NESTL_CONFIG_HAS_EXPLICIT_OPERATOR) */
+#endif /* NESTL_HAS_EXPLICIT_OPERATOR */
 
 private:
     element_type* m_ptr;
@@ -241,11 +241,11 @@ private:
     template <typename Type>
     friend class weak_ptr;
 
-#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
+#if NESTL_HAS_VARIADIC_TEMPLATES
     template <typename Type, typename Allocator, typename Y, typename ... Args>
     friend
     typename shared_ptr<Type>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, Args&& ... args);
-#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
+#else /* NESTL_HAS_VARIADIC_TEMPLATES */
     template <typename Type, typename Allocator, typename Y>
     friend
     typename shared_ptr<Type>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc);
@@ -253,7 +253,7 @@ private:
     template <typename Type, typename Allocator, typename Y, typename Arg>
     friend
     typename shared_ptr<Type>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, const Arg& arg);
-#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
+#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
 };
 
 
@@ -271,7 +271,7 @@ public:
     {
     }
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
     weak_ptr(weak_ptr&& other) NESTL_NOEXCEPT_SPEC
         : m_ptr(other.m_ptr)
         , m_refcount(other.m_refcount)
@@ -279,7 +279,7 @@ public:
         other.m_ptr = 0;
         other.m_refcount = 0;
     }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
     weak_ptr(const shared_ptr<T>& sp) NESTL_NOEXCEPT_SPEC
         : m_ptr(sp.m_ptr)
@@ -355,7 +355,7 @@ public:
         return *this;
     }
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
     weak_ptr& operator=(weak_ptr&& other) NESTL_NOEXCEPT_SPEC
     {
         const weak_ptr tmp(nestl::move(*this));
@@ -365,7 +365,7 @@ public:
 
         return *this;
     }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
     bool expired() const NESTL_NOEXCEPT_SPEC
     {
@@ -428,7 +428,7 @@ shared_ptr<T>::shared_ptr(const shared_ptr<Y>& other) NESTL_NOEXCEPT_SPEC
     }
 }
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
 template <typename T>
 shared_ptr<T>::shared_ptr(shared_ptr&& other) NESTL_NOEXCEPT_SPEC
     : m_ptr(0)
@@ -436,7 +436,7 @@ shared_ptr<T>::shared_ptr(shared_ptr&& other) NESTL_NOEXCEPT_SPEC
 {
     this->swap(other);
 }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
 template <typename T>
 shared_ptr<T>::~shared_ptr() NESTL_NOEXCEPT_SPEC
@@ -487,7 +487,7 @@ shared_ptr<T>& shared_ptr<T>::operator=(const shared_ptr<Y>& other) NESTL_NOEXCE
     return *this;
 }
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
 template <typename T>
 template <typename Y>
 shared_ptr<T>& shared_ptr<T>::operator=(shared_ptr<Y>&& other) NESTL_NOEXCEPT_SPEC
@@ -501,7 +501,7 @@ shared_ptr<T>& shared_ptr<T>::operator=(shared_ptr<Y>&& other) NESTL_NOEXCEPT_SP
 
     return *this;
 }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
 template <typename T>
 template <typename Y>
@@ -557,9 +557,9 @@ bool shared_ptr<T>::unique() const NESTL_NOEXCEPT_SPEC
     return (use_count() == 1);
 }
 
-#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
+#if NESTL_HAS_VARIADIC_TEMPLATES
 template <typename T, typename Allocator, typename Y, typename ... Args>
-typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, Args&& ... args)
+typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& /* alloc */, Args&& ... args)
 {
     NESTL_STATIC_ASSERT(sizeof(T), "T must be complete type");
     typedef typename shared_ptr<T>::operation_error operation_error;
@@ -607,7 +607,7 @@ typename shared_ptr<T>::operation_error make_shared(shared_ptr<T>& sp, Args&& ..
     return make_shared_ex<T>(sp, nestl::forward<Args>(args) ...);
 }
 
-#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
+#else /* NESTL_HAS_VARIADIC_TEMPLATES */
 
 
 template <typename T, typename Allocator, typename Y>
@@ -646,7 +646,7 @@ typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allo
 }
 
 template <typename T, typename Allocator, typename Y, typename Arg>
-typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, const Arg& arg)
+typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& /* alloc */, const Arg& arg)
 {
     NESTL_STATIC_ASSERT(sizeof(T), "T must be complete type");
     typedef typename shared_ptr<T>::operation_error operation_error;
@@ -712,7 +712,7 @@ typename shared_ptr<T>::operation_error make_shared(shared_ptr<T>& sp, const Arg
     return make_shared_ex<T>(sp, arg);
 }
 
-#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
+#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
 
 
 } // namespace nestl

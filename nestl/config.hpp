@@ -5,11 +5,10 @@
  * @file config file for nestl project
  */
 
-#define NESTL_COMPILER_CLANG                            1
-#define NESTL_COMPILER_GCC                              2
-#define NESTL_COMPILER_MSVC                             3
+#define NESTL_COMPILER_CLANG 1
+#define NESTL_COMPILER_GCC   2
+#define NESTL_COMPILER_MSVC  3
 
-#define NESTL_JOIN(x, y)                                x ## y
 
 #if defined(__clang__)
 #   include <nestl/detail/clang.hpp>
@@ -21,14 +20,16 @@
 
 #if !defined(NESTL_COMPILER)
 #   error Unknown compiler, please provide corresponding header
-#endif /* !defined(NESTL_COMPILER) */
+#endif /* NESTL_COMPILER */
 
 
 #if !defined(NESTL_NO_STD)
 
-#   define NESTL_CONFIG_HAS_STD_INCLUDES                1
+#   define NESTL_PLATFORM_HEADER <nestl/std_platform.hpp>
 
-#else /* !defined(NESTL_NO_STD) */
+#endif /* !defined(NESTL_NO_STD) */
+
+
 
 #   if !defined NESTL_PLATFORM_HEADER
 #       error "NESTL is not usable without platform-specific header, see nestl/platform.hpp.sample for details"
@@ -36,15 +37,8 @@
 
 #   include NESTL_PLATFORM_HEADER
 
-#endif /* NESTL_NO_STD */
 
-#if defined(NESTL_CONFIG_HAS_INITIALIZER_LIST_HEADER) && defined(NESTL_CONFIG_HAS_STD_INCLUDES)
-#   define NESTL_CONFIG_HAS_INITIALIZER_LIST            1
-#endif /* defined(NESTL_CONFIG_HAS_INITIALIZER_LIST_HEADER) && defined(NESTL_CONFIG_HAS_STD_INCLUDES) */
-
-
-
-
-
+#define NESTL_JOIN_(x, y) x ## y
+#define NESTL_JOIN(x, y) NESTL_JOIN_(x, y)
 
 #endif /* NESTL_CONFIG_HPP */

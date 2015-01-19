@@ -6,7 +6,8 @@
 #include <nestl/move.hpp>
 #include <nestl/set.hpp>
 
-#include "tests/gtest_gmock_emulation.hpp"
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 namespace nestl
 {
@@ -88,8 +89,6 @@ public:
 };
 
 
-#if defined(NESTL_CONFIG_HAS_SET)
-
 /**
  * Allocator which has its own state (remember who allocate memory)
  */
@@ -121,20 +120,23 @@ public:
     {
     }
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+
+#if NESTL_HAS_RVALUE_REF
     allocator_with_state(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
         : m_allocated_storage(nestl::move(other.m_allocated_storage))
     {
+        NESTL_ASSERT(!other.m_allocated_storage);
     }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
     template <typename Y>
     allocator_with_state(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
         : m_allocated_storage(nestl::move(other.m_allocated_storage))
     {
+        NESTL_ASSERT(!other.m_allocated_storage);
     }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
     allocator_with_state& operator=(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
     {
@@ -149,22 +151,24 @@ public:
         return *this;
     }
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
     allocator_with_state& operator=(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
     {
         m_allocated_storage = nestl::move(other.m_allocated_storage);
+        NESTL_ASSERT(!other.m_allocated_storage);
         return *this;
     }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
     template <typename Y>
     allocator_with_state& operator=(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
     {
         m_allocated_storage = nestl::move(other.m_allocated_storage);
+        NESTL_ASSERT(!other.m_allocated_storage);
         return *this;
     }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
     ~allocator_with_state() NESTL_NOEXCEPT_SPEC
     {
@@ -174,12 +178,12 @@ public:
         }
     }
 
-    T* allocate(std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    T* allocate(nestl::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
         T* res = static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
 
 
-        std::set<void*>::const_iterator pos = m_allocated_storage->find(res);
+        nestl::set<void*>::const_iterator pos = m_allocated_storage->find(res);
         if (pos != m_allocated_storage->end())
         {
             ADD_FAILURE() << "pointer [" << static_cast<void*>(res) << "] already belong to this allocator";
@@ -194,9 +198,9 @@ public:
         return res;
     }
 
-    void deallocate(T* p, std::size_t /* n */) NESTL_NOEXCEPT_SPEC
+    void deallocate(T* p, nestl::size_t /* n */) NESTL_NOEXCEPT_SPEC
     {
-        std::set<void*>::const_iterator pos = m_allocated_storage->find(p);
+        nestl::set<void*>::const_iterator pos = m_allocated_storage->find(p);
         if (pos == m_allocated_storage->end())
         {
             if (p)
@@ -211,15 +215,11 @@ public:
         else
         {
             m_allocated_storage->erase(pos);
-
             ::operator delete(p);
         }
     }
 
-
-private:
-
-    nestl::shared_ptr<std::set<void*> > m_allocated_storage;
+    nestl::shared_ptr<nestl::set<void*> > m_allocated_storage;
 };
 
 
@@ -234,11 +234,6 @@ bool operator != (const allocator_with_state<T>& left, const allocator_with_stat
 {
     return left.m_allocated_storage != right.m_allocated_storage;
 }
-
-#define NESTL_CONFIG_HAS_TEST_ALLOCATOR_WITH_STATE 1
-
-#endif /* defined(NESTL_CONFIG_HAS_SET) */
-
 
 } // namespace test
 

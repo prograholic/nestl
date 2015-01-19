@@ -31,7 +31,7 @@ TEST_F(VectorTestConstructorWithDefaultAllocator, ConstructorWithoutParametersWi
     EXPECT_TRUE(CheckVectorSize(vec, 0));
 }
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
 TEST_F(VectorTestConstructorWithDefaultAllocator, MoveConstructorFromEmptyVector)
 {
     nestl::vector<int> vec1;
@@ -41,10 +41,10 @@ TEST_F(VectorTestConstructorWithDefaultAllocator, MoveConstructorFromEmptyVector
     EXPECT_TRUE(CheckVectorSize(vec2, 0));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
 }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
 TEST_F(VectorTestConstructorWithDefaultAllocator, MoveConstructorFromNonEmptyVector)
 {
     nestl::vector<int> vec1;
@@ -56,7 +56,7 @@ TEST_F(VectorTestConstructorWithDefaultAllocator, MoveConstructorFromNonEmptyVec
     EXPECT_TRUE(CheckVectorSize(vec2, 10));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
 }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
 
 
@@ -87,7 +87,7 @@ TEST_F(VectorTestConstructorWithZeroAllocator, ConstructorWithoutParametersWithA
     EXPECT_TRUE(CheckVectorSize(vec, 0));
 }
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
 TEST_F(VectorTestConstructorWithZeroAllocator, MoveConstructorFromEmptyVector)
 {
     nestl::vector<int, zero_allocator<int> > vec1;
@@ -97,7 +97,7 @@ TEST_F(VectorTestConstructorWithZeroAllocator, MoveConstructorFromEmptyVector)
     EXPECT_TRUE(CheckVectorSize(vec2, 0));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
 }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
 
 
@@ -128,7 +128,7 @@ TEST_F(VectorTestConstructorWithMinimalAllocator, ConstructorWithoutParametersWi
     EXPECT_TRUE(CheckVectorSize(vec, 0));
 }
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
 TEST_F(VectorTestConstructorWithMinimalAllocator, MoveConstructorFromEmptyVector)
 {
     nestl::vector<int, minimal_allocator<int> > vec1;
@@ -138,9 +138,9 @@ TEST_F(VectorTestConstructorWithMinimalAllocator, MoveConstructorFromEmptyVector
     EXPECT_TRUE(CheckVectorSize(vec2, 0));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
 }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
 TEST_F(VectorTestConstructorWithMinimalAllocator, MoveConstructorFromNonEmptyVector)
 {
     nestl::vector<int, minimal_allocator<int> > vec1;
@@ -152,14 +152,12 @@ TEST_F(VectorTestConstructorWithMinimalAllocator, MoveConstructorFromNonEmptyVec
     EXPECT_TRUE(CheckVectorSize(vec2, 10));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
 }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Now check with stateful allocator
 ////////////////////////////////////////////////////////////////////////////////
-
-#if defined(NESTL_TEST_ALLOCATOR_WITH_STATE)
 
 class VectorTestConstructorWithStatefulAllocator : public VectorTestConstructorBase
 {
@@ -182,7 +180,7 @@ TEST_F(VectorTestConstructorWithStatefulAllocator, ConstructorWithoutParametersW
 }
 
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
 TEST_F(VectorTestConstructorWithStatefulAllocator, MoveConstructorFromEmptyVector)
 {
     nestl::vector<int, allocator_with_state<int> > vec1;
@@ -192,9 +190,9 @@ TEST_F(VectorTestConstructorWithStatefulAllocator, MoveConstructorFromEmptyVecto
     EXPECT_TRUE(CheckVectorSize(vec2, 0));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
 }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
+#if NESTL_HAS_RVALUE_REF
 TEST_F(VectorTestConstructorWithStatefulAllocator, MoveConstructorFromNonEmptyVector)
 {
     nestl::vector<int, allocator_with_state<int> > vec1;
@@ -206,9 +204,7 @@ TEST_F(VectorTestConstructorWithStatefulAllocator, MoveConstructorFromNonEmptyVe
     EXPECT_TRUE(CheckVectorSize(vec2, 10));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
 }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
-
-#endif /* defined(NESTL_TEST_ALLOCATOR_WITH_STATE) */
+#endif /* NESTL_HAS_RVALUE_REF */
 
 } // namespace test
 

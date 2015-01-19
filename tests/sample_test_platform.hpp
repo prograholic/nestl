@@ -46,5 +46,14 @@ typedef int          ptrdiff_t;
 
 } // namespace nestl
 
+#include <new>
+
+/**
+ * Following defines are needed for system_error.hpp header
+ */
+#define NESTL_ENOMEM    12
+#define NESTL_EINVAL    22
+#define NESTL_EOVERFLOW 75
+
 
 #endif /* NESTL_TESTS_SAMPLE_TEST_PLATFORM_HPP */
