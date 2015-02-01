@@ -8,7 +8,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 if (NESTL_CONFIG_HAS_CXX11)
   message(STATUS "Using nestl with c++ 11 features")
   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.6)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7)
       # fix for g++-4.6 which does not accept -std=c++11 parameter
       add_compile_options(-std=c++0x)
       # g++-4.6. fails to compil gtest/gmock in C++11 mode
