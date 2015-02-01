@@ -22,23 +22,37 @@ and provide platform-specific header (should define **NESTL_PLATFORM_HEADER**).
 You can see nestl/platform.hpp.sample for details.
 Also you can see tests/CMakeLists.txt and tests/sample_test_platform.hpp for details
 
+How to run tests
+----------------
+Nestl needs following dependencies for running tests:
+* CMake (http://www.cmake.org/), minimal version is 3.0
+* googlemock sources (https://code.google.com/p/googlemock/), minimal version 1.7 (1.6 should be acceptable but not tested)
+
+For configuring building and running nestl test suite one should perform following commands:
+'''sh
+mkdir build
+cd build
+cmake ../ -DNESTL_GOOGLEMOCK_DIR=/absolute/path/to/googlemock/
+make
+make test
+'''
+
+
 
 Compilers supported
 ===================
 
 Library has been tested on following platforms and compilers:
 
-Toolchain                 |C++-03|C++-03-no-std|C++-11     |C++-11-no-std
---------------------------|------|-------------|-----------|-------------
-i386-linux-gnu G++-4.7.4  |Yes   |Yes*         |Yes        |Yes*
-i386-linux-gnu G++-4.8.3  |Yes   |Yes*         |Yes        |Yes*
-i386-linux-gnu G++-4.9.1  |Yes   |Yes*         |Yes        |Yes*
-i386-linux-gnu clang++-3.4|Yes   |Yes*         |Yes        |Yes*
-i386-linux-gnu clang++-3.5|Yes   |Yes*         |Yes        |Yes
-i386-windows msvc-2008    |Yes   |Yes*         |Yes**      |Yes***
+Toolchain                    |C++-03|C++-03-no-std|C++-11     |C++-11-no-std
+-----------------------------|------|-------------|-----------|-------------
+x86_64-linux-gnu G++-4.6.3   |Yes   |Yes          |Yes        |Yes
+i386-linux-gnu G++-4.7.4     |Yes   |Yes          |Yes        |Yes
+i386-linux-gnu G++-4.8.3     |Yes   |Yes          |Yes        |Yes
+i386-linux-gnu G++-4.9.1     |Yes   |Yes          |Yes        |Yes
+x86_64-linux-gnu clang++-3.4 |Yes   |Yes          |Yes        |Yes
+i386-linux-gnu clang++-3.4   |Yes   |Yes          |Yes        |Yes
+i386-linux-gnu clang++-3.5   |Yes   |Yes          |Yes        |Yes
+i386-windows msvc-2008       |Yes   |Yes          |Yes*       |Yes*
 
-\* - Tests successfully compiles but not executed (because of gtest/gmock emulation)
-
-\*\* - Compiles, but actually this mode is same as C++-03
-
-\*\*\* - Tests compiles but not executed and mode is equal to C++-03
+\* - Compiles, but actually this mode is same as C++-03
