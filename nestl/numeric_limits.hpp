@@ -18,6 +18,16 @@ struct numeric_limits<unsigned int>
     }
 };
 
+
+template <>
+struct numeric_limits<unsigned long int>
+{
+    static unsigned int max() NESTL_NOEXCEPT_SPEC
+    {
+        return ~static_cast<unsigned long int>(0);
+    }
+};
+
 }
 
 #endif /* NESTL_NUMERIC_LIMITS_HPP */
