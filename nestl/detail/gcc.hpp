@@ -9,6 +9,7 @@
  */
 #define NESTL_GCC_VERSION                        (__GNUC__ * 10000 + __GNUC_MINOR__ * 100)
 
+#define NESTL_COMPILER_GCC_46                    40600
 #define NESTL_COMPILER_GCC_47                    40700
 #define NESTL_COMPILER_GCC_48                    40800
 #define NESTL_COMPILER_GCC_49                    40900
