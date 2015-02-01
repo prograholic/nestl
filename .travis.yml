@@ -7,8 +7,9 @@ compiler:
 env:
   global:
     - BUILD_TYPE=Debug
-#  matrix:
-#    -
+  matrix:
+    - DISABLE_STD=Yes
+    - DISABLE_STD=No
 
 before_install:
   - wget http://www.cmake.org/files/v3.1/cmake-3.1.1-Linux-x86_64.tar.gz
@@ -24,12 +25,11 @@ before_install:
 
 before_script:
   - mkdir build
-  - pwd
 
 script:
-  - "cd build && cmake -DNESTL_GOOGLEMOCK_DIR=`pwd`/../gmock-1.7.0 -DCMAKE_BUILD_TYPE=${BUILD_TYPE}"
-  - "pwd && make"
-  - "pwd && make test"
+  - "cd build && cmake ../ -DNESTL_GOOGLEMOCK_DIR=`pwd`/../gmock-1.7.0 -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DNESTL_DISABLE_STD=${DISABLE_STD}"
+  - cmake --build build
+  - cmake --build build --target test
 
 branches:
   only:
