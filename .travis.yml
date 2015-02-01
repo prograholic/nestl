@@ -4,23 +4,18 @@ compiler:
   - clang
   - gcc
 
-#before_install:
-# - sudo apt-get update
-# - sudo apt-get install libgtest-dev google-mock
-# - "cd /usr/src/gtest && sudo cmake . && sudo cmake --build . && sudo mv libg* /usr/local/lib/ ; cd -"
-#before_script:
-# - pwd
-#
-
-before_script:
+before_install:
   - wget http://www.cmake.org/files/v3.1/cmake-3.1.1-Linux-x86_64.tar.gz
   - tar -xzf cmake-3.1.1-Linux-x86_64.tar.gz
   - sudo cp -fR cmake-3.1.1-Linux-x86_64/* /usr
   - rm -rf cmake-3.1.1-Linux-x86_64
   - rm cmake-3.1.1-Linux-x86_64.tar.gz
   - cmake --version
+  - wget https://googlemock.googlecode.com/files/gmock-1.7.0.zip
+  - unzip gmock-1.7.0.zip
+  - pwd
 
-script: "mkdir build && cd build && cmake ../ && make"
+script: "pwd && ls && mkdir build && cd build && cmake ../ && make"
 branches:
   only:
     - master
