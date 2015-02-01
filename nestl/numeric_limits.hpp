@@ -22,7 +22,7 @@ struct numeric_limits<unsigned int>
 template <>
 struct numeric_limits<unsigned long int>
 {
-    static unsigned int max() NESTL_NOEXCEPT_SPEC
+    static unsigned long int max() NESTL_NOEXCEPT_SPEC
     {
         return ~static_cast<unsigned long int>(0);
     }
