@@ -25,11 +25,12 @@ before_install:
 
 before_script:
   - mkdir build
+  - cd build
 
 script:
-  - "pwd && cd build && cmake ../ -DNESTL_GOOGLEMOCK_DIR=`pwd`/../gmock-1.7.0 -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DNESTL_DISABLE_STD=${DISABLE_STD}"
-  - "pwd && cmake --build build"
-  - "pwd && cmake --build build --target test"
+  - cmake ../ -DNESTL_GOOGLEMOCK_DIR=`pwd`/../gmock-1.7.0 -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DNESTL_DISABLE_STD=${DISABLE_STD}
+  - make
+  - make test
 
 branches:
   only:
