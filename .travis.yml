@@ -10,15 +10,16 @@ compiler:
 # - "cd /usr/src/gtest && sudo cmake . && sudo cmake --build . && sudo mv libg* /usr/local/lib/ ; cd -"
 #before_script:
 # - pwd
+#
 
 script: "mkdir build && cd build && cmake ../ && make"
 branches:
   only:
-	- master
+    - master
 
 notifications:
   recipients:
-	- alexey.kutumov@gmail.com
+    - alexey.kutumov@gmail.com
   email:
-	on_success: change
-	on_failure: always
+    on_success: change
+    on_failure: always
