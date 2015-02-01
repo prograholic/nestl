@@ -1435,14 +1435,16 @@ template<typename Key, typename Val, typename KeyOfValue,
 #if NESTL_HAS_RVALUE_REF
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
-  rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
-  rb_tree(rb_tree&& x, node_allocator&& a) NESTL_NOEXCEPT_SPEC
-  : m_impl(x.m_impl.m_key_compare, nestl::move(a))
-  {
-    using eq = nestl::integral_constant<bool, node_allocator_traits::s_always_equal()>;
+rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
+rb_tree(rb_tree&& x, node_allocator&& a) NESTL_NOEXCEPT_SPEC
+    : m_impl(x.m_impl.m_key_compare, nestl::move(a))
+{
+    typedef nestl::integral_constant<bool, node_allocator_traits::s_always_equal()> eq_t;
     if (x.m_root() != 0)
-  m_move_data(x, eq());
-  }
+    {
+        m_move_data(x, eq_t());
+    }
+}
 
 #endif /* NESTL_HAS_RVALUE_REF */
 
