@@ -29,13 +29,13 @@ Nestl needs following dependencies for running tests:
 * googlemock sources (https://code.google.com/p/googlemock/), minimal version 1.7 (1.6 should be acceptable but not tested)
 
 For configuring building and running nestl test suite one should perform following commands:
-'''sh
+```sh
 mkdir build
 cd build
 cmake ../ -DNESTL_GOOGLEMOCK_DIR=/absolute/path/to/googlemock/
 make
 make test
-'''
+```
 
 
 
