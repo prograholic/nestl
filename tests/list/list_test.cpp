@@ -73,6 +73,12 @@ TYPED_TEST_P(ListTestCommon, CheckAssignWithSize1024)
     }
 }
 
+/**
+ * @note We use initialize function to init int values,
+ * otherwise g++ sometimes emit warning about using uninitialized value
+ */
+namespace init_workaround
+{
 
 template <typename T>
 void initialize(T& /* val */)
@@ -84,11 +90,13 @@ void initialize(int& val)
     val = 0;
 }
 
+} // namespace init_workaround
+
 TYPED_TEST_P(ListTestCommon, CheckInsertIntoEmptyList)
 {
     typename TestFixture::list_t l;
     typename TestFixture::value_type val;
-    initialize(val);
+    init_workaround::initialize(val);
 
     ASSERT_OPERATION_SUCCESS(l.insert(l.begin(), val));
 
