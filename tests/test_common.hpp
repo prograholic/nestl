@@ -13,6 +13,27 @@ namespace nestl
 namespace test
 {
 
+
+/**
+ * @note We use initialize function to init int values,
+ * otherwise g++ sometimes emit warning about using uninitialized value
+ */
+namespace init_workaround
+{
+
+template <typename T>
+void initialize(T& /* val */)
+{
+}
+
+void initialize(int& val)
+{
+    val = 0;
+}
+
+} // namespace init_workaround
+
+
 struct checker
 {
     ::testing::AssertionResult operator()(const nestl::error_condition& ec)
