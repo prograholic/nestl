@@ -27,7 +27,7 @@ addons:
       name: "prograholic/nestl"
       description: "Build submitted via Travis CI"
     notification_email: alexey.kutumov@gmail.com
-    build_command_prepend: "mkdir build && cd build && cmake ../ -DNESTL_GOOGLEMOCK_DIR=`pwd`/../gmock-1.7.0 -DCMAKE_BUILD_TYPE=Release -DNESTL_DISABLE_STD=Yes -DNESTL_CONFIG_HAS_CXX11=Yes"
+    build_command_prepend: "pwd && mkdir build && cd build && pwd && cmake ../ -DNESTL_GOOGLEMOCK_DIR=`pwd`/../gmock-1.7.0 -DCMAKE_BUILD_TYPE=Release -DNESTL_DISABLE_STD=Yes -DNESTL_CONFIG_HAS_CXX11=Yes"
     build_command:   "make"
     branch_pattern: coverity_scan
 
