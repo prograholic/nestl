@@ -5,7 +5,6 @@ compiler:
 
 env:
   global:
-    - BUILD_TYPE=Debug
     # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
     #   via the "travis encrypt" command using the project repo's public key
     - secure: "PRd28sDM/gQgRj1MaqzEk4Gvp8gzqs5eAmdhRlS8vHehYSgnAz6aYMoYETtSK5i9d6+als/Tj/21YE/s3KwWapYkMgl2DmnbSJk7sIr2to5QbKmKWfTBgtEv0jdf6bRaXQKNIqhAkv7qsuqC39dmeSbXSaKCo/5cIPEVFjWpXh8="
@@ -28,8 +27,8 @@ addons:
       name: "prograholic/nestl"
       description: "Build submitted via Travis CI"
     notification_email: alexey.kutumov@gmail.com
-    build_command_prepend: "mkdir build && cd build && cmake ../ -DNESTL_GOOGLEMOCK_DIR=`pwd`/../gmock-1.7.0 -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DNESTL_DISABLE_STD=${DISABLE_STD} -DNESTL_CONFIG_HAS_CXX11=${CONFIG_HAS_CXX11}"
-    build_command:   "make test"
+    build_command_prepend: "mkdir build && cd build && cmake ../ -DNESTL_GOOGLEMOCK_DIR=`pwd`/../gmock-1.7.0 -DCMAKE_BUILD_TYPE=Release -DNESTL_DISABLE_STD=Yes -DNESTL_CONFIG_HAS_CXX11=Yes"
+    build_command:   "make"
     branch_pattern: coverity_scan
 
 notifications:
