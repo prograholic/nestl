@@ -40,6 +40,7 @@ TYPED_TEST_P(ListTestCommon, CheckAssignWithSize1)
     const size_t expectedSize = 1;
     typename TestFixture::list_t l;
     typename TestFixture::value_type defaultParam;
+    init_workaround::initialize(defaultParam);
 
     ASSERT_OPERATION_SUCCESS(l.assign(expectedSize, defaultParam));
 
@@ -56,6 +57,7 @@ TYPED_TEST_P(ListTestCommon, CheckAssignWithSize1024)
     const size_t expectedSize = 1024;
     typename TestFixture::list_t l;
     typename TestFixture::value_type defaultParam;
+    init_workaround::initialize(defaultParam);
 
     ASSERT_OPERATION_SUCCESS(l.assign(expectedSize, defaultParam));
 
@@ -72,25 +74,6 @@ TYPED_TEST_P(ListTestCommon, CheckAssignWithSize1024)
         ++it;
     }
 }
-
-/**
- * @note We use initialize function to init int values,
- * otherwise g++ sometimes emit warning about using uninitialized value
- */
-namespace init_workaround
-{
-
-template <typename T>
-void initialize(T& /* val */)
-{
-}
-
-void initialize(int& val)
-{
-    val = 0;
-}
-
-} // namespace init_workaround
 
 TYPED_TEST_P(ListTestCommon, CheckInsertIntoEmptyList)
 {
@@ -366,6 +349,7 @@ TYPED_TEST_P(ListTestWithCopyableObjects, PushBackOneElement)
 {
     typename TestFixture::list_t l;
     typename TestFixture::value_type val;
+    init_workaround::initialize(val);
 
     ASSERT_OPERATION_SUCCESS(l.push_back(val));
 
@@ -377,6 +361,7 @@ TYPED_TEST_P(ListTestWithCopyableObjects, EmplaceBackOneElement)
 {
     typename TestFixture::list_t l;
     typename TestFixture::value_type val;
+    init_workaround::initialize(val);
 
     ASSERT_OPERATION_SUCCESS(l.emplace_back(val));
 
@@ -388,6 +373,7 @@ TYPED_TEST_P(ListTestWithCopyableObjects, PushFrontOneElement)
 {
     typename TestFixture::list_t l;
     typename TestFixture::value_type val;
+    init_workaround::initialize(val);
 
     ASSERT_OPERATION_SUCCESS(l.push_front(val));
 
@@ -399,6 +385,7 @@ TYPED_TEST_P(ListTestWithCopyableObjects, EmplaceFrontOneElement)
 {
     typename TestFixture::list_t l;
     typename TestFixture::value_type val;
+    init_workaround::initialize(val);
 
     ASSERT_OPERATION_SUCCESS(l.emplace_front(val));
 
