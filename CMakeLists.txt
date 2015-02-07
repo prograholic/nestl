@@ -61,6 +61,11 @@ set (nestl_sources
 
 add_library(nestl_lib ${nestl_sources})
 
+if (NOT DEFINED NESTL_GOOGLEMOCK_DIR)
+  #helper for travis
+  set(NESTL_GOOGLEMOCK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gmock-1.7.0)
+endif()
+
 if (EXISTS ${NESTL_GOOGLEMOCK_DIR}/CMakeLists.txt)
   enable_testing()
   add_subdirectory(tests)
