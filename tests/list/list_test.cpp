@@ -73,10 +73,22 @@ TYPED_TEST_P(ListTestCommon, CheckAssignWithSize1024)
     }
 }
 
+
+template <typename T>
+void initialize(T& /* val */)
+{
+}
+
+void initialize(int& val)
+{
+    val = 0;
+}
+
 TYPED_TEST_P(ListTestCommon, CheckInsertIntoEmptyList)
 {
     typename TestFixture::list_t l;
-    typename TestFixture::value_type val = TestFixture::value_type();
+    typename TestFixture::value_type val;
+    initialize(val);
 
     ASSERT_OPERATION_SUCCESS(l.insert(l.begin(), val));
 
