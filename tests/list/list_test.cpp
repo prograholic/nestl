@@ -76,7 +76,7 @@ TYPED_TEST_P(ListTestCommon, CheckAssignWithSize1024)
 TYPED_TEST_P(ListTestCommon, CheckInsertIntoEmptyList)
 {
     typename TestFixture::list_t l;
-    typename TestFixture::value_type val;
+    typename TestFixture::value_type val = TestFixture::value_type();
 
     ASSERT_OPERATION_SUCCESS(l.insert(l.begin(), val));
 
