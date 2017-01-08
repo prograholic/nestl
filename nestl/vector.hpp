@@ -82,12 +82,24 @@ public:
     {
         return static_cast<const allocator_type&>(*this);
     }
+    
+    void clear() noexcept
+    {
+        nestl::detail::destroy(get_alloc(), m_start, m_finish);
+        m_finish = m_start;
+    }
 
 public:
     
     pointer m_start;
     pointer m_finish;
     pointer m_end_of_storage;
+};
+
+template <typename VectorBase>
+struct vector_base_nothrow : public VectorBase
+{
+    
 };
 
 /**
@@ -277,42 +289,40 @@ public: // data accessors
         return *this;
     }
 
-    operation_error assign_copy(const vector& other) noexcept
+    void assign_copy(operation_error& error, const vector& other) noexcept
     {
-        return this->assign(other.cbegin(), other.cend());
+        return this->assign_nothrow(error, other.cbegin(), other.cend());
     }
 
-    operation_error assign(size_type n, const_reference val = value_type()) noexcept
+    void assign_nothrow(operation_error& error, size_type n, const_reference val = value_type()) noexcept
     {
         vector tmp; tmp.swap(*this);
 
         NESTL_ASSERT(empty());
 
-        operation_error err = grow(n);
-        if (err)
+        grow_nothrow(error, n);
+        if (error)
         {
-            return err;
+            return;
         }
 
         while (n > 0)
         {
-            err = this->push_back(val);
-            if (err)
+            this->push_back_nothrow(error, val);
+            if (error)
             {
-                return err;
+                return;
             }
             --n;
         }
-
-        return operation_error();
     }
 
     template<typename InputIterator>
-    operation_error assign(InputIterator first, InputIterator last) noexcept
+    void assign_nothrow(operation_error& error, InputIterator first, InputIterator last) noexcept
     {
         vector tmp; tmp.swap(*this);
 
-        return assign_iterator(typename nestl::iterator_traits<InputIterator>::iterator_category(), first, last);
+        assign_iterator_nothrow(error, typename nestl::iterator_traits<InputIterator>::iterator_category(), first, last);
     }
 
 
@@ -320,79 +330,79 @@ public: // data accessors
 
 // modifiers
 
-    operation_error reserve(size_type new_cap) noexcept
+    void reserve_nothrow(operation_error& error, size_type new_cap) noexcept
     {
         if (new_cap <= capacity())
         {
-            return operation_error();
+            return;
         }
         else
         {
             if (new_cap > max_size())
             {
-                return operation_error(nestl::errc::value_too_large);
+                error = operation_error(nestl::errc::value_too_large);
+                return;
             }
         }
 
-        return do_reserve(new_cap);
+        do_reserve_nothrow(error, new_cap);
     }
 
-    operation_error shrink_to_fit() noexcept
+    void shrink_to_fit_nothrow(operation_error& error) noexcept
     {
         if (capacity() > size())
         {
-            return do_reserve(size());
+            return do_reserve_nothrow(error, size());
         }
 
-        return operation_error();
+        return;
     }
 
     void clear() noexcept
     {
-        nestl::detail::destroy(this->get_alloc(), this->m_start, this->m_finish);
-        this->m_finish = this->m_start;
+        base_type::clear();
     }
 
-    iterator_with_operation_error insert(const_iterator pos, const value_type& value) noexcept
+    iterator insert_nothrow(operation_error& error, const_iterator pos, const value_type& value) noexcept
     {
-        return insert_value(pos, value);
+        return insert_value_nothrow(error, pos, value);
     }
 
-    iterator_with_operation_error insert(const_iterator pos, value_type&& value) noexcept
+    iterator insert_nothrow(operation_error& error, const_iterator pos, value_type&& value) noexcept
     {
-        return insert_value(pos, nestl::move(value));
+        return insert_value_nothrow(error, pos, nestl::move(value));
     }
 
     template<typename InputIterator>
-    operation_error insert(const_iterator pos, InputIterator first, InputIterator last) noexcept
+    void insert_nothrow(operation_error& error, const_iterator pos, InputIterator first, InputIterator last) noexcept
     {
-        return this->insert_range(pos, first, last).error();
+        insert_range_nothrow(error, pos, first, last);
     }
 
-    operation_error push_back(const value_type& value) noexcept
+    void push_back_nothrow(operation_error& error, const value_type& value) noexcept
     {
-        return this->insert(this->cend(), value).error();
+        insert_nothrow(error, cend(), value);
     }
 
-    operation_error push_back(value_type&& value) noexcept
+    void push_back_nothrow(operation_error& error, value_type&& value) noexcept
     {
-        return this->insert(this->cend(), nestl::move(value)).error();
+        insert_nothrow(error, cend(), nestl::move(value));
     }
 
     template<typename ... Args>
-    operation_error emplace_back(Args&& ... args) noexcept
+    void emplace_back_nothrow(operation_error& error, Args&& ... args) noexcept
     {
-        return insert_value(this->cend(), nestl::forward<Args>(args) ...).error();
+        insert_value_nothrow(error, cend(), nestl::forward<Args>(args) ...);
     }
 
-    operation_error resize(size_type count) noexcept
+    void resize_nothrow(operation_error& error, size_type count) noexcept
     {
-        return do_resize(count);
+        do_resize_nothrow(error, count);
     }
 
-    operation_error resize(size_type count, const value_type& value) noexcept
+    void resize_nothrow(operation_error& error, size_type count, const value_type& value) noexcept
     {
-        return do_resize(count, value);
+        do_resize_nothrow(error, count, value);
     }
 
     void swap(vector& other) noexcept
@@ -403,30 +413,184 @@ public: // data accessors
 
 private:
 
-    void move_assign(const nestl::true_type& /* true_val */, vector&& other) noexcept;
+    void move_assign(const nestl::true_type& /* true_val */, vector&& other) noexcept
+    {
+        const vector tmp(nestl::move(*this));
+        this->swap_data(other);
+    }
 
     template <typename InputIterator>
-    operation_error assign_iterator(nestl::random_access_iterator_tag /* tag */,
-                                    InputIterator first,
-                                    InputIterator last) noexcept;
+    void assign_iterator_nothrow(operation_error& error,
+                                 nestl::random_access_iterator_tag /* tag */,
+                                 InputIterator first,
+                                 InputIterator last) noexcept
+    {
+        NESTL_ASSERT(empty());
+        size_t required_size = nestl::distance(first, last);
+
+        grow_nothrow(error, required_size);
+        if (error)
+        {
+            return;
+        }
+
+        assign_iterator_nothrow(error, nestl::input_iterator_tag(), first, last);
+    }
 
     template <typename InputIterator>
-    operation_error assign_iterator(nestl::input_iterator_tag /* tag */,
-                                    InputIterator first,
-                                    InputIterator last) noexcept;
+    void assign_iterator_nothrow(operation_error& error,
+                                 nestl::input_iterator_tag /* tag */,
+                                 InputIterator first,
+                                 InputIterator last) noexcept
+    {
+        NESTL_ASSERT(empty());
+
+        while (first != last)
+        {
+            push_back_nothrow(error, *first);
+            if (error)
+            {
+                return;
+            }
+
+            ++first;
+        }
+    }
 
     template <typename ... Args>
-    iterator_with_operation_error insert_value(const_iterator pos, Args&& ... args) noexcept;
+    iterator insert_value_nothrow(operation_error& error, const_iterator pos, Args&& ... args) noexcept
+    {
+        NESTL_ASSERT(pos >= this->m_start);
+        NESTL_ASSERT(pos <= this->m_finish);
+
+        /// we should calculate offset before possible reallocation
+        size_t offset = pos - this->m_start;
+
+        if (capacity() == size())
+        {
+            grow_nothrow(error, capacity() + 1);
+            if (error)
+            {
+                return iterator();
+            }
+        }
+        NESTL_ASSERT(capacity() > size());
+
+        value_type* last = this->m_finish;
+        value_type* first = this->m_start + offset;
+        for (value_type* val = last; val != first; --val)
+        {
+            value_type* oldLocation = val - 1;
+            error = nestl::detail::construct<operation_error>(val, this->get_alloc(), *oldLocation);
+            if (error)
+            {
+                return iterator();
+            }
+            nestl::detail::destroy(this->get_alloc(), oldLocation, val);
+        }
+
+
+        error = nestl::detail::construct<operation_error>(first, this->get_alloc(), nestl::forward<Args>(args) ...);
+        if (error)
+        {
+            return iterator();
+        }
+
+        ++this->m_finish;
+        return first;
+    }
 
     template <typename InputIterator>
-    iterator_with_operation_error insert_range(const_iterator pos, InputIterator first, InputIterator last) noexcept;
+    iterator insert_range_nothrow(operation_error& error, const_iterator pos, InputIterator first, InputIterator last) noexcept
+    {
+        NESTL_ASSERT(pos >= this->m_start);
+        NESTL_ASSERT(pos <= this->m_finish);
+
+        /// we should calculate offset before possible reallocation
+        size_t offset = pos - this->m_start;
+
+        iterator res = begin() + distance(cbegin(), pos);
+        for ( ; first != last; ++first, ++offset)
+        {
+            const_iterator newPos = this->m_start + offset;
+            res = insert_value_nothrow(error, newPos, *first);
+            if (error)
+            {
+                return res;
+            }
+        }
+
+        return res;
+    }
 
     template <typename ... Args>
-    operation_error do_resize(size_type count, Args&& ... args) noexcept;
+    void do_resize_nothrow(operation_error& error, size_type count, Args&& ... args) noexcept
+    {
+        if (count <= size())
+        {
+            nestl::detail::destroy(this->get_alloc(), this->m_start + count, this->m_finish);
+            this->m_finish = this->m_start + count;
+        }
+        else
+        {
+            grow_nothrow(error, count);
+            if (error)
+            {
+                return;
+            }
 
-    operation_error grow(size_type requiredCapacity) noexcept;
+            while (this->m_finish < this->m_start + count)
+            {
+                error = nestl::detail::construct<operation_error>(this->m_finish, this->get_alloc(), nestl::forward<Args>(args) ...);
+                if (error)
+                {
+                    return;
+                }
+                ++this->m_finish;
+            }
+        }
+    }
 
-    operation_error do_reserve(size_type new_cap) noexcept;
+    void grow_nothrow(operation_error& error, size_type requiredCapacity) noexcept
+    {
+        size_type newCapacity = (((capacity() + 1) * 3) / 2);
+        if (newCapacity < requiredCapacity)
+        {
+            newCapacity = requiredCapacity;
+        }
+
+        /// @bug overflow error
+        NESTL_ASSERT(newCapacity > capacity());
+
+        reserve_nothrow(error, newCapacity);
+    }
+
+    void do_reserve_nothrow(operation_error& error, size_type new_cap) noexcept
+    {
+        value_type* ptr = alloc_traits::allocate(this->get_alloc(), new_cap);
+        if (!ptr)
+        {
+            error = operation_error(nestl::errc::not_enough_memory);
+            return;
+        }
+        nestl::detail::allocation_scoped_guard<value_type*, allocator_type> guard(this->get_alloc(), ptr, new_cap);
+
+        error = nestl::uninitialised_copy<operation_error>(this->m_start, this->m_finish, ptr, this->get_alloc());
+        if (error)
+        {
+            return;
+        }
+
+        const size_t current_size = size();
+        nestl::detail::destroy(this->get_alloc(), this->m_start, this->m_finish);
+        alloc_traits::deallocate(this->get_alloc(), this->m_start, this->m_end_of_storage - this->m_start);
+
+        this->m_start = ptr;
+        this->m_finish = ptr + current_size;
+        this->m_end_of_storage = ptr + new_cap;
+
+        guard.release();
+    }
 };
 
 /**
@@ -506,221 +670,6 @@ bool operator == (const nestl::vector<T, Allocator>& left,
     return true;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/// Private implementation
-
-
-
-template <typename T, typename A>
-void vector<T, A>::move_assign(const nestl::true_type& /* true_val */, vector&& other) noexcept
-{
-    const vector tmp(nestl::move(*this));
-    this->swap_data(other);
-}
-
-template <typename T, typename A>
-template <typename InputIterator>
-typename vector<T, A>::operation_error
-vector<T, A>::assign_iterator(nestl::random_access_iterator_tag /* tag */,
-                              InputIterator first,
-                              InputIterator last) noexcept
-{
-    NESTL_ASSERT(empty());
-    size_t required_size = nestl::distance(first, last);
-
-    operation_error err = this->grow(required_size);
-    if (err)
-    {
-        return err;
-    }
-
-    return this->assign_iterator(nestl::input_iterator_tag(), first, last);
-}
-
-template <typename T, typename A>
-template <typename InputIterator>
-typename vector<T, A>::operation_error
-vector<T, A>::assign_iterator(nestl::input_iterator_tag /* tag */,
-                              InputIterator first,
-                              InputIterator last) noexcept
-{
-    NESTL_ASSERT(empty());
-
-    while (first != last)
-    {
-        operation_error err = this->push_back(*first);
-        if (err)
-        {
-            return err;
-        }
-
-        ++first;
-    }
-
-    return operation_error();
-}
-
-template <typename T, typename A>
-template <typename ... Args>
-typename vector<T, A>::iterator_with_operation_error
-vector<T, A>::insert_value(const_iterator pos, Args&& ... args) noexcept
-{
-    NESTL_ASSERT(pos >= this->m_start);
-    NESTL_ASSERT(pos <= this->m_finish);
-
-    /// we should calculate offset before possible reallocation
-    size_t offset = pos - this->m_start;
-
-    if (capacity() == size())
-    {
-        operation_error err = this->grow(capacity() + 1);
-        if (err)
-        {
-            return nestl::make_result_with_operation_error(this->begin(), err);
-        }
-    }
-    NESTL_ASSERT(capacity() > size());
-
-    value_type* last = this->m_finish;
-    value_type* first = this->m_start + offset;
-    for (value_type* val = last; val != first; --val)
-    {
-        value_type* oldLocation = val - 1;
-        operation_error err = nestl::detail::construct<operation_error>(val, this->get_alloc(), *oldLocation);
-        if (err)
-        {
-            return nestl::make_result_with_operation_error(this->begin(), err);
-        }
-        nestl::detail::destroy(this->get_alloc(), oldLocation, val);
-    }
-
-
-    operation_error err = nestl::detail::construct<operation_error>(first, this->get_alloc(), nestl::forward<Args>(args) ...);
-    if (err)
-    {
-        return nestl::make_result_with_operation_error(this->begin(), err);
-    }
-
-    ++this->m_finish;
-    return nestl::make_result_with_operation_error(first, err);
-}
-
-template <typename T, typename A>
-template <typename InputIterator>
-typename vector<T, A>::iterator_with_operation_error
-vector<T, A>::insert_range(const_iterator pos, InputIterator first, InputIterator last) noexcept
-{
-    NESTL_ASSERT(pos >= this->m_start);
-    NESTL_ASSERT(pos <= this->m_finish);
-
-    /// we should calculate offset before possible reallocation
-    size_t offset = pos - this->m_start;
-
-    iterator_with_operation_error err;
-    for ( ; first != last; ++first, ++offset)
-    {
-        const_iterator newPos = this->m_start + offset;
-        err = insert_value(newPos, *first);
-        if (err)
-        {
-            return err;
-        }
-    }
-
-    return err;
-}
-
-
-template <typename T, typename A>
-template <typename ... Args>
-typename vector<T, A>::operation_error
-vector<T, A>::do_resize(size_type count, Args&& ... args) noexcept
-{
-    if (count <= size())
-    {
-        nestl::detail::destroy(this->get_alloc(), this->m_start + count, this->m_finish);
-        this->m_finish = this->m_start + count;
-    }
-    else
-    {
-        operation_error err = grow(count);
-        if (err)
-        {
-            return err;
-        }
-
-        while (this->m_finish < this->m_start + count)
-        {
-            err = nestl::detail::construct<operation_error>(this->m_finish, this->get_alloc(), nestl::forward<Args>(args) ...);
-            if (err)
-            {
-                return err;
-            }
-            ++this->m_finish;
-        }
-    }
-
-    return operation_error();
-}
-
-template <typename T, typename A>
-typename vector<T, A>::operation_error
-vector<T, A>::grow(size_type requiredCapacity) noexcept
-{
-    size_type newCapacity = (((capacity() + 1) * 3) / 2);
-    if (newCapacity < requiredCapacity)
-    {
-        newCapacity = requiredCapacity;
-    }
-
-    /// @bug overflow error
-    NESTL_ASSERT(newCapacity > capacity());
-
-    return reserve(newCapacity);
-}
-
-template <typename T, typename A>
-typename vector<T, A>::operation_error
-vector<T, A>::do_reserve(size_type new_cap) noexcept
-{
-    value_type* ptr = alloc_traits::allocate(this->get_alloc(), new_cap);
-    if (!ptr)
-    {
-        return operation_error(nestl::errc::not_enough_memory);
-    }
-    nestl::detail::allocation_scoped_guard<value_type*, allocator_type> guard(this->get_alloc(), ptr, new_cap);
-
-    operation_error err = nestl::uninitialised_copy<operation_error>(this->m_start, this->m_finish, ptr, this->get_alloc());
-    if (err)
-    {
-        return err;
-    }
-
-    const size_t current_size = size();
-    nestl::detail::destroy(this->get_alloc(), this->m_start, this->m_finish);
-    alloc_traits::deallocate(this->get_alloc(), this->m_start, this->m_end_of_storage - this->m_start);
-
-    this->m_start = ptr;
-    this->m_finish = ptr + current_size;
-    this->m_end_of_storage = ptr + new_cap;
-
-    guard.release();
-    return operation_error();
-}
 
 } // namespace nestl
 
