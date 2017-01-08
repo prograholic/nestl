@@ -59,29 +59,15 @@ struct integral_constant
     typedef integral_constant<Type, val> type;
     typedef Type                         value_type;
 
-#if NESTL_HAS_CONSTEXPR
-
     static constexpr value_type value = val;
     constexpr operator value_type() const { return value; }
     constexpr value_type operator()() const { return value; }
-
-#else /* NESTL_HAS_CONSTEXPR */
-
-    enum
-    {
-        value = val
-    };
-
-    operator value_type() const { return static_cast<value_type>(value); }
-    value_type operator()() const { return static_cast<value_type>(value); }
-
-#endif /* NESTL_HAS_CONSTEXPR */
 };
 
-#if NESTL_HAS_CONSTEXPR
-    template<typename Type, Type val>
-    NESTL_CONSTEXPR Type integral_constant<Type, val>::value;
-#endif /* NESTL_HAS_CONSTEXPR */
+
+template<typename Type, Type val>
+constexpr Type integral_constant<Type, val>::value;
+
 
 
 /// The type used as a compile-time boolean with true value.
@@ -96,7 +82,6 @@ typedef integral_constant<bool, false>    false_type;
 namespace mpl
 {
 
-#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
 
 template <typename ...>
 struct and_;
@@ -132,7 +117,7 @@ struct or_<> : public false_type
 };
 
 template<typename B1>
-struct or_<_B1> : public B1
+struct or_<B1> : public B1
 {
 };
 
@@ -146,81 +131,8 @@ struct or_<B1, B2, B3, Bn...> : public conditional<B1::value, B1, or_<B2, B3, Bn
 {
 };
 
-#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
-
-
-namespace detail
-{
-
-template<bool , typename T1, typename T2, typename T3, typename T4>
-struct and_impl : public nestl::false_type
-{
-};
-
-template<typename T1, typename T2, typename T3, typename T4>
-struct and_impl<true, T1, T2, T3, T4> : public and_impl<T1::value, T2, T3, T4, nestl::true_type>
-{
-};
-
-template<>
-struct and_impl<true, nestl::true_type, nestl::true_type, nestl::true_type, nestl::true_type> : public nestl::true_type
-{
-};
-
-
-template<bool , typename T1, typename T2, typename T3, typename T4>
-struct or_impl : public nestl::true_type
-{
-};
-
-template<typename T1, typename T2, typename T3, typename T4>
-struct or_impl<false, T1, T2, T3, T4> : public or_impl<T1::value, T2, T3, T4, nestl::false_type>
-{
-};
-
-template<>
-struct or_impl<false, nestl::false_type, nestl::false_type, nestl::false_type, nestl::false_type> : public nestl::false_type
-{
-};
-
-} // namespace detail
-
-
-template <
-    typename T1 = nestl::true_type,
-    typename T2 = nestl::true_type,
-    typename T3 = nestl::true_type,
-    typename T4 = nestl::true_type,
-    typename T5 = nestl::true_type>
-struct and_ : public detail::and_impl<T1::value, T2, T3, T4, T5>
-{
-};
-
-
-template <
-    typename T1 = nestl::false_type,
-    typename T2 = nestl::false_type,
-    typename T3 = nestl::false_type,
-    typename T4 = nestl::false_type,
-    typename T5 = nestl::false_type>
-struct or_ : public detail::or_impl<T1::value, T2, T3, T4, T5>
-{
-};
-
-
-template <typename T>
-struct not_ : public integral_constant<bool, !T::value>
-{
-};
-
-
-#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
-
-
 } // namespace mpl
 
-
-#if NESTL_HAS_RVALUE_REF
 
 template <typename T>
 struct add_rvalue_reference
@@ -240,23 +152,6 @@ struct add_rvalue_reference<T&&>
     typedef T&& type;
 };
 
-#else /* NESTL_HAS_RVALUE_REF */
-
-template <typename T>
-struct add_rvalue_reference
-{
-    typedef T type;
-};
-
-template <typename T>
-struct add_rvalue_reference<T&>
-{
-    typedef T& type;
-};
-
-#endif /* NESTL_HAS_RVALUE_REF */
-
-
 template <typename T>
 nestl::add_rvalue_reference<T> declval();
 
@@ -273,15 +168,11 @@ struct remove_reference<T&>
     typedef T type;
 };
 
-#if NESTL_HAS_RVALUE_REF
-
 template<typename T>
 struct remove_reference<T&&>
 {
     typedef T type;
 };
-
-#endif /* NESTL_HAS_RVALUE_REF */
 
 
 template<typename T>
@@ -330,15 +221,10 @@ struct is_rvalue_reference : public false_type
 {
 };
 
-#if NESTL_HAS_RVALUE_REF
-
 template<typename T>
 struct is_rvalue_reference<T&&> : public true_type
 {
 };
-
-#endif /* NESTL_HAS_RVALUE_REF */
-
 
 template<typename T, typename U>
 struct is_same : public nestl::false_type

@@ -17,7 +17,7 @@ namespace detail
 {
 
 template <typename Allocator, typename ForwardIterator>
-void destroy(Allocator& alloc, ForwardIterator first, ForwardIterator last) NESTL_NOEXCEPT_SPEC
+void destroy(Allocator& alloc, ForwardIterator first, ForwardIterator last) noexcept
 {
     while (first != last)
     {
@@ -30,14 +30,14 @@ void destroy(Allocator& alloc, ForwardIterator first, ForwardIterator last) NEST
 template <typename ForwardIterator, typename Allocator>
 struct destruction_scoped_guard : private nestl::noncopyable
 {
-    destruction_scoped_guard(ForwardIterator first, ForwardIterator& last, Allocator& alloc) NESTL_NOEXCEPT_SPEC
+    destruction_scoped_guard(ForwardIterator first, ForwardIterator& last, Allocator& alloc) noexcept
         : m_first(first)
         , m_last(&last)
         , m_alloc(alloc)
     {
     }
 
-    ~destruction_scoped_guard() NESTL_NOEXCEPT_SPEC
+    ~destruction_scoped_guard() noexcept
     {
         nestl::detail::destroy(m_alloc, m_first, *m_last);
     }
@@ -61,14 +61,14 @@ private:
 template<typename PointerType, typename Allocator>
 struct allocation_scoped_guard : private nestl::noncopyable
 {
-    allocation_scoped_guard(Allocator& alloc, PointerType ptr, size_t size) NESTL_NOEXCEPT_SPEC
+    allocation_scoped_guard(Allocator& alloc, PointerType ptr, size_t size) noexcept
         : m_alloc(alloc)
         , m_ptr(ptr)
         , m_size(size)
     {
     }
 
-    ~allocation_scoped_guard() NESTL_NOEXCEPT_SPEC
+    ~allocation_scoped_guard() noexcept
     {
         nestl::allocator_traits<Allocator>::deallocate(m_alloc, m_ptr, m_size);
     }

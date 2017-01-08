@@ -5,7 +5,6 @@
 #include "tests/allocators.hpp"
 
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
 namespace nestl
 {

@@ -13,13 +13,13 @@ struct aligned_storage
 {
     struct type
     {
-        NESTL_ALIGNAS(unsigned char data[len], alignment);
+        alignas(alignment) unsigned char data[len];
     };
 };
 
 
 template<class T>
-struct alignment_of : public nestl::integral_constant<size_t, NESTL_ALIGNOF(T)>
+struct alignment_of : public nestl::integral_constant<size_t, alignof(T)>
 {
 };
 
@@ -35,22 +35,22 @@ struct aligned_buffer : public nestl::aligned_storage<sizeof(T), nestl::alignmen
 
     storage_type m_storage;
 
-    void* address() NESTL_NOEXCEPT_SPEC
+    void* address() noexcept
     {
         return static_cast<void*>(&m_storage);
     }
 
-    const void* address() const NESTL_NOEXCEPT_SPEC
+    const void* address() const noexcept
     {
         return static_cast<const void*>(&m_storage);
     }
 
-    T* ptr() NESTL_NOEXCEPT_SPEC
+    T* ptr() noexcept
     {
         return static_cast<T*>(address());
     }
 
-    const T* ptr() const NESTL_NOEXCEPT_SPEC
+    const T* ptr() const noexcept
     {
         return static_cast<const T*>(address());
     }

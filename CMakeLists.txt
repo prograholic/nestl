@@ -4,23 +4,6 @@ project(nestl CXX)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-
-if (NESTL_CONFIG_HAS_CXX11)
-  message(STATUS "Using nestl with c++ 11 features")
-  if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7)
-      # fix for g++-4.6 which does not accept -std=c++11 parameter
-      add_compile_options(-std=c++0x)
-      # g++-4.6. fails to compil gtest/gmock in C++11 mode
-      add_definitions(-DGTEST_LANG_CXX11=0)
-    else()
-      add_compile_options(-std=c++11)
-    endif()
-  endif()
-else()
-  message(STATUS "Using nestl with c++ 03 features")
-endif()
-
 if (NESTL_DISABLE_STD)
   message(STATUS "Using nestl without standard library")
   add_definitions(-DNESTL_NO_STD)
@@ -59,7 +42,20 @@ set (nestl_sources
 )
 
 
+set (NESTL_CXX_FEATURES_LIST
+    cxx_constexpr
+    cxx_alignas
+    cxx_alignof
+    cxx_decltype
+    cxx_noexcept
+    cxx_rvalue_references
+    cxx_static_assert
+    cxx_variadic_templates
+    cxx_variadic_macros
+)
+
 add_library(nestl_lib ${nestl_sources})
+target_compile_features(nestl_lib PUBLIC ${NESTL_CXX_FEATURES_LIST})
 
 if (NOT DEFINED NESTL_GOOGLEMOCK_DIR)
   #helper for travis

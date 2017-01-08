@@ -1,13 +1,4 @@
 
-if (MSVC)
-  # msvc-2012 lacks variadic template support
-  if (MSVC_VERSION EQUAL 1700) # mcvc-2012
-	message(STATUS "msvc lacks variadic template support")
-	add_definitions(-D_VARIADIC_MAX=10)
-  endif()
-endif(MSVC)
-
-
 set(gtest_disable_pthreads YES)
 add_subdirectory(${NESTL_GOOGLEMOCK_DIR} ${CMAKE_CURRENT_BINARY_DIR}/googlemock)
 
@@ -24,14 +15,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GN
   add_compile_options(-Wall)
   add_compile_options(-Wextra)
 
-  if (NESTL_ENABLE_CXX11)
-	# we cannot use pedantic for C++-03 mode, because we use some compiler-specific features
-	# for emulating C++-11 features
-	add_compile_options(-pedantic)
-  else (NESTL_ENABLE_CXX11)
-	# variadic macros are very useful, so we use them anyway
-	add_compile_options(-Wno-variadic-macros)
-  endif (NESTL_ENABLE_CXX11)
+  add_compile_options(-pedantic)
 
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   add_compile_options(/W4)
@@ -46,6 +30,8 @@ endif()
 function(cxx_test2 name libs)
   cxx_test_with_flags("${name}" "${cxx_default}" "${libs}"
 	"${name}.cpp" ${ARGN})
+
+  target_compile_features("${name}" PUBLIC ${NESTL_CXX_FEATURES_LIST})
 endfunction()
 
 

@@ -12,9 +12,9 @@ template<typename T>
 inline void
 swap(T& a, T& b)
 {
-    T tmp = NESTL_MOVE_IF_SUPPORTED(a);
-    a = NESTL_MOVE_IF_SUPPORTED(b);
-    b = NESTL_MOVE_IF_SUPPORTED(tmp);
+    T tmp = move(a);
+    a = move(b);
+    b = move(tmp);
   }
 } // namespace nestl
 

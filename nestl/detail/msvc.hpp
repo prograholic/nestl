@@ -125,5 +125,10 @@
 #   define NESTL_NOEXCEPT_OR_THROW_SPEC          throw()
 #endif /* NESTL_ENABLE_CXX11 */
 
+#if defined _CPPUNWIND
+#   define NESTL_HAS_EXCEPTIONS                  1
+#else /* _CPPUNWIND */
+#   define NESTL_HAS_EXCEPTIONS                  0
+#endif /* _CPPUNWIND */
 
 #endif /* NESTL_DETAIL_MSVC_HPP */

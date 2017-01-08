@@ -49,9 +49,6 @@ namespace nestl
     } \
 
 #       define NESTL_SELECT_NESTED_TYPE_TEMPLATE(Type, NestedType, ResultType, Default) typedef Default nestl_nested_type_ ## ResultType
-
-/// @bug msvc-2008 does not compile following type selector (maybe there is my bug)
-#if 0
     __if_exists(Type::template NestedType) \
     { \
         typedef typename Type::template NestedType nestl_nested_type_ ## ResultType; \
@@ -60,8 +57,6 @@ namespace nestl
     { \
         typedef Default nestl_nested_type_ ## ResultType; \
     } \
-
-#endif //0
 
 
 #else /* _MSC_EXTENSIONS */

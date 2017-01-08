@@ -17,6 +17,11 @@
 
 #define NESTL_UNUSED                             __attribute__((unused))
 
+#if defined __cpp_exceptions
+#   define NESTL_HAS_EXCEPTIONS                  1
+#else /* __cpp_exceptions */
+#   define NESTL_HAS_EXCEPTIONS                  0
+#endif /* __cpp_exceptions */
 
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
 

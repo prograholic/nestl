@@ -44,7 +44,7 @@ struct rb_tree_node_base
     base_ptr m_left;
     base_ptr m_right;
 
-    static base_ptr s_minimum(base_ptr x) NESTL_NOEXCEPT_SPEC
+    static base_ptr s_minimum(base_ptr x) noexcept
     {
         NESTL_ASSERT(x);
         while (x->m_left != 0)
@@ -55,7 +55,7 @@ struct rb_tree_node_base
     }
 
 
-    static const_base_ptr s_minimum(const_base_ptr x) NESTL_NOEXCEPT_SPEC
+    static const_base_ptr s_minimum(const_base_ptr x) noexcept
     {
         NESTL_ASSERT(x);
         while (x->m_left != 0)
@@ -65,7 +65,7 @@ struct rb_tree_node_base
         return x;
     }
 
-    static base_ptr s_maximum(base_ptr x) NESTL_NOEXCEPT_SPEC
+    static base_ptr s_maximum(base_ptr x) noexcept
     {
         NESTL_ASSERT(x);
         while (x->m_right != 0)
@@ -75,7 +75,7 @@ struct rb_tree_node_base
         return x;
     }
 
-    static const_base_ptr s_maximum(const_base_ptr x) NESTL_NOEXCEPT_SPEC
+    static const_base_ptr s_maximum(const_base_ptr x) noexcept
     {
         while (x->m_right != 0)
         {
@@ -93,12 +93,12 @@ struct rb_tree_node : public rb_tree_node_base
 
     nestl::aligned_buffer<Val> m_storage;
 
-    Val* m_valptr() NESTL_NOEXCEPT_SPEC
+    Val* m_valptr() noexcept
     {
         return m_storage.ptr();
     }
 
-    const Val* m_valptr() const NESTL_NOEXCEPT_SPEC
+    const Val* m_valptr() const noexcept
     {
         return m_storage.ptr();
     }
@@ -111,30 +111,11 @@ struct class_traits<detail::rb_tree_node<Val> >
 {
     typedef detail::rb_tree_node<Val> link_type;
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
-
     template <typename OperationError, typename Allocator, typename ... Args>
     static OperationError construct(link_type* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
         return nestl::detail::construct<OperationError>(ptr->m_valptr(), alloc, nestl::forward<Args>(args) ...);
     }
-
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
-
-    template <typename OperationError, typename Allocator>
-    static OperationError construct(link_type* ptr, Allocator& alloc) NESTL_NOEXCEPT_SPEC
-    {
-        return nestl::detail::construct<OperationError>(ptr->m_valptr(), alloc);
-    }
-
-    template <typename OperationError, typename Allocator, typename Arg>
-    static OperationError construct(link_type* ptr, Allocator& alloc, const Arg& arg) NESTL_NOEXCEPT_SPEC
-    {
-        return nestl::detail::construct<OperationError>(ptr->m_valptr(), alloc, arg);
-    }
-
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
-
 };
 
 
@@ -1094,7 +1075,6 @@ public:
     {
     }
 
-#if NESTL_HAS_RVALUE_REF
     rb_tree(rb_tree&& x) NESTL_NOEXCEPT_SPEC
         : m_impl(x.m_impl.m_key_compare, x.m_get_node_allocator())
     {
@@ -1112,8 +1092,6 @@ public:
 
     rb_tree(rb_tree&& x, node_allocator&& a) NESTL_NOEXCEPT_SPEC;
 
-#endif /* NESTL_HAS_RVALUE_REF */
-
     ~rb_tree() NESTL_NOEXCEPT_SPEC
     {
         m_erase(m_begin());
@@ -1125,8 +1103,8 @@ public:
         {
             // Note that _Key may be a constant type.
             clear();
-            operation_error err = nestl::detail::alloc_on_copy(m_get_node_allocator(),
-                                                               other.m_get_node_allocator());
+            operation_error err = nestl::detail::alloc_on_copy_nothrow(m_get_node_allocator(),
+                                                                       other.m_get_node_allocator());
             if (err)
             {
                 return err;
@@ -1247,8 +1225,6 @@ public:
     iterator
     m_insert_equal_at(const_iterator position, NESTL_RB_RV_ARG(Arg, value_type) x) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
-
     template<typename... Args>
     iterator_with_flag_with_operation_error
     m_emplace_unique(Args&&... args) NESTL_NOEXCEPT_SPEC;
@@ -1264,8 +1240,6 @@ public:
     template<typename... Args>
     iterator_with_operation_error
     m_emplace_hint_equal(const_iterator pos, Args&&... args) NESTL_NOEXCEPT_SPEC;
-
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
 
 
     template<typename InputIterator>
@@ -1432,7 +1406,6 @@ template<typename Key, typename Val, typename KeyOfValue,
   { x.swap(y); }
 
 
-#if NESTL_HAS_RVALUE_REF
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
@@ -1445,8 +1418,6 @@ rb_tree(rb_tree&& x, node_allocator&& a) NESTL_NOEXCEPT_SPEC
         m_move_data(x, eq_t());
     }
 }
-
-#endif /* NESTL_HAS_RVALUE_REF */
 
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>

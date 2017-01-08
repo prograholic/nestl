@@ -11,6 +11,7 @@
 #include <nestl/assert.hpp>
 #include <nestl/detail/select_type.hpp>
 #include <nestl/forward.hpp>
+#include <nestl/exception_support.hpp>
 
 namespace nestl
 {
@@ -53,7 +54,7 @@ struct max_size_helper
 template <typename Allocator, typename SizeType>
 struct max_size_helper<Allocator, SizeType, true>
 {
-    static SizeType max_size(const Allocator& alloc) NESTL_NOEXCEPT_SPEC
+    static SizeType max_size(const Allocator& alloc) noexcept
     {
         return alloc.max_size();
     }
@@ -63,57 +64,21 @@ struct max_size_helper<Allocator, SizeType, true>
 template <typename Allocator, bool>
 struct construct_helper
 {
-#if NESTL_HAS_VARIADIC_TEMPLATES
-
     template <typename U, typename ... Args>
-    static void construct(Allocator& /* alloc */, U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    static void construct(Allocator& /* alloc */, U* ptr, Args&& ... args) noexcept
     {
         ::new(static_cast<void*>(ptr)) U(nestl::forward<Args>(args)...);
     }
-
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
-
-    template <typename U>
-    static void construct(Allocator& /* alloc */, U* ptr) NESTL_NOEXCEPT_SPEC
-    {
-        ::new(static_cast<void*>(ptr)) U();
-    }
-
-    template <typename U, typename Arg>
-    static void construct(Allocator& /* alloc */, U* ptr, const Arg& arg) NESTL_NOEXCEPT_SPEC
-    {
-        ::new(static_cast<void*>(ptr)) U(arg);
-    }
-
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
 };
 
 template <typename Allocator>
 struct construct_helper<Allocator, true>
 {
-#if NESTL_HAS_VARIADIC_TEMPLATES
-
     template <typename U, typename ... Args>
-    static void construct(Allocator& alloc, U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    static void construct(Allocator& alloc, U* ptr, Args&& ... args) noexcept
     {
         alloc.construct(ptr, nestl::forward<Args>(args)...);
     }
-
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
-
-    template <typename U>
-    static void construct(Allocator& alloc, U* ptr) NESTL_NOEXCEPT_SPEC
-    {
-        alloc.construct(ptr);
-    }
-
-    template <typename U, typename Arg>
-    static void construct(Allocator& alloc, U* ptr, const Arg& arg) NESTL_NOEXCEPT_SPEC
-    {
-        alloc.construct(ptr, arg);
-    }
-
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
 };
 
 
@@ -137,14 +102,36 @@ struct allocator_traits
 
     NESTL_SELECT_NESTED_TYPE(Allocator, size_type, nestl::size_t);
     typedef nestl_nested_type_size_type size_type;
+    
+    typedef can_deal_with_exceptions<value_type> detail_can_deal_with_exceptions_t;
+    NESTL_SELECT_NESTED_TYPE(Allocator, has_exceptions, detail_can_deal_with_exceptions_t);
+    typedef nestl_nested_type_has_exceptions has_exceptions;
+    
+    typedef can_deal_with_noexcept<value_type> detail_can_deal_with_noexcept_t;
+    NESTL_SELECT_NESTED_TYPE(Allocator, has_noexcept, detail_can_deal_with_noexcept_t);
+    typedef nestl_nested_type_has_noexcept has_noexcept;
+    
+    
+    
+    static_assert(has_exceptions::value || has_noexcept::value, "objects of given type cannot be handled by this allocator");
 
 
     /**
      * @note Each allocator should provide method allocate
      */
-    static pointer allocate(Allocator& alloc, size_type n, void* hint = 0) NESTL_NOEXCEPT_SPEC
+    static typename enable_if<has_exceptions, pointer>::type
+    allocate(Allocator& alloc, size_type n, void* hint = 0)
     {
         return alloc.allocate(n, hint);
+    }
+    
+    /**
+     * @note Each allocator should provide method allocate_nothrow
+     */
+    static typename enable_if<has_noexcept, pointer>::type
+    allocate_nothrow(Allocator& alloc, size_type n, void* hint = 0) noexcept
+    {
+        return alloc.allocate_nothrow(n, hint);
     }
 
     /**
@@ -177,49 +164,12 @@ struct allocator_traits
 
     NESTL_CHECK_METHOD_WITH_SIGNATURE(Allocator, construct);
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
-
     template<typename U, typename ... Args>
     static void construct(Allocator& alloc, U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
         typedef has_construct_impl<Allocator, size_type(Allocator::*)(U*, Args...)> has_construct_method;
         detail::construct_helper<Allocator, has_construct_method::value>::construct(alloc, ptr, nestl::forward<Args>(args) ...);
     }
-
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
-
-
-    template<typename U>
-    static void construct(Allocator& alloc, U* ptr) NESTL_NOEXCEPT_SPEC
-    {
-        typedef has_construct_impl<Allocator, size_type(Allocator::*)(U*)> has_construct_method;
-        detail::construct_helper<Allocator, has_construct_method::value>::construct(alloc, ptr);
-    }
-
-    template<typename U, typename Arg>
-    static void construct_helper(Allocator& alloc, const nestl::true_type& /* trueVal */, U* ptr, const Arg& arg)
-    {
-        return alloc.construct(ptr, arg);
-    }
-
-    template<typename U, typename Arg>
-    static void construct_helper(Allocator& /* alloc */, const nestl::false_type& /* falseVal */, U* ptr, const Arg& arg)
-    {
-        NESTL_ASSERT(ptr);
-        ::new(static_cast<void*>(ptr)) U(arg);
-    }
-
-    template<typename U, typename Arg>
-    static void construct(Allocator& alloc, U* ptr, const Arg& arg)
-    {
-        typedef has_construct_impl<Allocator, size_type(Allocator::*)(U*, const Arg&)> has_construct_method;
-        detail::construct_helper<Allocator, has_construct_method::value>::construct(alloc, ptr, arg);
-    }
-
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
-
-
-#undef NESTL_ALLOC_DECLARE_STATIC_METHOD
 };
 
 } // namespace nestl

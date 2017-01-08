@@ -8,6 +8,7 @@
 #include <nestl/assert.hpp>
 #include <nestl/numeric_limits.hpp>
 #include <nestl/new.hpp>
+#include <nestl/exception_support.hpp>
 
 
 namespace nestl
@@ -26,6 +27,9 @@ public:
     typedef ptrdiff_t       difference_type;
 
     typedef nestl::true_type  propagate_on_container_move_assignment;
+    
+    typedef can_deal_with_exceptions<value_type> has_exceptions;
+    typedef can_deal_with_noexcept<value_type> has_noexcept;
 
     template<typename U>
     struct rebind
@@ -33,77 +37,64 @@ public:
         typedef allocator<U> other;
     };
 
-    allocator() NESTL_NOEXCEPT_SPEC
+    allocator() noexcept
     {
     }
 
-    allocator(const allocator& /* other */) NESTL_NOEXCEPT_SPEC
+    allocator(const allocator& /* other */) noexcept
     {
     }
 
     template <typename Y>
-    allocator(const allocator<Y>& /* other */) NESTL_NOEXCEPT_SPEC
+    allocator(const allocator<Y>& /* other */) noexcept
     {
     }
 
-    ~allocator() NESTL_NOEXCEPT_SPEC
+    ~allocator() noexcept
     {
     }
 
-    pointer address(reference x) const NESTL_NOEXCEPT_SPEC
-    {
-        return nestl::addressof(x);
-    }
-
-    const_pointer address(const_reference x) const NESTL_NOEXCEPT_SPEC
+    pointer address(reference x) const noexcept
     {
         return nestl::addressof(x);
     }
 
-    pointer allocate(size_type n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    const_pointer address(const_reference x) const noexcept
+    {
+        return nestl::addressof(x);
+    }
+
+    typename enable_if<has_exceptions, pointer>::type
+    allocate(size_type n, const void* /* hint */ = 0)
+    {
+        return static_cast<pointer>(::operator new(n * sizeof(value_type)));
+    }
+    
+    typename enable_if<has_noexcept, pointer>::type
+    allocate_nothrow(size_type n, const void* /* hint */ = 0) noexcept
     {
         return static_cast<pointer>(::operator new(n * sizeof(value_type), std::nothrow));
     }
 
-    void deallocate(pointer p, size_type /* n */) NESTL_NOEXCEPT_SPEC
+    void deallocate(pointer p, size_type /* n */) noexcept
     {
         ::operator delete(p);
     }
 
-    size_type max_size() const NESTL_NOEXCEPT_SPEC
+    size_type max_size() const noexcept
     {
         return nestl::numeric_limits<size_type>::max();
     }
 
-#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
-
     template<typename U, typename ... Args>
-    void construct(U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    void construct(U* ptr, Args&& ... args) noexcept
     {
         NESTL_ASSERT(ptr);
         ::new(static_cast<void*>(ptr)) U(nestl::forward<Args>(args)...);
     }
 
-#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
-
     template<typename U>
-    void construct(U* ptr) NESTL_NOEXCEPT_SPEC
-    {
-        NESTL_ASSERT(ptr);
-        ::new(static_cast<void*>(ptr)) U();
-    }
-
-    template<typename U, typename Arg>
-    void construct(U* ptr, const Arg& arg) NESTL_NOEXCEPT_SPEC
-    {
-        NESTL_ASSERT(ptr);
-        ::new(static_cast<void*>(ptr)) U(arg);
-    }
-
-#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
-
-    template<typename U>
-    void destroy(U* ptr)
+    void destroy(U* ptr) noexcept
     {
         NESTL_ASSERT(ptr);
         ptr->~U();
