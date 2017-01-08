@@ -31,7 +31,6 @@ TEST_F(VectorTestConstructorWithDefaultAllocator, ConstructorWithoutParametersWi
     EXPECT_TRUE(CheckVectorSize(vec, 0));
 }
 
-#if NESTL_HAS_RVALUE_REF
 TEST_F(VectorTestConstructorWithDefaultAllocator, MoveConstructorFromEmptyVector)
 {
     nestl::vector<int> vec1;
@@ -41,10 +40,7 @@ TEST_F(VectorTestConstructorWithDefaultAllocator, MoveConstructorFromEmptyVector
     EXPECT_TRUE(CheckVectorSize(vec2, 0));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
 
-
-#if NESTL_HAS_RVALUE_REF
 TEST_F(VectorTestConstructorWithDefaultAllocator, MoveConstructorFromNonEmptyVector)
 {
     nestl::vector<int> vec1;
@@ -56,10 +52,6 @@ TEST_F(VectorTestConstructorWithDefaultAllocator, MoveConstructorFromNonEmptyVec
     EXPECT_TRUE(CheckVectorSize(vec2, 10));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Now check with zero allocator
@@ -179,8 +171,6 @@ TEST_F(VectorTestConstructorWithStatefulAllocator, ConstructorWithoutParametersW
     EXPECT_TRUE(CheckVectorSize(vec, 0));
 }
 
-
-#if NESTL_HAS_RVALUE_REF
 TEST_F(VectorTestConstructorWithStatefulAllocator, MoveConstructorFromEmptyVector)
 {
     nestl::vector<int, allocator_with_state<int> > vec1;
@@ -190,9 +180,7 @@ TEST_F(VectorTestConstructorWithStatefulAllocator, MoveConstructorFromEmptyVecto
     EXPECT_TRUE(CheckVectorSize(vec2, 0));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
 
-#if NESTL_HAS_RVALUE_REF
 TEST_F(VectorTestConstructorWithStatefulAllocator, MoveConstructorFromNonEmptyVector)
 {
     nestl::vector<int, allocator_with_state<int> > vec1;
@@ -204,7 +192,6 @@ TEST_F(VectorTestConstructorWithStatefulAllocator, MoveConstructorFromNonEmptyVe
     EXPECT_TRUE(CheckVectorSize(vec2, 10));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
 
 } // namespace test
 

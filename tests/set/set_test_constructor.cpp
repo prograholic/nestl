@@ -31,7 +31,6 @@ TEST_F(SetTestConstructorWithDefaultAllocator, ConstructorWithoutParametersWithA
     EXPECT_TRUE(CheckSetSize(s, 0));
 }
 
-#if NESTL_HAS_RVALUE_REF
 TEST_F(SetTestConstructorWithDefaultAllocator, MoveConstructorFromEmptyVector)
 {
     nestl::set<int> s1;
@@ -41,10 +40,7 @@ TEST_F(SetTestConstructorWithDefaultAllocator, MoveConstructorFromEmptyVector)
     EXPECT_TRUE(CheckSetSize(s2, 0));
     EXPECT_TRUE(CheckSetSize(s1, 0));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
 
-
-#if NESTL_HAS_RVALUE_REF
 TEST_F(SetTestConstructorWithDefaultAllocator, MoveConstructorFromNonEmptyVector)
 {
     nestl::set<int> s1;
@@ -56,8 +52,6 @@ TEST_F(SetTestConstructorWithDefaultAllocator, MoveConstructorFromNonEmptyVector
     EXPECT_TRUE(CheckSetSize(s2, 1));
     EXPECT_TRUE(CheckSetSize(s1, 0));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
-
 
 
 
@@ -87,7 +81,6 @@ TEST_F(SetTestConstructorWithZeroAllocator, ConstructorWithoutParametersWithAllo
     EXPECT_TRUE(CheckSetSize(s, 0));
 }
 
-#if NESTL_HAS_RVALUE_REF
 TEST_F(SetTestConstructorWithZeroAllocator, MoveConstructorFromEmptyVector)
 {
     nestl::set<int, zero_allocator<int> > s1;
@@ -97,8 +90,6 @@ TEST_F(SetTestConstructorWithZeroAllocator, MoveConstructorFromEmptyVector)
     EXPECT_TRUE(CheckSetSize(s2, 0));
     EXPECT_TRUE(CheckSetSize(s1, 0));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
-
 
 
 
@@ -128,7 +119,6 @@ TEST_F(SetTestConstructorWithMinimalAllocator, ConstructorWithoutParametersWithA
     EXPECT_TRUE(CheckSetSize(s, 0));
 }
 
-#if NESTL_HAS_RVALUE_REF
 TEST_F(SetTestConstructorWithMinimalAllocator, MoveConstructorFromEmptyVector)
 {
     nestl::set<int, nestl::less<int>, minimal_allocator<int> > s1;
@@ -138,9 +128,7 @@ TEST_F(SetTestConstructorWithMinimalAllocator, MoveConstructorFromEmptyVector)
     EXPECT_TRUE(CheckSetSize(s2, 0));
     EXPECT_TRUE(CheckSetSize(s1, 0));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
 
-#if NESTL_HAS_RVALUE_REF
 TEST_F(SetTestConstructorWithMinimalAllocator, MoveConstructorFromNonEmptyVector)
 {
     nestl::set<int, nestl::less<int>, minimal_allocator<int> > s1;
@@ -152,7 +140,6 @@ TEST_F(SetTestConstructorWithMinimalAllocator, MoveConstructorFromNonEmptyVector
     EXPECT_TRUE(CheckSetSize(s2, 1));
     EXPECT_TRUE(CheckSetSize(s1, 0));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -180,7 +167,6 @@ TEST_F(SetTestConstructorWithStatefulAllocator, ConstructorWithoutParametersWith
 }
 
 
-#if NESTL_HAS_RVALUE_REF
 TEST_F(SetTestConstructorWithStatefulAllocator, MoveConstructorFromEmptyVector)
 {
     nestl::set<int, nestl::less<int>, allocator_with_state<int> > s1;
@@ -190,9 +176,8 @@ TEST_F(SetTestConstructorWithStatefulAllocator, MoveConstructorFromEmptyVector)
     EXPECT_TRUE(CheckSetSize(s2, 0));
     EXPECT_TRUE(CheckSetSize(s1, 0));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
 
-#if NESTL_HAS_RVALUE_REF
+
 TEST_F(SetTestConstructorWithStatefulAllocator, MoveConstructorFromNonEmptyVector)
 {
     nestl::set<int, nestl::less<int>, allocator_with_state<int> > s1;
@@ -204,7 +189,6 @@ TEST_F(SetTestConstructorWithStatefulAllocator, MoveConstructorFromNonEmptyVecto
     EXPECT_TRUE(CheckSetSize(s2, 1));
     EXPECT_TRUE(CheckSetSize(s1, 0));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
 
 } // namespace test
 

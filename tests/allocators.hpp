@@ -89,6 +89,51 @@ public:
 };
 
 
+namespace detail
+{
+
+struct alloc_impl: private nestl::set<void*>
+{
+    typedef nestl::set<void*> base_type;
+    
+    typedef typename base_type::value_type     value_type;
+    typedef typename base_type::const_iterator const_iterator;
+    
+    const_iterator get_end() const noexcept
+    {
+        return this->end();
+    }
+    
+    void do_erase(const_iterator pos) noexcept
+    {
+        this->erase(pos);
+    }
+    
+    const_iterator do_find(const value_type& val) const noexcept
+    {
+        return this->find(val);
+    }
+    
+    void do_insert(const value_type& val) noexcept
+    {
+        auto err = this->insert(val);
+        if (err)
+        {
+            ADD_FAILURE() << "insert failed";
+        }
+    }
+    
+    ~alloc_impl()
+    {
+        if (!this->empty())
+        {
+            ADD_FAILURE() << "memory leaks detected";
+        }
+    }
+};
+    
+} // namespace detail
+
 /**
  * Allocator which has its own state (remember who allocate memory)
  */
@@ -100,13 +145,8 @@ public:
     typedef T               value_type;
 
     allocator_with_state() NESTL_NOEXCEPT_SPEC
-        : m_allocated_storage()
+        : m_allocated_storage(create_storage())
     {
-         nestl::error_condition err = nestl::make_shared(m_allocated_storage);
-         if (err)
-         {
-             ADD_FAILURE() << "make_shared failed";
-         }
     }
 
     allocator_with_state(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
@@ -120,23 +160,18 @@ public:
     {
     }
 
-
-#if NESTL_HAS_RVALUE_REF
     allocator_with_state(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
-        : m_allocated_storage(nestl::move(other.m_allocated_storage))
+        : m_allocated_storage(create_storage())
     {
-        NESTL_ASSERT(!other.m_allocated_storage);
+        swap(m_allocated_storage, other.m_allocated_storage);
     }
-#endif /* NESTL_HAS_RVALUE_REF */
 
-#if NESTL_HAS_RVALUE_REF
     template <typename Y>
     allocator_with_state(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
-        : m_allocated_storage(nestl::move(other.m_allocated_storage))
+        : m_allocated_storage(create_storage())
     {
-        NESTL_ASSERT(!other.m_allocated_storage);
+        swap(m_allocated_storage, other.m_allocated_storage);
     }
-#endif /* NESTL_HAS_RVALUE_REF */
 
     allocator_with_state& operator=(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
     {
@@ -151,31 +186,23 @@ public:
         return *this;
     }
 
-#if NESTL_HAS_RVALUE_REF
     allocator_with_state& operator=(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
     {
-        m_allocated_storage = nestl::move(other.m_allocated_storage);
-        NESTL_ASSERT(!other.m_allocated_storage);
+        m_allocated_storage = create_storage();
+        swap(m_allocated_storage, other.m_allocated_storage);
         return *this;
     }
-#endif /* NESTL_HAS_RVALUE_REF */
 
-#if NESTL_HAS_RVALUE_REF
     template <typename Y>
     allocator_with_state& operator=(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
     {
-        m_allocated_storage = nestl::move(other.m_allocated_storage);
-        NESTL_ASSERT(!other.m_allocated_storage);
+        m_allocated_storage = create_storage();
+        swap(m_allocated_storage, other.m_allocated_storage);
         return *this;
     }
-#endif /* NESTL_HAS_RVALUE_REF */
 
     ~allocator_with_state() NESTL_NOEXCEPT_SPEC
     {
-        if (m_allocated_storage && !m_allocated_storage->empty())
-        {
-            ADD_FAILURE() << "memory leaks detected!!!";
-        }
     }
 
     T* allocate(nestl::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
@@ -183,8 +210,8 @@ public:
         T* res = static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
 
 
-        nestl::set<void*>::const_iterator pos = m_allocated_storage->find(res);
-        if (pos != m_allocated_storage->end())
+        detail::alloc_impl::const_iterator pos = m_allocated_storage->do_find(res);
+        if (pos != m_allocated_storage->get_end())
         {
             ADD_FAILURE() << "pointer [" << static_cast<void*>(res) << "] already belong to this allocator";
 
@@ -193,15 +220,15 @@ public:
              */
         }
 
-        m_allocated_storage->insert(res);
+        m_allocated_storage->do_insert(res);
 
         return res;
     }
 
     void deallocate(T* p, nestl::size_t /* n */) NESTL_NOEXCEPT_SPEC
     {
-        nestl::set<void*>::const_iterator pos = m_allocated_storage->find(p);
-        if (pos == m_allocated_storage->end())
+        detail::alloc_impl::const_iterator pos = m_allocated_storage->do_find(p);
+        if (pos == m_allocated_storage->get_end())
         {
             if (p)
             {
@@ -214,12 +241,26 @@ public:
         }
         else
         {
-            m_allocated_storage->erase(pos);
+            m_allocated_storage->do_erase(pos);
             ::operator delete(p);
         }
     }
-
-    nestl::shared_ptr<nestl::set<void*> > m_allocated_storage;
+    
+    
+    nestl::shared_ptr<detail::alloc_impl> m_allocated_storage;
+    
+private:
+    static nestl::shared_ptr<detail::alloc_impl> create_storage()
+    {
+        nestl::shared_ptr<detail::alloc_impl> storage;
+        nestl::error_condition err = nestl::make_shared(storage);
+        if (err)
+        {
+            ADD_FAILURE() << "make_shared failed";
+        }
+        
+        return storage;
+    }
 };
 
 

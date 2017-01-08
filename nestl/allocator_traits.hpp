@@ -23,7 +23,7 @@ template <typename Allocator, bool>
 struct destroy_helper
 {
     template <typename U>
-    static void destroy(Allocator& /* alloc */, U* ptr) NESTL_NOEXCEPT_SPEC
+    static void destroy(Allocator& /* alloc */, U* ptr) noexcept
     {
         ptr->~U();
     }
@@ -33,7 +33,7 @@ template <typename Allocator>
 struct destroy_helper<Allocator, true>
 {
     template <typename U>
-    static void destroy(Allocator& alloc, U* ptr) NESTL_NOEXCEPT_SPEC
+    static void destroy(Allocator& alloc, U* ptr) noexcept
     {
         alloc.destroy(ptr);
     }
@@ -45,7 +45,7 @@ struct destroy_helper<Allocator, true>
 template <typename Allocator, typename SizeType, bool>
 struct max_size_helper
 {
-    static SizeType max_size(const Allocator& /* alloc */) NESTL_NOEXCEPT_SPEC
+    static SizeType max_size(const Allocator& /* alloc */) noexcept
     {
         return nestl::numeric_limits<SizeType>::max();
     }
@@ -120,7 +120,7 @@ struct allocator_traits
      * @note Each allocator should provide method allocate
      */
     static typename enable_if<has_exceptions, pointer>::type
-    allocate(Allocator& alloc, size_type n, void* hint = 0)
+    allocate(Allocator& alloc, size_type n, void* hint = nullptr)
     {
         return alloc.allocate(n, hint);
     }
@@ -129,7 +129,7 @@ struct allocator_traits
      * @note Each allocator should provide method allocate_nothrow
      */
     static typename enable_if<has_noexcept, pointer>::type
-    allocate_nothrow(Allocator& alloc, size_type n, void* hint = 0) noexcept
+    allocate_nothrow(Allocator& alloc, size_type n, void* hint = nullptr) noexcept
     {
         return alloc.allocate_nothrow(n, hint);
     }
@@ -138,7 +138,7 @@ struct allocator_traits
      * @note Each allocator should provide method deallocate
      */
     template<typename U>
-    static void deallocate(Allocator& alloc, U* ptr, size_type n) NESTL_NOEXCEPT_SPEC
+    static void deallocate(Allocator& alloc, U* ptr, size_type n) noexcept
     {
         alloc.deallocate(ptr, n);
     }
@@ -146,7 +146,7 @@ struct allocator_traits
     NESTL_CHECK_METHOD_WITH_SIGNATURE(Allocator, destroy);
 
     template<typename U>
-    static void destroy(Allocator& alloc, U* ptr) NESTL_NOEXCEPT_SPEC
+    static void destroy(Allocator& alloc, U* ptr) noexcept
     {
         typedef has_destroy_impl<Allocator, void(Allocator::*)(U*)> has_destroy_method;
         detail::destroy_helper<Allocator, has_destroy_method::value>::destroy(alloc, ptr);
@@ -155,7 +155,7 @@ struct allocator_traits
 
     NESTL_CHECK_METHOD_WITH_SIGNATURE(Allocator, max_size);
 
-    static size_type max_size(const Allocator& alloc) NESTL_NOEXCEPT_SPEC
+    static size_type max_size(const Allocator& alloc) noexcept
     {
         typedef has_max_size_impl<Allocator, size_type(Allocator::*)() const> has_max_size_method;
         return detail::max_size_helper<Allocator, size_type, has_max_size_method::value>::max_size(alloc);
@@ -165,7 +165,7 @@ struct allocator_traits
     NESTL_CHECK_METHOD_WITH_SIGNATURE(Allocator, construct);
 
     template<typename U, typename ... Args>
-    static void construct(Allocator& alloc, U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    static void construct(Allocator& alloc, U* ptr, Args&& ... args) noexcept
     {
         typedef has_construct_impl<Allocator, size_type(Allocator::*)(U*, Args...)> has_construct_method;
         detail::construct_helper<Allocator, has_construct_method::value>::construct(alloc, ptr, nestl::forward<Args>(args) ...);
