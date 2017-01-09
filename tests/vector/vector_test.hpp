@@ -72,7 +72,6 @@ public:
 
     typedef nestl::vector<value_type, allocator>             vector_t;
     typedef typename vector_t::operation_error               operation_error;
-    typedef typename vector_t::iterator_with_operation_error iterator_with_operation_error;
 };
 
 

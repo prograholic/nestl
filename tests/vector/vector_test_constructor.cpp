@@ -44,8 +44,11 @@ TEST_F(VectorTestConstructorWithDefaultAllocator, MoveConstructorFromEmptyVector
 TEST_F(VectorTestConstructorWithDefaultAllocator, MoveConstructorFromNonEmptyVector)
 {
     nestl::vector<int> vec1;
+    
+    typename nestl::vector<int>::operation_error error;
 
-    ASSERT_OPERATION_SUCCESS(vec1.assign(10));
+    vec1.assign_nothrow(error, 10);
+    ASSERT_OPERATION_SUCCESS(error);
 
     nestl::vector<int> vec2(nestl::move(vec1));
 
@@ -137,7 +140,10 @@ TEST_F(VectorTestConstructorWithMinimalAllocator, MoveConstructorFromNonEmptyVec
 {
     nestl::vector<int, minimal_allocator<int> > vec1;
 
-    ASSERT_OPERATION_SUCCESS(vec1.assign(10));
+    typename nestl::vector<int>::operation_error error;
+    
+    vec1.assign_nothrow(error, 10);
+    ASSERT_OPERATION_SUCCESS(error);
 
     nestl::vector<int, minimal_allocator<int> > vec2(nestl::move(vec1));
 
@@ -185,7 +191,10 @@ TEST_F(VectorTestConstructorWithStatefulAllocator, MoveConstructorFromNonEmptyVe
 {
     nestl::vector<int, allocator_with_state<int> > vec1;
 
-    ASSERT_OPERATION_SUCCESS(vec1.assign(10));
+    typename nestl::vector<int>::operation_error error;
+    
+    vec1.assign_nothrow(error, 10);
+    ASSERT_OPERATION_SUCCESS(error);
 
     nestl::vector<int, allocator_with_state<int> > vec2(nestl::move(vec1));
 

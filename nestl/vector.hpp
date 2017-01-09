@@ -126,8 +126,6 @@ public:
     typedef typename base_type::const_reverse_iterator                             const_reverse_iterator;
     typedef nestl::error_condition                                                 operation_error;
 
-    typedef typename nestl::result_with_operation_error<iterator, operation_error> iterator_with_operation_error;
-
     typedef typename base_type::alloc_traits                                       alloc_traits;
 
 
@@ -627,15 +625,16 @@ struct class_traits <nestl::vector<T, VectorAllocator> >
         vector_t* end = ptr + 1;
         nestl::detail::destruction_scoped_guard<vector_t*, Allocator> guard(ptr, end, alloc);
 
-        OperationError err = ptr->assign_copy(other);
-        if (err)
+        OperationError error;
+        ptr->assign_copy(error, other);
+        if (error)
         {
-            return err;
+            return error;
         }
 
         guard.release();
 
-        return err;
+        return error;
     }
 };
 

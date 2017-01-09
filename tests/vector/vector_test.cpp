@@ -24,7 +24,9 @@ TYPED_TEST_P(VectorTestCommon, CheckAssignWithSize0)
 {
     typename TestFixture::vector_t vec;
 
-    ASSERT_OPERATION_SUCCESS(vec.assign(0));
+    typename TestFixture::operation_error error;
+    vec.assign_nothrow(error, 0);
+    ASSERT_OPERATION_SUCCESS(error);
 
     EXPECT_TRUE(CheckVectorSize(vec, 0));
 }
@@ -35,7 +37,9 @@ TYPED_TEST_P(VectorTestCommon, CheckAssignWithSize1)
     typename TestFixture::vector_t vec;
     typename TestFixture::value_type defaultParam;
 
-    ASSERT_OPERATION_SUCCESS(vec.assign(expectedSize, defaultParam));
+    typename TestFixture::operation_error error;
+    vec.assign_nothrow(error, expectedSize, defaultParam);
+    ASSERT_OPERATION_SUCCESS(error);
 
     ASSERT_TRUE(CheckVectorSize(vec, expectedSize));
 
@@ -52,7 +56,9 @@ TYPED_TEST_P(VectorTestCommon, CheckAssignWithSize1024)
     typename TestFixture::vector_t vec;
     typename TestFixture::value_type defaultParam;
 
-    ASSERT_OPERATION_SUCCESS(vec.assign(expectedSize, defaultParam));
+    typename TestFixture::operation_error error;
+    vec.assign_nothrow(error, expectedSize, defaultParam);
+    ASSERT_OPERATION_SUCCESS(error);
 
     ASSERT_TRUE(CheckVectorSize(vec, expectedSize));
 
@@ -74,10 +80,13 @@ TYPED_TEST_P(VectorTestCommon, CheckInsertIntoEmptyVector)
     typename TestFixture::vector_t vec;
     typename TestFixture::value_type val;
 
-    ASSERT_OPERATION_SUCCESS(vec.insert(vec.begin(), val));
+    typename TestFixture::operation_error error;
+    auto pos = vec.insert_nothrow(error, vec.begin(), val);
+    ASSERT_OPERATION_SUCCESS(error);
 
     ASSERT_TRUE(CheckVectorSize(vec, 1));
 
+    EXPECT_EQ(pos, vec.begin());
     EXPECT_EQ(val, *(vec.begin()));
     EXPECT_EQ(val, *(vec.cbegin()));
     EXPECT_EQ(val, vec[0]);
@@ -116,7 +125,9 @@ TYPED_TEST_P(VectorTestNumeric, CheckAssignFromIterators)
     typename TestFixture::value_type values [] = {0, 1, 2, 3, 4, 5};
     const size_t expectedSize = nestl::distance(nestl::begin(values), nestl::end(values));
 
-    ASSERT_OPERATION_SUCCESS(vec.assign(nestl::begin(values), nestl::end(values)));
+    typename TestFixture::operation_error error;
+    vec.assign_nothrow(error, nestl::begin(values), nestl::end(values));
+    ASSERT_OPERATION_SUCCESS(error);
 
     ASSERT_TRUE(CheckVectorSize(vec, expectedSize));
 
@@ -136,19 +147,26 @@ TYPED_TEST_P(VectorTestNumeric, CheckAssignFromIterators)
 
 TYPED_TEST_P(VectorTestNumeric, InsertOneElementBeforeBeginToNonEmptyVector)
 {
-    typedef typename TestFixture::vector_t::iterator_with_operation_error iterator_with_operation_error;
-
     typename TestFixture::vector_t vec;
 
-    ASSERT_OPERATION_SUCCESS(vec.push_back(1));
-    ASSERT_OPERATION_SUCCESS(vec.push_back(2));
-    ASSERT_OPERATION_SUCCESS(vec.push_back(3));
-    ASSERT_OPERATION_SUCCESS(vec.push_back(4));
+    typename TestFixture::operation_error error;
+    
+    vec.push_back_nothrow(error, 1);
+    ASSERT_OPERATION_SUCCESS(error);
+    
+    vec.push_back_nothrow(error, 2);
+    ASSERT_OPERATION_SUCCESS(error);
+    
+    vec.push_back_nothrow(error, 3);
+    ASSERT_OPERATION_SUCCESS(error);
+    
+    vec.push_back_nothrow(error, 4);
+    ASSERT_OPERATION_SUCCESS(error);
 
-    iterator_with_operation_error st = vec.insert(vec.begin(), 0);
-    ASSERT_OPERATION_SUCCESS(st);
+    typename TestFixture::vector_t::iterator pos = vec.insert_nothrow(error, vec.begin(), 0);
+    ASSERT_OPERATION_SUCCESS(error);
     ASSERT_TRUE(CheckVectorSize(vec, 5));
-    ASSERT_EQ(vec.begin(), st.result());
+    ASSERT_EQ(vec.begin(), pos);
 
     EXPECT_EQ(0, vec[0]);
     EXPECT_EQ(1, vec[1]);
@@ -159,19 +177,26 @@ TYPED_TEST_P(VectorTestNumeric, InsertOneElementBeforeBeginToNonEmptyVector)
 
 TYPED_TEST_P(VectorTestNumeric, InsertOneElementBeforeEndToNonEmptyVector)
 {
-    typedef typename TestFixture::vector_t::iterator_with_operation_error iterator_with_operation_error;
-
     typename TestFixture::vector_t vec;
 
-    ASSERT_OPERATION_SUCCESS(vec.push_back(0));
-    ASSERT_OPERATION_SUCCESS(vec.push_back(1));
-    ASSERT_OPERATION_SUCCESS(vec.push_back(2));
-    ASSERT_OPERATION_SUCCESS(vec.push_back(3));
+    typename TestFixture::operation_error error;
+    
+    vec.push_back_nothrow(error, 0);
+    ASSERT_OPERATION_SUCCESS(error);
+    
+    vec.push_back_nothrow(error, 1);
+    ASSERT_OPERATION_SUCCESS(error);
+    
+    vec.push_back_nothrow(error, 2);
+    ASSERT_OPERATION_SUCCESS(error);
+    
+    vec.push_back_nothrow(error, 3);
+    ASSERT_OPERATION_SUCCESS(error);
 
-    iterator_with_operation_error st = vec.insert(vec.end(), 4);
-    ASSERT_OPERATION_SUCCESS(st);
+    auto pos = vec.insert_nothrow(error, vec.end(), 4);
+    ASSERT_OPERATION_SUCCESS(error);
     ASSERT_TRUE(CheckVectorSize(vec, 5));
-    ASSERT_EQ(vec.end() - 1, st.result());
+    ASSERT_EQ(vec.end() - 1, pos);
 
     EXPECT_EQ(0, vec[0]);
     EXPECT_EQ(1, vec[1]);
@@ -203,7 +228,9 @@ TYPED_TEST_P(VectorTestWithCopyableObjects, PushBackOneElement)
     typename TestFixture::vector_t vec;
     typename TestFixture::value_type val;
 
-    ASSERT_OPERATION_SUCCESS(vec.push_back(val));
+    typename TestFixture::operation_error error;
+    vec.push_back_nothrow(error, val);
+    ASSERT_OPERATION_SUCCESS(error);
 
     EXPECT_TRUE(CheckVectorSize(vec, 1));
 }
@@ -214,7 +241,9 @@ TYPED_TEST_P(VectorTestWithCopyableObjects, EmplaceBackOneElement)
     typename TestFixture::vector_t vec;
     typename TestFixture::value_type val;
 
-    ASSERT_OPERATION_SUCCESS(vec.emplace_back(val));
+    typename TestFixture::operation_error error;
+    vec.emplace_back_nothrow(error, val);
+    ASSERT_OPERATION_SUCCESS(error);
 
     EXPECT_TRUE(CheckVectorSize(vec, 1));
 }
