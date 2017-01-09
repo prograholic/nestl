@@ -79,7 +79,7 @@ struct iterator_traits<const T*>
     typedef nestl::error_condition     operation_error;
     typedef ptrdiff_t                  difference_type;
     typedef const T*                   pointer;
-    typedef const T&                   eference;
+    typedef const T&                   reference;
     typedef random_access_iterator_tag iterator_category;
 };
 
@@ -368,34 +368,36 @@ public:
 
     typedef typename Container::value_type      container_value_type;
 
-    explicit back_insert_iterator(Container& container) NESTL_NOEXCEPT_SPEC
+    explicit back_insert_iterator(Container& container) noexcept
         : m_container(nestl::addressof(container))
     {
     }
 
-    operation_error assign(const container_value_type& val) NESTL_NOEXCEPT_SPEC
+    operation_error assign(const container_value_type& val) noexcept
     {
-        return m_container->push_back(val);
+        operation_error error;
+        m_container->push_back_nothrow(error, val);
+        return error;
     }
 
-#if NESTL_HAS_RVALUE_REF
-    operation_error assign(container_value_type&& val) NESTL_NOEXCEPT_SPEC
+    operation_error assign(container_value_type&& val) noexcept
     {
-        return m_container->push_back(nestl::move(val));
-    }
-#endif /* NESTL_HAS_RVALUE_REF */
-
-    back_insert_iterator& operator*() NESTL_NOEXCEPT_SPEC
-    {
-        return *this;
+        operation_error error;
+        m_container->push_back_nothrow(error, nestl::move(val));
+        return error;
     }
 
-    back_insert_iterator& operator++() NESTL_NOEXCEPT_SPEC
+    back_insert_iterator& operator*() noexcept
     {
         return *this;
     }
 
-    back_insert_iterator operator++(int) NESTL_NOEXCEPT_SPEC
+    back_insert_iterator& operator++() noexcept
+    {
+        return *this;
+    }
+
+    back_insert_iterator operator++(int) noexcept
     {
         return *this;
     }
@@ -406,7 +408,7 @@ private:
 
 
 template <typename Container>
-back_insert_iterator<Container> back_inserter(Container& c) NESTL_NOEXCEPT_SPEC
+back_insert_iterator<Container> back_inserter(Container& c) noexcept
 {
     return back_insert_iterator<Container>(c);
 }
@@ -418,18 +420,20 @@ template <typename Container>
 struct class_traits<nestl::back_insert_iterator<Container> >
 {
 
-#if NESTL_HAS_RVALUE_REF
     template <typename OperationError, typename Y>
-    static OperationError assign(nestl::back_insert_iterator<Container>& dest, Y&& src) NESTL_NOEXCEPT_SPEC
+    static OperationError assign(nestl::back_insert_iterator<Container>& dest, Y&& src) noexcept
     {
-        return dest.assign(src);
+        OperationError error;
+        dest.assign_nothrow(error, nestl::forward<Y>(src));
+        return error;
     }
-#endif /* NESTL_HAS_RVALUE_REF */
 
     template <typename OperationError, typename Y>
-    static OperationError assign(nestl::back_insert_iterator<Container>& dest, const Y& src) NESTL_NOEXCEPT_SPEC
+    static OperationError assign(nestl::back_insert_iterator<Container>& dest, const Y& src) noexcept
     {
-        return dest.assign(src);
+        OperationError error;
+        dest.assign_nothrow(error, src);
+        return error;
     }
 };
 
@@ -445,13 +449,13 @@ public:
     typedef typename Container::iterator        container_iterator;
 
 
-    insert_iterator(Container& container, container_iterator pos) NESTL_NOEXCEPT_SPEC
+    insert_iterator(Container& container, container_iterator pos) noexcept
         : m_container(nestl::addressof(container))
         , m_pos(pos)
     {
     }
 
-    operation_error assign(const container_value_type& val) NESTL_NOEXCEPT_SPEC
+    operation_error assign(const container_value_type& val) noexcept
     {
         operation_error err = m_container->insert(m_pos, val);
         if (!err)
@@ -464,7 +468,7 @@ public:
     }
 
 #if NESTL_HAS_RVALUE_REF
-    operation_error assign(container_value_type&& val) NESTL_NOEXCEPT_SPEC
+    operation_error assign(container_value_type&& val) noexcept
     {
         operation_error err = m_container->insert(m_pos, nestl::move(val));
         if (!err)
@@ -477,17 +481,17 @@ public:
     }
 #endif /* NESTL_HAS_RVALUE_REF */
 
-    insert_iterator& operator*() NESTL_NOEXCEPT_SPEC
+    insert_iterator& operator*() noexcept
     {
         return *this;
     }
 
-    insert_iterator& operator++() NESTL_NOEXCEPT_SPEC
+    insert_iterator& operator++() noexcept
     {
         return *this;
     }
 
-    insert_iterator operator++(int) NESTL_NOEXCEPT_SPEC
+    insert_iterator operator++(int) noexcept
     {
         return *this;
     }
@@ -500,7 +504,7 @@ private:
 
 
 template <typename Container, typename Iterator>
-insert_iterator<Container> inserter(Container& c, Iterator pos) NESTL_NOEXCEPT_SPEC
+insert_iterator<Container> inserter(Container& c, Iterator pos) noexcept
 {
     return insert_iterator<Container>(c, pos);
 }
@@ -511,19 +515,11 @@ insert_iterator<Container> inserter(Container& c, Iterator pos) NESTL_NOEXCEPT_S
 template <typename Container>
 struct class_traits<nestl::insert_iterator<Container> >
 {
-#if defined(NESTL_CONFIG_HAS_RVALUE_REF)
     template <typename OperationError, typename Y>
-    static OperationError assign(nestl::insert_iterator<Container>& dest, Y&& src) NESTL_NOEXCEPT_SPEC
+    static OperationError assign(nestl::insert_iterator<Container>& dest, Y&& src) noexcept
     {
         return dest.assign(nestl::forward<Y>(src));
     }
-#else /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
-    template <typename OperationError, typename Y>
-    static OperationError assign(nestl::insert_iterator<Container>& dest, const Y& src) NESTL_NOEXCEPT_SPEC
-    {
-        return dest.assign(src);
-    }
-#endif /* defined(NESTL_CONFIG_HAS_RVALUE_REF) */
 };
 
 

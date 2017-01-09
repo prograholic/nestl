@@ -45,7 +45,9 @@ TEST_F(SetTestConstructorWithDefaultAllocator, MoveConstructorFromNonEmptyVector
 {
     nestl::set<int> s1;
 
-    ASSERT_OPERATION_SUCCESS(s1.insert(10));
+    typename nestl::set<int>::operation_error error;
+    s1.insert_nothrow(error, 10);
+    ASSERT_OPERATION_SUCCESS(error);
 
     nestl::set<int> s2(nestl::move(s1));
 
@@ -131,9 +133,12 @@ TEST_F(SetTestConstructorWithMinimalAllocator, MoveConstructorFromEmptyVector)
 
 TEST_F(SetTestConstructorWithMinimalAllocator, MoveConstructorFromNonEmptyVector)
 {
-    nestl::set<int, nestl::less<int>, minimal_allocator<int> > s1;
+    typedef nestl::set<int, nestl::less<int>, minimal_allocator<int> > set_t;
+    set_t s1;
 
-    ASSERT_OPERATION_SUCCESS(s1.insert(10));
+    typename set_t::operation_error error;
+    s1.insert_nothrow(error, 10);
+    ASSERT_OPERATION_SUCCESS(error);
 
     nestl::set<int, nestl::less<int>, minimal_allocator<int> > s2(nestl::move(s1));
 
@@ -180,9 +185,12 @@ TEST_F(SetTestConstructorWithStatefulAllocator, MoveConstructorFromEmptyVector)
 
 TEST_F(SetTestConstructorWithStatefulAllocator, MoveConstructorFromNonEmptyVector)
 {
-    nestl::set<int, nestl::less<int>, allocator_with_state<int> > s1;
+    typedef nestl::set<int, nestl::less<int>, allocator_with_state<int> > set_t;
+    set_t s1;
 
-    ASSERT_OPERATION_SUCCESS(s1.insert(10));
+    typename set_t::operation_error error;
+    s1.insert_nothrow(error, 10);
+    ASSERT_OPERATION_SUCCESS(error);
 
     nestl::set<int, nestl::less<int>, allocator_with_state<int> > s2(nestl::move(s1));
 

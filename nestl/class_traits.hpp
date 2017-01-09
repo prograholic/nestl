@@ -19,7 +19,7 @@ struct class_traits
 {
 
     template <typename OperationError, typename Allocator, typename ... Args>
-    static OperationError construct(T* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    static OperationError construct(T* ptr, Allocator& alloc, Args&& ... args) noexcept
     {
         nestl::allocator_traits<Allocator>::construct(alloc, ptr, nestl::forward<Args>(args) ...);
 
@@ -27,7 +27,7 @@ struct class_traits
     }
 
     template <typename OperationError, typename Y>
-    static OperationError assign(T& dest, Y&& src) NESTL_NOEXCEPT_SPEC
+    static OperationError assign(T& dest, Y&& src) noexcept
     {
         dest = nestl::forward<Y>(src);
 
@@ -40,13 +40,13 @@ namespace detail
 {
 
 template<typename OperationError, typename T, typename Allocator, typename ... Args>
-OperationError construct(T* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
+OperationError construct(T* ptr, Allocator& alloc, Args&& ... args) noexcept
 {
 #define NESTL_CALL_CLASS_TRAITS_CONSTRUCT \
     nestl::class_traits<T>:: template construct<OperationError>(ptr, alloc, nestl::forward<Args>(args) ...)
 
-    NESTL_STATIC_ASSERT(NESTL_NOEXCEPT_OPERATOR(NESTL_CALL_CLASS_TRAITS_CONSTRUCT),
-                        "User should provide nothrow class_traits::construct method");
+    constexpr bool is_nothrow_op = noexcept(NESTL_CALL_CLASS_TRAITS_CONSTRUCT);
+    static_assert(is_nothrow_op, "User should provide nothrow class_traits::construct method");
 
 
     return NESTL_CALL_CLASS_TRAITS_CONSTRUCT;
@@ -60,8 +60,8 @@ OperationError assign(T& dest, Args&& ... args) noexcept
 #define NESTL_CALL_CLASS_TRAITS_ASSIGN \
     nestl::class_traits<T>:: template assign<OperationError>(dest, nestl::forward<Args>(args) ...)
 
-    NESTL_CONSTEXPR bool is_nothrow_op = NESTL_NOEXCEPT_OPERATOR(NESTL_CALL_CLASS_TRAITS_ASSIGN);
-    NESTL_STATIC_ASSERT(is_nothrow_op, "User should provide nothrow class_traits::assign method");
+    constexpr bool is_nothrow_op = noexcept(NESTL_CALL_CLASS_TRAITS_ASSIGN);
+    static_assert(is_nothrow_op, "User should provide nothrow class_traits::assign method");
 
 
     return NESTL_CALL_CLASS_TRAITS_ASSIGN;

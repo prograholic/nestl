@@ -19,7 +19,9 @@ TEST_F(SetTestInsertWithDefaultAllocator, InsertOneElement)
 {
     nestl::set<int> s;
 
-    s.insert(10);
+    typename nestl::set<int>::operation_error error;
+    s.insert_nothrow(error, 10);
+    ASSERT_OPERATION_SUCCESS(error);
 
     EXPECT_TRUE(CheckSetSize(s, 1));
 }

@@ -29,8 +29,10 @@ TYPED_TEST_P(ListTestCommon, ConstructorWithoutParameters)
 TYPED_TEST_P(ListTestCommon, CheckAssignWithSize0)
 {
     typename TestFixture::list_t l;
-
-    ASSERT_OPERATION_SUCCESS(l.assign(0));
+    typename TestFixture::list_t::operation_error error;
+    
+    l.assign_nothrow(error, 0);
+    ASSERT_OPERATION_SUCCESS(error);
 
     EXPECT_TRUE(CheckListSize(l, 0));
 }
@@ -42,7 +44,9 @@ TYPED_TEST_P(ListTestCommon, CheckAssignWithSize1)
     typename TestFixture::value_type defaultParam;
     init_workaround::initialize(defaultParam);
 
-    ASSERT_OPERATION_SUCCESS(l.assign(expectedSize, defaultParam));
+    typename TestFixture::list_t::operation_error error;
+    l.assign_nothrow(error, expectedSize, defaultParam);
+    ASSERT_OPERATION_SUCCESS(error);
 
     ASSERT_TRUE(CheckListSize(l, expectedSize));
 
@@ -59,7 +63,9 @@ TYPED_TEST_P(ListTestCommon, CheckAssignWithSize1024)
     typename TestFixture::value_type defaultParam;
     init_workaround::initialize(defaultParam);
 
-    ASSERT_OPERATION_SUCCESS(l.assign(expectedSize, defaultParam));
+    typename TestFixture::list_t::operation_error error;
+    l.assign_nothrow(error, expectedSize, defaultParam);
+    ASSERT_OPERATION_SUCCESS(error);
 
     ASSERT_TRUE(CheckListSize(l, expectedSize));
 
@@ -81,7 +87,9 @@ TYPED_TEST_P(ListTestCommon, CheckInsertIntoEmptyList)
     typename TestFixture::value_type val;
     init_workaround::initialize(val);
 
-    ASSERT_OPERATION_SUCCESS(l.insert(l.begin(), val));
+    typename TestFixture::list_t::operation_error error;
+    l.insert_nothrow(error, l.begin(), val);
+    ASSERT_OPERATION_SUCCESS(error);
 
     ASSERT_TRUE(CheckListSize(l, 1));
 
@@ -118,7 +126,9 @@ TYPED_TEST_P(ListTestNumeric, CheckAssignFromIterators)
     typename TestFixture::value_type values [] = {0, 1, 2, 3, 4, 5};
     const size_t expectedSize = nestl::distance(nestl::begin(values), nestl::end(values));
 
-    ASSERT_OPERATION_SUCCESS(l.assign(nestl::begin(values), nestl::end(values)));
+    typename TestFixture::list_t::operation_error error;
+    l.assign_nothrow(error, nestl::begin(values), nestl::end(values));
+    ASSERT_OPERATION_SUCCESS(error);
 
     ASSERT_TRUE(CheckListSize(l, expectedSize));
 
@@ -141,12 +151,14 @@ TYPED_TEST_P(ListTestNumeric, InsertOneElementBeforeBeginToNonEmptyList)
 
     typename TestFixture::value_type values [] = {1, 2, 3, 4};
 
-    ASSERT_OPERATION_SUCCESS(l.assign(nestl::begin(values), nestl::end(values)));
+    typename TestFixture::list_t::operation_error error;
+    l.assign_nothrow(error, nestl::begin(values), nestl::end(values));
+    ASSERT_OPERATION_SUCCESS(error);
 
-    typename TestFixture::iterator_with_operation_error st = l.insert(l.begin(), 0);
-    ASSERT_OPERATION_SUCCESS(st);
+    typename TestFixture::iterator pos = l.insert_nothrow(error, l.begin(), 0);
+    ASSERT_OPERATION_SUCCESS(error);
     ASSERT_TRUE(CheckListSize(l, expectedSize));
-    ASSERT_EQ(l.begin(), st.result());
+    ASSERT_EQ(l.begin(), pos);
 
     typename TestFixture::const_iterator constIt = l.cbegin();
     typename TestFixture::iterator it = l.begin();
@@ -166,14 +178,17 @@ TYPED_TEST_P(ListTestNumeric, InsertOneElementBeforeEndToNonEmptyList)
     const size_t expectedSize = 5;
 
     typename TestFixture::value_type values [] = {0, 1, 2, 3};
-    ASSERT_OPERATION_SUCCESS(l.assign(nestl::begin(values), nestl::end(values)));
+    
+    typename TestFixture::list_t::operation_error error;
+    l.assign_nothrow(error, nestl::begin(values), nestl::end(values));
+    ASSERT_OPERATION_SUCCESS(error);
 
-    typename TestFixture::iterator_with_operation_error st = l.insert(l.end(), 4);
-    ASSERT_OPERATION_SUCCESS(st);
+    typename TestFixture::iterator pos = l.insert_nothrow(error, l.end(), 4);
+    ASSERT_OPERATION_SUCCESS(error);
     ASSERT_TRUE(CheckListSize(l, expectedSize));
 
     typename TestFixture::iterator beforeEnd = l.end(); --beforeEnd;
-    ASSERT_EQ(beforeEnd, st.result());
+    ASSERT_EQ(beforeEnd, pos);
 
     typename TestFixture::const_iterator constIt = l.cbegin();
     typename TestFixture::iterator it = l.begin();
@@ -191,7 +206,9 @@ TYPED_TEST_P(ListTestNumeric, PopFrontFromListWith1Element)
 {
     typename TestFixture::list_t l;
 
-    ASSERT_OPERATION_SUCCESS(l.push_back(0));
+    typename TestFixture::list_t::operation_error error;
+    l.push_back_nothrow(error, 0);
+    ASSERT_OPERATION_SUCCESS(error);
     ASSERT_TRUE(CheckListSize(l, 1));
 
     l.pop_front();
@@ -202,7 +219,9 @@ TYPED_TEST_P(ListTestNumeric, PopBackFromListWith1Element)
 {
     typename TestFixture::list_t l;
 
-    ASSERT_OPERATION_SUCCESS(l.push_back(0));
+    typename TestFixture::list_t::operation_error error;
+    l.push_back_nothrow(error, 0);
+    ASSERT_OPERATION_SUCCESS(error);
     ASSERT_TRUE(CheckListSize(l, 1));
 
     l.pop_back();
@@ -213,8 +232,14 @@ TYPED_TEST_P(ListTestNumeric, PopFrontFromListWith2Elements)
 {
     typename TestFixture::list_t l;
 
-    ASSERT_OPERATION_SUCCESS(l.push_back(0));
-    ASSERT_OPERATION_SUCCESS(l.push_back(1));
+    typename TestFixture::list_t::operation_error error;
+    
+    l.push_back_nothrow(error, 0);
+    ASSERT_OPERATION_SUCCESS(error);
+    
+    l.push_back_nothrow(error, 1);
+    ASSERT_OPERATION_SUCCESS(error);
+    
     ASSERT_TRUE(CheckListSize(l, 2));
 
     l.pop_front();
@@ -226,8 +251,14 @@ TYPED_TEST_P(ListTestNumeric, PopBackFromListWith2Elements)
 {
     typename TestFixture::list_t l;
 
-    ASSERT_OPERATION_SUCCESS(l.push_back(0));
-    ASSERT_OPERATION_SUCCESS(l.push_back(1));
+    typename TestFixture::list_t::operation_error error;
+    
+    l.push_back_nothrow(error, 0);
+    ASSERT_OPERATION_SUCCESS(error);
+    
+    l.push_back_nothrow(error, 1);
+    ASSERT_OPERATION_SUCCESS(error);
+
     ASSERT_TRUE(CheckListSize(l, 2));
 
     l.pop_back();
@@ -262,11 +293,16 @@ TYPED_TEST_P(ListTestNumeric, MergeTwoNonEmptyLists)
     typename TestFixture::value_type v1 [] = {0, 2, 4, 6};
 
     typename TestFixture::list_t l1;
-    ASSERT_OPERATION_SUCCESS(l1.assign(nestl::begin(v1), nestl::end(v1)));
+    typename TestFixture::list_t::operation_error error;
+    
+    l1.assign_nothrow(error, nestl::begin(v1), nestl::end(v1));
+    ASSERT_OPERATION_SUCCESS(error);
 
     typename TestFixture::value_type v2 [] = {1, 3, 5, 7};
     typename TestFixture::list_t l2;
-    ASSERT_OPERATION_SUCCESS(l2.assign(nestl::begin(v2), nestl::end(v2)));
+    
+    l2.assign_nothrow(error, nestl::begin(v2), nestl::end(v2));
+    ASSERT_OPERATION_SUCCESS(error);
 
     l1.merge(l2);
     ASSERT_TRUE(CheckListSize(l2, 0));
@@ -292,7 +328,9 @@ TYPED_TEST_P(ListTestNumeric, SortEmptyList)
 TYPED_TEST_P(ListTestNumeric, SortListWithOneElement)
 {
     typename TestFixture::list_t l;
-    ASSERT_OPERATION_SUCCESS(l.assign(1));
+    typename TestFixture::list_t::operation_error error;
+    l.assign_nothrow(error, 1);
+    ASSERT_OPERATION_SUCCESS(error);
 
     l.sort();
     ASSERT_TRUE(CheckListSize(l, 1));
@@ -305,7 +343,9 @@ TYPED_TEST_P(ListTestNumeric, SortListWithSeveralElements)
     typename TestFixture::value_type unsorted [] = {0, 4, 2, 3, 1};
 
     typename TestFixture::list_t l;
-    ASSERT_OPERATION_SUCCESS(l.assign(nestl::begin(unsorted), nestl::end(unsorted)));
+    typename TestFixture::list_t::operation_error error;
+    l.assign_nothrow(error, nestl::begin(unsorted), nestl::end(unsorted));
+    ASSERT_OPERATION_SUCCESS(error);
 
     l.sort();
     ASSERT_TRUE(CheckListSize(l, 5));
@@ -351,7 +391,9 @@ TYPED_TEST_P(ListTestWithCopyableObjects, PushBackOneElement)
     typename TestFixture::value_type val;
     init_workaround::initialize(val);
 
-    ASSERT_OPERATION_SUCCESS(l.push_back(val));
+    typename TestFixture::list_t::operation_error error;
+    l.push_back_nothrow(error, val);
+    ASSERT_OPERATION_SUCCESS(error);
 
     EXPECT_TRUE(CheckListSize(l, 1));
 }
@@ -363,7 +405,9 @@ TYPED_TEST_P(ListTestWithCopyableObjects, EmplaceBackOneElement)
     typename TestFixture::value_type val;
     init_workaround::initialize(val);
 
-    ASSERT_OPERATION_SUCCESS(l.emplace_back(val));
+    typename TestFixture::list_t::operation_error error;
+    l.emplace_back_nothrow(error, val);
+    ASSERT_OPERATION_SUCCESS(error);
 
     EXPECT_TRUE(CheckListSize(l, 1));
 }
@@ -375,7 +419,9 @@ TYPED_TEST_P(ListTestWithCopyableObjects, PushFrontOneElement)
     typename TestFixture::value_type val;
     init_workaround::initialize(val);
 
-    ASSERT_OPERATION_SUCCESS(l.push_front(val));
+    typename TestFixture::list_t::operation_error error;
+    l.push_front_nothrow(error, val);
+    ASSERT_OPERATION_SUCCESS(error);
 
     EXPECT_TRUE(CheckListSize(l, 1));
 }
@@ -387,7 +433,9 @@ TYPED_TEST_P(ListTestWithCopyableObjects, EmplaceFrontOneElement)
     typename TestFixture::value_type val;
     init_workaround::initialize(val);
 
-    ASSERT_OPERATION_SUCCESS(l.emplace_front(val));
+    typename TestFixture::list_t::operation_error error;
+    l.emplace_front_nothrow(error, val);
+    ASSERT_OPERATION_SUCCESS(error);
 
     EXPECT_TRUE(CheckListSize(l, 1));
 }

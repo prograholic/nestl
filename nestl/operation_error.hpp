@@ -38,91 +38,11 @@ int value(const OperationError& e) NESTL_NOEXCEPT_SPEC
 } // namespace error_info
 
 
-template <typename Type, typename OperationError>
-class result_with_operation_error
+template <typename OperationError, typename Enum>
+OperationError make_operation_error(Enum value)
 {
-public:
-
-    result_with_operation_error()
-        : m_val()
-        , m_error()
-    {
-    }
-
-    result_with_operation_error(const Type& val, const OperationError& err) NESTL_NOEXCEPT_SPEC
-        : m_val(val)
-        , m_error(err)
-    {
-    }
-
-    template <typename ErrorCode>
-    result_with_operation_error(const Type& val, const ErrorCode& ec) NESTL_NOEXCEPT_SPEC
-        : m_val(val)
-        , m_error(ec)
-    {
-    }
-
-    const OperationError& error() const NESTL_NOEXCEPT_SPEC
-    {
-        return m_error;
-    }
-
-    const Type& result() const NESTL_NOEXCEPT_SPEC
-    {
-        return m_val;
-    }
-
-    Type& result() NESTL_NOEXCEPT_SPEC
-    {
-        return m_val;
-    }
-
-#if NESTL_HAS_EXPLICIT_OPERATOR
-
-    explicit operator bool() const NESTL_NOEXCEPT_SPEC
-    {
-        return m_error ? true : false;
-    }
-
-#else /* NESTL_HAS_EXPLICIT_OPERATOR */
-
-    typedef OperationError result_with_operation_error::*unspecified_bool_type;
-
-    operator unspecified_bool_type() const NESTL_NOEXCEPT_SPEC
-    {
-        return m_error ? &result_with_operation_error::m_error : 0;
-    }
-
-#endif /* NESTL_HAS_EXPLICIT_OPERATOR */
-
-private:
-    Type m_val;
-    OperationError m_error;
-};
-
-
-template <typename Type, typename OperationError>
-result_with_operation_error<Type, OperationError>
-make_result_with_operation_error(const Type& val, const OperationError& err) NESTL_NOEXCEPT_SPEC
-{
-    return result_with_operation_error<Type, OperationError>(val, err);
+    return OperationError{value};
 }
-
-/**
- * @brief Specialization for result_with_operation_error
- */
-template <typename Type, typename OperationError>
-struct operation_error_traits <result_with_operation_error<Type, OperationError> >
-{
-
-    typedef result_with_operation_error<Type, OperationError> operation_error;
-
-    static int value(const operation_error& e) NESTL_NOEXCEPT_SPEC
-    {
-        return e.error().value();
-    }
-};
-
 
 } // namespace nestl
 

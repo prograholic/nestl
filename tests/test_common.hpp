@@ -45,18 +45,6 @@ struct checker
 
         return ::testing::AssertionSuccess();
     }
-
-    template <typename Result, typename OperationError>
-    ::testing::AssertionResult operator()(const nestl::result_with_operation_error<Result, OperationError>& ec)
-    {
-        if (ec)
-        {
-            return ::testing::AssertionFailure() <<
-                "operation failed with following error: " << ec.error();
-        }
-
-        return ::testing::AssertionSuccess();
-    }
 };
 
 

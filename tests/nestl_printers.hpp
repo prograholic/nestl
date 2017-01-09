@@ -14,12 +14,4 @@ inline std::ostream& operator <<(std::ostream& strm, const nestl::error_conditio
     return strm;
 }
 
-
-template <typename Result, typename OperationError>
-inline std::ostream& operator <<(std::ostream& strm, const nestl::result_with_operation_error<Result, OperationError>& ec)
-{
-    strm << "result_with_operation_error { message : " << ec.error().message() << ", value: " << ec.error().value() << " };";
-    return strm;
-}
-
 #endif /* NESTL_TESTS_NESTL_PRINTERS_HPP */

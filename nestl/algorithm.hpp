@@ -41,41 +41,41 @@ distance(InputIterator first, InputIterator last, const nestl::input_iterator_ta
 } // namespace detail
 
 template<typename OperationError, typename InputIterator, typename OutputIterator, typename UnaryPredicate>
-nestl::result_with_operation_error<OutputIterator, OperationError>
-copy_if(InputIterator first, InputIterator last, OutputIterator d_first, UnaryPredicate pred)
+OutputIterator
+copy_if(OperationError& error, InputIterator first, InputIterator last, OutputIterator d_first, UnaryPredicate pred)
 {
     while (first != last)
     {
         if (pred(*first))
         {
-            OperationError err = nestl::detail::assign<OperationError>(*d_first, *first);
-            if (err)
+            error = nestl::detail::assign<OperationError>(*d_first, *first);
+            if (error)
             {
-                return nestl::make_result_with_operation_error(d_first, err);
+                return d_first;
             }
             ++d_first;
         }
         ++first;
     }
-    return nestl::make_result_with_operation_error(d_first, OperationError());
+    return d_first;
 }
 
 template<typename OperationError, typename InputIterator, typename OutputIterator>
-nestl::result_with_operation_error<OutputIterator, OperationError>
-copy(InputIterator first, InputIterator last, OutputIterator d_first)
+OutputIterator
+copy(OperationError& error, InputIterator first, InputIterator last, OutputIterator d_first)
 {
     while (first != last)
     {
-        OperationError err = nestl::detail::assign<OperationError>(*d_first, *first);
-        if (err)
+        error = nestl::detail::assign<OperationError>(*d_first, *first);
+        if (error)
         {
-            return nestl::make_result_with_operation_error(d_first, err);
+            return d_first;
         }
 
         ++d_first;
         ++first;
     }
-    return nestl::make_result_with_operation_error(d_first, OperationError());
+    return d_first;
 }
 
 

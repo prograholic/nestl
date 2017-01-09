@@ -116,8 +116,9 @@ struct alloc_impl: private nestl::set<void*>
     
     void do_insert(const value_type& val) noexcept
     {
-        auto err = this->insert(val);
-        if (err)
+        typename base_type::operation_error error;
+        this->insert_nothrow(error, val);
+        if (error)
         {
             ADD_FAILURE() << "insert failed";
         }
