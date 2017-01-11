@@ -25,25 +25,25 @@ public:
 
     typedef T value_type;
 
-    minimal_allocator() NESTL_NOEXCEPT_SPEC
+    minimal_allocator() noexcept
     {
     }
 
-    minimal_allocator(const minimal_allocator& /* other */) NESTL_NOEXCEPT_SPEC
+    minimal_allocator(const minimal_allocator& /* other */) noexcept
     {
     }
 
     template <typename Y>
-    minimal_allocator(const minimal_allocator<Y>& /* other */) NESTL_NOEXCEPT_SPEC
+    minimal_allocator(const minimal_allocator<Y>& /* other */) noexcept
     {
     }
 
-    T* allocate(nestl::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    T* allocate(nestl::size_t n, const void* /* hint */ = 0) noexcept
     {
         return static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
     }
 
-    void deallocate(T* p, nestl::size_t /* n */) NESTL_NOEXCEPT_SPEC
+    void deallocate(T* p, nestl::size_t /* n */) noexcept
     {
         ::operator delete(p);
     }
@@ -60,29 +60,29 @@ public:
 
     typedef T               value_type;
 
-    zero_allocator() NESTL_NOEXCEPT_SPEC
+    zero_allocator() noexcept
     {
     }
 
-    zero_allocator(const zero_allocator& /* other */) NESTL_NOEXCEPT_SPEC
+    zero_allocator(const zero_allocator& /* other */) noexcept
     {
     }
 
     template <typename Y>
-    zero_allocator(const zero_allocator<Y>& /* other */) NESTL_NOEXCEPT_SPEC
+    zero_allocator(const zero_allocator<Y>& /* other */) noexcept
     {
     }
 
-    ~zero_allocator() NESTL_NOEXCEPT_SPEC
+    ~zero_allocator() noexcept
     {
     }
 
-    T* allocate(nestl::size_t /* n */, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    T* allocate(nestl::size_t /* n */, const void* /* hint */ = 0) noexcept
     {
         return 0;
     }
 
-    void deallocate(T* p, nestl::size_t /* n */) NESTL_NOEXCEPT_SPEC
+    void deallocate(T* p, nestl::size_t /* n */) noexcept
     {
         ::operator delete(p);
     }
@@ -145,49 +145,49 @@ public:
 
     typedef T               value_type;
 
-    allocator_with_state() NESTL_NOEXCEPT_SPEC
+    allocator_with_state() noexcept
         : m_allocated_storage(create_storage())
     {
     }
 
-    allocator_with_state(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
+    allocator_with_state(const allocator_with_state& other) noexcept
         : m_allocated_storage(other.m_allocated_storage)
     {
     }
 
     template <typename Y>
-    allocator_with_state(const allocator_with_state<Y>& other) NESTL_NOEXCEPT_SPEC
+    allocator_with_state(const allocator_with_state<Y>& other) noexcept
         : m_allocated_storage(other.m_allocated_storage)
     {
     }
 
-    allocator_with_state(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
+    allocator_with_state(allocator_with_state&& other) noexcept
         : m_allocated_storage(create_storage())
     {
         swap(m_allocated_storage, other.m_allocated_storage);
     }
 
     template <typename Y>
-    allocator_with_state(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
+    allocator_with_state(allocator_with_state<Y>&& other) noexcept
         : m_allocated_storage(create_storage())
     {
         swap(m_allocated_storage, other.m_allocated_storage);
     }
 
-    allocator_with_state& operator=(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
+    allocator_with_state& operator=(const allocator_with_state& other) noexcept
     {
         m_allocated_storage = other.m_allocated_storage;
         return *this;
     }
 
     template <typename Y>
-    allocator_with_state& operator=(const allocator_with_state<Y>& other) NESTL_NOEXCEPT_SPEC
+    allocator_with_state& operator=(const allocator_with_state<Y>& other) noexcept
     {
         m_allocated_storage = other.m_allocated_storage;
         return *this;
     }
 
-    allocator_with_state& operator=(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
+    allocator_with_state& operator=(allocator_with_state&& other) noexcept
     {
         m_allocated_storage = create_storage();
         swap(m_allocated_storage, other.m_allocated_storage);
@@ -195,18 +195,18 @@ public:
     }
 
     template <typename Y>
-    allocator_with_state& operator=(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
+    allocator_with_state& operator=(allocator_with_state<Y>&& other) noexcept
     {
         m_allocated_storage = create_storage();
         swap(m_allocated_storage, other.m_allocated_storage);
         return *this;
     }
 
-    ~allocator_with_state() NESTL_NOEXCEPT_SPEC
+    ~allocator_with_state() noexcept
     {
     }
 
-    T* allocate(nestl::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    T* allocate(nestl::size_t n, const void* /* hint */ = 0) noexcept
     {
         T* res = static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
 
@@ -226,7 +226,7 @@ public:
         return res;
     }
 
-    void deallocate(T* p, nestl::size_t /* n */) NESTL_NOEXCEPT_SPEC
+    void deallocate(T* p, nestl::size_t /* n */) noexcept
     {
         detail::alloc_impl::const_iterator pos = m_allocated_storage->do_find(p);
         if (pos == m_allocated_storage->get_end())

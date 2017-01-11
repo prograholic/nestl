@@ -57,12 +57,12 @@ set (NESTL_CXX_FEATURES_LIST
 add_library(nestl_lib ${nestl_sources})
 target_compile_features(nestl_lib PUBLIC ${NESTL_CXX_FEATURES_LIST})
 
-if (NOT DEFINED NESTL_GOOGLEMOCK_DIR)
+if (NOT DEFINED NESTL_GOOGLETEST_DIR)
   #helper for travis
-  set(NESTL_GOOGLEMOCK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gmock-1.7.0)
+  set(NESTL_GOOGLETEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gtest)
 endif()
 
-if (EXISTS ${NESTL_GOOGLEMOCK_DIR}/CMakeLists.txt)
+if (EXISTS ${NESTL_GOOGLETEST_DIR}/CMakeLists.txt)
   enable_testing()
   add_subdirectory(tests)
 endif()

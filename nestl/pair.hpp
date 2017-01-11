@@ -16,13 +16,13 @@ struct pair
     second_type second;
 
 
-    NESTL_CONSTEXPR pair():
+    constexpr pair():
         first(),
         second()
     {
     }
 
-    NESTL_CONSTEXPR pair(const T1& a, const T2& b)
+    constexpr pair(const T1& a, const T2& b)
         : first(a)
         , second(b)
     {

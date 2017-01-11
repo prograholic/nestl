@@ -17,7 +17,7 @@ template <typename OperationError, typename InputIterator, typename ForwardItera
 OperationError uninitialised_copy(InputIterator first,
                                   InputIterator last,
                                   ForwardIterator output,
-                                  Allocator& alloc) NESTL_NOEXCEPT_SPEC
+                                  Allocator& alloc) noexcept
 {
     ForwardIterator cur = output;
     nestl::detail::destruction_scoped_guard<ForwardIterator, Allocator> guard(output, cur, alloc);

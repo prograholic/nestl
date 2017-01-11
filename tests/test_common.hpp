@@ -68,17 +68,17 @@ struct type_with_allocator
 
 struct non_copyable : private nestl::noncopyable
 {
-    non_copyable() NESTL_NOEXCEPT_SPEC
+    non_copyable() noexcept
         : v(0)
     {
     }
 
-    non_copyable(int x) NESTL_NOEXCEPT_SPEC
+    non_copyable(int x) noexcept
         : v(x)
     {
     }
 
-    nestl::error_condition assign(const non_copyable& other) NESTL_NOEXCEPT_SPEC
+    nestl::error_condition assign(const non_copyable& other) noexcept
     {
         v = other.v;
         return nestl::error_condition();
@@ -108,7 +108,7 @@ struct class_traits<test::non_copyable>
     template <typename OperationError, typename Allocator>
     static OperationError construct(test::non_copyable* ptr,
                                     Allocator& alloc,
-                                    const test::non_copyable& other) NESTL_NOEXCEPT_SPEC
+                                    const test::non_copyable& other) noexcept
     {
         alloc.construct(ptr);
 
@@ -126,7 +126,7 @@ struct class_traits<test::non_copyable>
     }
 
     template <typename OperationError, typename Allocator>
-    static OperationError construct(test::non_copyable* ptr, Allocator& alloc) NESTL_NOEXCEPT_SPEC
+    static OperationError construct(test::non_copyable* ptr, Allocator& alloc) noexcept
     {
         alloc.construct(ptr);
         return OperationError();

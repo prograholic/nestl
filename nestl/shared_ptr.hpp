@@ -511,7 +511,7 @@ bool shared_ptr<T>::unique() const noexcept
 template <typename T, typename Allocator, typename Y, typename ... Args>
 typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& /* alloc */, Args&& ... args)
 {
-    NESTL_STATIC_ASSERT(sizeof(T), "T must be complete type");
+    static_assert(sizeof(T), "T must be complete type");
     typedef typename shared_ptr<T>::operation_error operation_error;
 
     typedef detail::type_stored_by_value<T, Allocator, operation_error> shared_count_t;

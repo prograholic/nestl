@@ -17,7 +17,7 @@ template <typename OperationError>
 struct operation_error_traits
 {
 
-    static int value(const OperationError& e) NESTL_NOEXCEPT_SPEC
+    static int value(const OperationError& e) noexcept
     {
         return e.value();
     }
@@ -29,7 +29,7 @@ namespace error_info
 {
 
 template <typename OperationError>
-int value(const OperationError& e) NESTL_NOEXCEPT_SPEC
+int value(const OperationError& e) noexcept
 {
     return nestl::operation_error_traits<OperationError>::value(e);
 }

@@ -42,7 +42,7 @@ namespace detail
         NESTL_ASSERT((node)->m_prev->m_next == (node)); \
         NESTL_ASSERT((node)->m_next->m_prev == (node)); \
     } \
-    while ((bool)(void*)0)\
+    while ((bool)(void*)0, 0)\
 
 #else /* NDEBUG */
 

@@ -1,9 +1,8 @@
 
 set(gtest_disable_pthreads YES)
-add_subdirectory(${NESTL_GOOGLEMOCK_DIR} ${CMAKE_CURRENT_BINARY_DIR}/googlemock)
+add_subdirectory(${NESTL_GOOGLETEST_DIR} ${CMAKE_CURRENT_BINARY_DIR}/googletest)
 
-include_directories(${NESTL_GOOGLEMOCK_DIR}/include)
-include_directories(${NESTL_GOOGLEMOCK_DIR}/gtest/include)
+include_directories(${NESTL_GOOGLETEST_DIR}/include)
 
 
 config_compiler_and_linker()
@@ -17,7 +16,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GN
 
   add_compile_options(-pedantic)
 
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
   add_compile_options(/W4)
   add_compile_options(/WX)
 endif()

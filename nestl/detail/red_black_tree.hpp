@@ -19,6 +19,7 @@
 #include <nestl/type_traits.hpp>
 #include <nestl/algorithm.hpp>
 #include <nestl/swap.hpp>
+#include <nestl/forward.hpp>
 
 
 
