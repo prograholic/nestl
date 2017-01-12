@@ -82,7 +82,6 @@ TEST_F(VectorTestConstructorWithZeroAllocator, ConstructorWithoutParametersWithA
     EXPECT_TRUE(CheckVectorSize(vec, 0));
 }
 
-#if NESTL_HAS_RVALUE_REF
 TEST_F(VectorTestConstructorWithZeroAllocator, MoveConstructorFromEmptyVector)
 {
     nestl::vector<int, zero_allocator<int> > vec1;
@@ -92,9 +91,6 @@ TEST_F(VectorTestConstructorWithZeroAllocator, MoveConstructorFromEmptyVector)
     EXPECT_TRUE(CheckVectorSize(vec2, 0));
     EXPECT_TRUE(CheckVectorSize(vec1, 0));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////

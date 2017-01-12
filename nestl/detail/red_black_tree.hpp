@@ -651,22 +651,6 @@ rb_tree_rebalance_for_erase(rb_tree_node_base* const z,
     return y;
   }
 
-
-#if NESTL_HAS_RVALUE_REF
-
-#   define NESTL_RB_TEMPLATE_ARG(Type) template <typename Type>
-#   define NESTL_RB_RV_ARG(TypeIfSupported, TypeIfNotSupported) TypeIfSupported&&
-#   define NESTL_RB_FORWARD(Type, arg) nestl::forward<Type>(arg)
-
-#else /* NESTL_HAS_RVALUE_REF */
-
-#   define NESTL_RB_TEMPLATE_ARG(Type)
-#   define NESTL_RB_RV_ARG(TypeIfSupported, TypeIfNotSupported) const TypeIfNotSupported&
-#   define NESTL_RB_FORWARD(Type, arg) arg
-
-#endif /* NESTL_HAS_RVALUE_REF */
-
-
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc = allocator<Val> >
 class rb_tree

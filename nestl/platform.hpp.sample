@@ -62,38 +62,38 @@ class bad_alloc
 } // namespace std
 
 
-void* operator new(nestl::platform::size_t) NESTL_THROW_SPEC(std::bad_alloc);
+void* operator new(nestl::platform::size_t);
 
-void* operator new[](nestl::platform::size_t) NESTL_THROW_SPEC(std::bad_alloc);
+void* operator new[](nestl::platform::size_t);
 
-void operator delete(void*) NESTL_NOEXCEPT_OR_THROW_SPEC;
+void operator delete(void*) noexcept;
 
-void operator delete[](void*) NESTL_NOEXCEPT_OR_THROW_SPEC;
+void operator delete[](void*) noexcept;
 
-void* operator new(nestl::platform::size_t, const std::nothrow_t&) NESTL_NOEXCEPT_SPEC;
+void* operator new(nestl::platform::size_t, const std::nothrow_t&) noexcept;
 
-void* operator new[](nestl::platform::size_t, const std::nothrow_t&) NESTL_NOEXCEPT_SPEC;
+void* operator new[](nestl::platform::size_t, const std::nothrow_t&) noexcept;
 
-void operator delete(void*, const std::nothrow_t&) NESTL_NOEXCEPT_SPEC;
+void operator delete(void*, const std::nothrow_t&) noexcept;
 
-void operator delete[](void*, const std::nothrow_t&) NESTL_NOEXCEPT_SPEC;
+void operator delete[](void*, const std::nothrow_t&) noexcept;
 
 // Default placement versions of operator new.
-inline void* operator new(nestl::platform::size_t, void* location) NESTL_NOEXCEPT_SPEC
+inline void* operator new(nestl::platform::size_t, void* location) noexcept
 {
     return location;
 }
-inline void* operator new[](nestl::platform::size_t, void* location) NESTL_NOEXCEPT_SPEC
+inline void* operator new[](nestl::platform::size_t, void* location) noexcept
 {
     return location;
 }
 
 // Default placement versions of operator delete.
-inline void operator delete  (void*, void*) NESTL_NOEXCEPT_SPEC
+inline void operator delete  (void*, void*) noexcept
 {
 }
 
-inline void operator delete[](void*, void*) NESTL_NOEXCEPT_SPEC
+inline void operator delete[](void*, void*) noexcept
 {
 }
 

@@ -6,26 +6,25 @@ namespace nestl
 {
 namespace test
 {
-#if NESTL_HAS_RVALUE_REF
 struct moveable : private nestl::noncopyable
 {
-    explicit moveable(int value) NESTL_NOEXCEPT_SPEC:
+    explicit moveable(int value) noexcept:
         m_value(value)
     {
     }
 
-    moveable(moveable&& other) NESTL_NOEXCEPT_SPEC
+    moveable(moveable&& other) noexcept
         : m_value(other.m_value)
     {
         other.m_value = 0;
     }
 
-    int get_value() const NESTL_NOEXCEPT_SPEC
+    int get_value() const noexcept
     {
         return m_value;
     }
 
-    moveable& operator=(moveable&& other) NESTL_NOEXCEPT_SPEC
+    moveable& operator=(moveable&& other) noexcept
     {
         m_value = other.m_value;
         other.m_value = 0;
@@ -38,8 +37,6 @@ private:
     int m_value;
 };
 
-#if 0
-
 TEST_F(MoveTestBase, CheckMove)
 {
     moveable src(5);
@@ -49,10 +46,6 @@ TEST_F(MoveTestBase, CheckMove)
     EXPECT_EQ(5, dst.get_value());
     EXPECT_EQ(0, src.get_value());
 }
-
-#endif //0
-
-#endif /* NESTL_HAS_RVALUE_REF */
 
 } // namespace test
 

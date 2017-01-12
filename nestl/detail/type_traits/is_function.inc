@@ -9,8 +9,6 @@ struct is_function : public false_type
 {
 };
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
-
 /**
  * @bug gcc-4.7.2 fails to compile specialization of is_function with ref qualifiers
  * so we explicitly forbide such specializations
@@ -178,66 +176,4 @@ struct is_function<Res(ArgTypes..., ...) const volatile &&> : public true_type
 
 #endif /* NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS */
 
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
 
-
-template<typename Res>
-struct is_function<Res()> : public true_type
-{
-};
-
-template<typename Res>
-struct is_function<Res(...)> : public true_type
-{
-};
-
-
-template<typename Res, typename Arg>
-struct is_function<Res(Arg)> : public true_type
-{
-};
-
-template<typename Res, typename Arg>
-struct is_function<Res(Arg, ...)> : public true_type
-{
-};
-
-
-template<typename Res, typename Arg0, typename Arg1>
-struct is_function<Res(Arg0, Arg1)> : public true_type
-{
-};
-
-template<typename Res, typename Arg0, typename Arg1>
-struct is_function<Res(Arg0, Arg1, ...)> : public true_type
-{
-};
-
-
-template<typename Res, typename Arg0, typename Arg1, typename Arg2>
-struct is_function<Res(Arg0, Arg1, Arg2)> : public true_type
-{
-};
-
-template<typename Res, typename Arg0, typename Arg1, typename Arg2>
-struct is_function<Res(Arg0, Arg1, Arg2, ...)> : public true_type
-{
-};
-
-
-template<typename Res, typename Arg0, typename Arg1, typename Arg2, typename Arg3>
-struct is_function<Res(Arg0, Arg1, Arg2, Arg3)> : public true_type
-{
-};
-
-template<typename Res, typename Arg0, typename Arg1, typename Arg2, typename Arg3>
-struct is_function<Res(Arg0, Arg1, Arg2, Arg3, ...)> : public true_type
-{
-};
-
-
-
-
-
-
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */

@@ -467,7 +467,6 @@ public:
         return err.error();
     }
 
-#if NESTL_HAS_RVALUE_REF
     operation_error assign(container_value_type&& val) noexcept
     {
         operation_error err = m_container->insert(m_pos, nestl::move(val));
@@ -479,7 +478,6 @@ public:
         }
         return err.error();
     }
-#endif /* NESTL_HAS_RVALUE_REF */
 
     insert_iterator& operator*() noexcept
     {

@@ -37,23 +37,15 @@ struct is_integral_helper<wchar_t> : public true_type
 {
 };
 
-#if NESTL_HAS_NATIVE_CHAR16_TYPE
-
 template<>
 struct is_integral_helper<char16_t> : public true_type
 {
 };
 
-#endif /* NESTL_HAS_NATIVE_CHAR16_TYPE */
-
-#if NESTL_HAS_NATIVE_CHAR32_TYPE
-
 template<>
 struct is_integral_helper<char32_t> : public true_type
 {
 };
-
-#endif /* NESTL_HAS_NATIVE_CHAR32_TYPE */
 
 template<>
 struct is_integral_helper<short> : public true_type
