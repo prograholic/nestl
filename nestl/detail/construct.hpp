@@ -3,11 +3,8 @@
 
 #include <nestl/config.hpp>
 
-#include <nestl/addressof.hpp>
 #include <nestl/noncopyable.hpp>
 #include <nestl/allocator_traits.hpp>
-#include <nestl/addressof.hpp>
-#include <nestl/forward.hpp>
 
 #include <type_traits>
 
@@ -22,7 +19,7 @@ void destroy(Allocator& alloc, ForwardIterator first, ForwardIterator last) NEST
 {
     while (first != last)
     {
-         nestl::allocator_traits<Allocator>::destroy(alloc, nestl::addressof(*first));
+		nestl::allocator_traits<Allocator>::destroy(alloc, std::addressof(*first));
         ++first;
     }
 }

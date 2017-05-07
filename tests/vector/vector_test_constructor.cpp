@@ -23,7 +23,7 @@ void run_tests()
     {
         nestl::vector<int> vec1;
 
-        nestl::vector<int> vec2(nestl::move(vec1));
+        nestl::vector<int> vec2(std::move(vec1));
 
         CheckVectorSize(vec2, 0);
         CheckVectorSize(vec1, 0);
@@ -34,7 +34,7 @@ void run_tests()
 
         ASSERT_OPERATION_SUCCESS(vec1.assign(10));
 
-        nestl::vector<int> vec2(nestl::move(vec1));
+        nestl::vector<int> vec2(std::move(vec1));
 
         CheckVectorSize(vec2, 10);
         CheckVectorSize(vec1, 0);
@@ -60,7 +60,7 @@ void run_tests()
     {
         nestl::vector<int, zero_allocator<int> > vec1;
 
-        nestl::vector<int, zero_allocator<int> > vec2(nestl::move(vec1));
+        nestl::vector<int, zero_allocator<int> > vec2(std::move(vec1));
 
         CheckVectorSize(vec2, 0);
         CheckVectorSize(vec1, 0);
@@ -86,7 +86,7 @@ void run_tests()
     {
         nestl::vector<int, minimal_allocator<int> > vec1;
 
-        nestl::vector<int, minimal_allocator<int> > vec2(nestl::move(vec1));
+        nestl::vector<int, minimal_allocator<int> > vec2(std::move(vec1));
 
         CheckVectorSize(vec2, 0);
         CheckVectorSize(vec1, 0);
@@ -97,7 +97,7 @@ void run_tests()
 
         ASSERT_OPERATION_SUCCESS(vec1.assign(10));
 
-        nestl::vector<int, minimal_allocator<int> > vec2(nestl::move(vec1));
+		nestl::vector<int, minimal_allocator<int> > vec2(std::move(vec1));
 
         CheckVectorSize(vec2, 10);
         CheckVectorSize(vec1, 0);
@@ -123,7 +123,7 @@ void run_tests()
     {
         nestl::vector<int, allocator_with_state<int> > vec1;
 
-        nestl::vector<int, allocator_with_state<int> > vec2(nestl::move(vec1));
+		nestl::vector<int, allocator_with_state<int> > vec2(std::move(vec1));
 
         CheckVectorSize(vec2, 0);
         CheckVectorSize(vec1, 0);
@@ -134,7 +134,7 @@ void run_tests()
 
         ASSERT_OPERATION_SUCCESS(vec1.assign(10));
 
-        nestl::vector<int, allocator_with_state<int> > vec2(nestl::move(vec1));
+		nestl::vector<int, allocator_with_state<int> > vec2(std::move(vec1));
 
         CheckVectorSize(vec2, 10);
         CheckVectorSize(vec1, 0);

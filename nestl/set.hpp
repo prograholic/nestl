@@ -5,7 +5,6 @@
 #include <nestl/functional.hpp>
 #include <nestl/allocator.hpp>
 #include <nestl/allocator_traits.hpp>
-#include <nestl/cstddef.hpp>
 #include <nestl/system_error.hpp>
 #include <nestl/operation_error.hpp>
 #include <nestl/detail/red_black_tree.hpp>
@@ -156,7 +155,7 @@ set<T, C, A>::set(const A& alloc) NESTL_NOEXCEPT_SPEC
 #if NESTL_HAS_RVALUE_REF
 template <typename T, typename C, typename A>
 set<T, C, A>::set(set&& other) NESTL_NOEXCEPT_SPEC
-    : m_impl(nestl::move(other.m_impl))
+	: m_impl(std::move(other.m_impl))
 {
 }
 #endif /* NESTL_HAS_RVALUE_REF */
@@ -325,7 +324,7 @@ template <typename T, typename C, typename A>
 typename set<T, C, A>::iterator_with_flag_with_operation_error
 set<T, C, A>::insert(value_type&& val) NESTL_NOEXCEPT_SPEC
 {
-    return m_impl.m_insert_unique(nestl::forward<value_type>(val));
+	return m_impl.m_insert_unique(std::forward<value_type>(val));
 }
 #endif /* NESTL_HAS_RVALUE_REF */
 

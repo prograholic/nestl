@@ -8,9 +8,6 @@
 
 #include <nestl/config.hpp>
 
-#include <nestl/declval.hpp>
-#include <nestl/static_assert.hpp>
-
 namespace nestl
 {
 

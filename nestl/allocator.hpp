@@ -4,8 +4,6 @@
 #include <nestl/config.hpp>
 
 #include <nestl/memory.hpp>
-#include <nestl/assert.hpp>
-#include <nestl/new.hpp>
 
 #include <type_traits>
 #include <limits>
@@ -52,12 +50,12 @@ public:
 
     pointer address(reference x) const NESTL_NOEXCEPT_SPEC
     {
-        return nestl::addressof(x);
+        return std::addressof(x);
     }
 
     const_pointer address(const_reference x) const NESTL_NOEXCEPT_SPEC
     {
-        return nestl::addressof(x);
+        return std::addressof(x);
     }
 
     pointer allocate(size_type n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
@@ -75,37 +73,17 @@ public:
         return std::numeric_limits<size_type>::max();
     }
 
-#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
-
     template<typename U, typename ... Args>
     void construct(U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
         NESTL_ASSERT(ptr);
-        ::new(static_cast<void*>(ptr)) U(nestl::forward<Args>(args)...);
+        ::new(static_cast<void*>(ptr)) U(std::forward<Args>(args)...);
     }
-
-#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
-
-    template<typename U>
-    void construct(U* ptr) NESTL_NOEXCEPT_SPEC
-    {
-        NESTL_ASSERT(ptr);
-        ::new(static_cast<void*>(ptr)) U();
-    }
-
-    template<typename U, typename Arg>
-    void construct(U* ptr, const Arg& arg) NESTL_NOEXCEPT_SPEC
-    {
-        NESTL_ASSERT(ptr);
-        ::new(static_cast<void*>(ptr)) U(arg);
-    }
-
-#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
     template<typename U>
     void destroy(U* ptr)
     {
-        NESTL_ASSERT(ptr);
+        assert(ptr);
         ptr->~U();
     }
 };

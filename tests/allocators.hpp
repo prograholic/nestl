@@ -3,7 +3,6 @@
 
 #include <nestl/allocator.hpp>
 #include <nestl/shared_ptr.hpp>
-#include <nestl/move.hpp>
 #include <nestl/set.hpp>
 
 #include "tests/test_common.hpp"
@@ -37,12 +36,12 @@ public:
     {
     }
 
-    T* allocate(nestl::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    T* allocate(std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
         return static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
     }
 
-    void deallocate(T* p, nestl::size_t /* n */) NESTL_NOEXCEPT_SPEC
+    void deallocate(T* p, std::size_t /* n */) NESTL_NOEXCEPT_SPEC
     {
         ::operator delete(p);
     }
@@ -76,12 +75,12 @@ public:
     {
     }
 
-    T* allocate(nestl::size_t /* n */, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    T* allocate(std::size_t /* n */, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
         return 0;
     }
 
-    void deallocate(T* p, nestl::size_t /* n */) NESTL_NOEXCEPT_SPEC
+    void deallocate(T* p, std::size_t /* n */) NESTL_NOEXCEPT_SPEC
     {
         ::operator delete(p);
     }
@@ -117,16 +116,16 @@ public:
 
 
     allocator_with_state(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
-        : m_allocated_storage(nestl::move(other.m_allocated_storage))
+        : m_allocated_storage(std::move(other.m_allocated_storage))
     {
-        NESTL_ASSERT(!other.m_allocated_storage);
+        assert(!other.m_allocated_storage);
     }
 
     template <typename Y>
     allocator_with_state(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
-        : m_allocated_storage(nestl::move(other.m_allocated_storage))
+        : m_allocated_storage(std::move(other.m_allocated_storage))
     {
-        NESTL_ASSERT(!other.m_allocated_storage);
+        assert(!other.m_allocated_storage);
     }
 
     allocator_with_state& operator=(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
@@ -144,15 +143,15 @@ public:
 
     allocator_with_state& operator=(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
     {
-        m_allocated_storage = nestl::move(other.m_allocated_storage);
-        NESTL_ASSERT(!other.m_allocated_storage);
+		m_allocated_storage = std::move(other.m_allocated_storage);
+        assert(!other.m_allocated_storage);
         return *this;
     }
 
     template <typename Y>
     allocator_with_state& operator=(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
     {
-        m_allocated_storage = nestl::move(other.m_allocated_storage);
+        m_allocated_storage = std::move(other.m_allocated_storage);
         NESTL_ASSERT(!other.m_allocated_storage);
         return *this;
     }
@@ -165,7 +164,7 @@ public:
         }
     }
 
-    T* allocate(nestl::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+	T* allocate(std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
         T* res = static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
 
@@ -185,7 +184,7 @@ public:
         return res;
     }
 
-    void deallocate(T* p, nestl::size_t /* n */) NESTL_NOEXCEPT_SPEC
+    void deallocate(T* p, std::size_t /* n */) NESTL_NOEXCEPT_SPEC
     {
         nestl::set<void*>::const_iterator pos = m_allocated_storage->find(p);
         if (pos == m_allocated_storage->end())

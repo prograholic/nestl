@@ -25,7 +25,7 @@ void run_tests()
     {
         nestl::set<int> s1;
 
-        nestl::set<int> s2(nestl::move(s1));
+        nestl::set<int> s2(std::move(s1));
 
         CheckSetSize(s2, 0);
         CheckSetSize(s1, 0);
@@ -36,7 +36,7 @@ void run_tests()
 
         ASSERT_OPERATION_SUCCESS(s1.insert(10));
 
-        nestl::set<int> s2(nestl::move(s1));
+        nestl::set<int> s2(std::move(s1));
 
         CheckSetSize(s2, 1);
         CheckSetSize(s1, 0);
@@ -63,7 +63,7 @@ void run_tests()
     {
         nestl::set<int, zero_allocator<int> > s1;
 
-        nestl::set<int, zero_allocator<int> > s2(nestl::move(s1));
+        nestl::set<int, zero_allocator<int> > s2(std::move(s1));
 
         CheckSetSize(s2, 0);
         CheckSetSize(s1, 0);
@@ -88,7 +88,7 @@ void run_tests()
     {
         nestl::set<int, nestl::less<int>, minimal_allocator<int> > s1;
 
-        nestl::set<int, nestl::less<int>, minimal_allocator<int> > s2(nestl::move(s1));
+        nestl::set<int, nestl::less<int>, minimal_allocator<int> > s2(std::move(s1));
 
         CheckSetSize(s2, 0);
         CheckSetSize(s1, 0);
@@ -99,7 +99,7 @@ void run_tests()
 
         ASSERT_OPERATION_SUCCESS(s1.insert(10));
 
-        nestl::set<int, nestl::less<int>, minimal_allocator<int> > s2(nestl::move(s1));
+        nestl::set<int, nestl::less<int>, minimal_allocator<int> > s2(std::move(s1));
 
         CheckSetSize(s2, 1);
         CheckSetSize(s1, 0);
@@ -126,7 +126,7 @@ void run_tests()
     {
         nestl::set<int, nestl::less<int>, allocator_with_state<int> > s1;
 
-        nestl::set<int, nestl::less<int>, allocator_with_state<int> > s2(nestl::move(s1));
+		nestl::set<int, nestl::less<int>, allocator_with_state<int> > s2(std::move(s1));
 
         CheckSetSize(s2, 0);
         CheckSetSize(s1, 0);
@@ -137,7 +137,7 @@ void run_tests()
 
         ASSERT_OPERATION_SUCCESS(s1.insert(10));
 
-        nestl::set<int, nestl::less<int>, allocator_with_state<int> > s2(nestl::move(s1));
+		nestl::set<int, nestl::less<int>, allocator_with_state<int> > s2(std::move(s1));
 
         CheckSetSize(s2, 1);
         CheckSetSize(s1, 0);

@@ -24,7 +24,7 @@ OperationError uninitialised_copy(InputIterator first,
 
     for ( ; first != last; ++first, ++cur)
     {
-        OperationError err = nestl::detail::construct<OperationError>(nestl::addressof(*cur), alloc, *first);
+		OperationError err = nestl::detail::construct<OperationError>(std::addressof(*cur), alloc, *first);
         if (err)
         {
             return err;
