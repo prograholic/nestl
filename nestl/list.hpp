@@ -19,6 +19,8 @@
 #include <nestl/alignment.hpp>
 #include <nestl/functional.hpp>
 
+#include <cassert>
+
 namespace nestl
 {
 
@@ -516,24 +518,15 @@ public:
 
     iterator_with_operation_error insert(const_iterator pos, const value_type& value) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
     iterator_with_operation_error insert(const_iterator pos, value_type&& value) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
     operation_error insert(const_iterator pos, size_type count, const value_type& value) NESTL_NOEXCEPT_SPEC;
 
     template<typename InputIterator>
     operation_error insert(const_iterator pos, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
     template<typename ... Args>
     iterator_with_operation_error emplace(const_iterator pos, Args&&... args) NESTL_NOEXCEPT_SPEC;
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
-    iterator_with_operation_error emplace(const_iterator pos) NESTL_NOEXCEPT_SPEC;
-
-    template<typename Arg>
-    iterator_with_operation_error emplace(const_iterator pos, const Arg& arg) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
 
     iterator erase(const_iterator pos) NESTL_NOEXCEPT_SPEC;
 
@@ -541,37 +534,19 @@ public:
 
     operation_error push_back(const value_type& value) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
     operation_error push_back(value_type&& value) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
     template<typename ... Args>
     operation_error emplace_back(Args&& ... args) NESTL_NOEXCEPT_SPEC;
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
-    operation_error emplace_back() NESTL_NOEXCEPT_SPEC;
-
-    template<typename Arg>
-    operation_error emplace_back(const Arg& arg) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
 
     void pop_back() NESTL_NOEXCEPT_SPEC;
 
     operation_error push_front(const value_type& value) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
     operation_error push_front(value_type&& value) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
     template<typename ... Args>
     operation_error emplace_front(Args&& ... args) NESTL_NOEXCEPT_SPEC;
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
-    operation_error emplace_front() NESTL_NOEXCEPT_SPEC;
-
-    template<typename Arg>
-    operation_error emplace_front(const Arg& arg) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
 
     void pop_front() NESTL_NOEXCEPT_SPEC;
 
@@ -584,35 +559,25 @@ public:
     // operations
     void merge(list& other) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
     void merge(list&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
     template <typename Compare>
     void merge(list& other, Compare comp) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
     template <typename Compare>
     void merge(list&& other, Compare comp) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
     void splice(const_iterator pos, list& other) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
     void splice(const_iterator pos, list&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
     void splice(const_iterator pos, list& other, const_iterator it) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
     void splice(const_iterator pos, list&& other, const_iterator it) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
     void splice(const_iterator pos, list& other, const_iterator first, const_iterator last) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
     void splice(const_iterator pos, list&& other, const_iterator first, const_iterator last) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
     void remove(const value_type& value) NESTL_NOEXCEPT_SPEC;
 
@@ -647,19 +612,10 @@ private:
 
     void swap_data(list& other) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
-	void move_assign(const std::true_type& /* true_val */, list&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
+    void move_assign(const std::true_type& /* true_val */, list&& other) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
     template <typename ... Args>
     operation_error create_node(node_type*& node, Args&& ... args) NESTL_NOEXCEPT_SPEC;
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
-    operation_error create_node(node_type*& node) NESTL_NOEXCEPT_SPEC;
-
-    template <typename Arg>
-    operation_error create_node(node_type*& node, const Arg& arg) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
 
     template <typename ListIterator1, typename ListIterator2, typename ListIterator3>
     void transfer(ListIterator1 pos, ListIterator2 first, ListIterator3 last) NESTL_NOEXCEPT_SPEC;
@@ -1157,7 +1113,7 @@ template <typename T, typename A>
 void
 list<T, A>::merge(list&& other) NESTL_NOEXCEPT_SPEC
 {
-	merge(std::forward<list&&>(other), nestl::less<T>());
+	merge(std::forward<list&&>(other), std::less<T>());
 }
 
 template <typename T, typename A>
@@ -1262,7 +1218,7 @@ template <typename T, typename A>
 void
 list<T, A>::sort() NESTL_NOEXCEPT_SPEC
 {
-    sort(nestl::less<value_type>());
+    sort(std::less<value_type>());
 }
 
 template <typename T, typename A>

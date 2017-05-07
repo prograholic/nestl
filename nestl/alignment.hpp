@@ -8,26 +8,6 @@
 namespace nestl
 {
 
-template<size_t len, size_t alignment>
-struct aligned_storage
-{
-    struct type
-    {
-        NESTL_ALIGNAS(unsigned char data[len], alignment);
-    };
-};
-
-
-template<class T>
-struct alignment_of : public std::integral_constant<size_t, NESTL_ALIGNOF(T)>
-{
-};
-
-} // namespace nestl
-
-namespace nestl
-{
-
 template <typename T>
 struct aligned_buffer : public std::aligned_storage<sizeof(T), std::alignment_of<T>::value>
 {

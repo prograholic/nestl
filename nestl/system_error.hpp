@@ -3,6 +3,8 @@
 
 #include <nestl/config.hpp>
 
+#include <cerrno>
+
 namespace nestl
 {
 
@@ -11,9 +13,9 @@ namespace errc
 
 enum
 {
-    invalid_argument  = NESTL_EINVAL,
-    not_enough_memory = NESTL_ENOMEM,
-    value_too_large   = NESTL_EOVERFLOW
+    invalid_argument  = EINVAL,
+    not_enough_memory = ENOMEM,
+    value_too_large   = EOVERFLOW
 };
 
 } // namespace errc
@@ -42,18 +44,11 @@ public:
         return m_value;
     }
 
-#if NESTL_HAS_EXPLICIT_OPERATOR
     explicit operator bool() const NESTL_NOEXCEPT_SPEC
     {
         return m_value != 0;
     }
-#else /* NESTL_HAS_EXPLICIT_OPERATOR */
-    typedef int error_condition::*unspecified_bool_type;
-    operator unspecified_bool_type() const NESTL_NOEXCEPT_SPEC
-    {
-        return m_value == 0 ? 0 : &error_condition::m_value;
-    }
-#endif /* NESTL_HAS_EXPLICIT_OPERATOR */
+
 private:
     int m_value;
 };

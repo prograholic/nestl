@@ -73,33 +73,33 @@ void run_tests()
     /// Now check with minimal allocator
     ////////////////////////////////////////////////////////////////////////////////
     {
-        nestl::set<int, nestl::less<int>, minimal_allocator<int> > s;
+        nestl::set<int, std::less<int>, minimal_allocator<int> > s;
 
         CheckSetSize(s, 0);
     }
 
     {
         minimal_allocator<int> a;
-        nestl::set<int, nestl::less<int>, minimal_allocator<int> > s(a);
+        nestl::set<int, std::less<int>, minimal_allocator<int> > s(a);
 
         CheckSetSize(s, 0);
     }
 
     {
-        nestl::set<int, nestl::less<int>, minimal_allocator<int> > s1;
+        nestl::set<int, std::less<int>, minimal_allocator<int> > s1;
 
-        nestl::set<int, nestl::less<int>, minimal_allocator<int> > s2(std::move(s1));
+        nestl::set<int, std::less<int>, minimal_allocator<int> > s2(std::move(s1));
 
         CheckSetSize(s2, 0);
         CheckSetSize(s1, 0);
     }
 
     {
-        nestl::set<int, nestl::less<int>, minimal_allocator<int> > s1;
+        nestl::set<int, std::less<int>, minimal_allocator<int> > s1;
 
         ASSERT_OPERATION_SUCCESS(s1.insert(10));
 
-        nestl::set<int, nestl::less<int>, minimal_allocator<int> > s2(std::move(s1));
+        nestl::set<int, std::less<int>, minimal_allocator<int> > s2(std::move(s1));
 
         CheckSetSize(s2, 1);
         CheckSetSize(s1, 0);
@@ -111,33 +111,33 @@ void run_tests()
     ////////////////////////////////////////////////////////////////////////////////
 
     {
-        nestl::set<int, nestl::less<int>, allocator_with_state<int> > s;
+        nestl::set<int, std::less<int>, allocator_with_state<int> > s;
 
         CheckSetSize(s, 0);
     }
 
     {
         allocator_with_state<int> a;
-        nestl::set<int, nestl::less<int>, allocator_with_state<int> > s(a);
+        nestl::set<int, std::less<int>, allocator_with_state<int> > s(a);
 
         CheckSetSize(s, 0);
     }
 
     {
-        nestl::set<int, nestl::less<int>, allocator_with_state<int> > s1;
+        nestl::set<int, std::less<int>, allocator_with_state<int> > s1;
 
-		nestl::set<int, nestl::less<int>, allocator_with_state<int> > s2(std::move(s1));
+        nestl::set<int, std::less<int>, allocator_with_state<int> > s2(std::move(s1));
 
         CheckSetSize(s2, 0);
         CheckSetSize(s1, 0);
     }
 
     {
-        nestl::set<int, nestl::less<int>, allocator_with_state<int> > s1;
+        nestl::set<int, std::less<int>, allocator_with_state<int> > s1;
 
         ASSERT_OPERATION_SUCCESS(s1.insert(10));
 
-		nestl::set<int, nestl::less<int>, allocator_with_state<int> > s2(std::move(s1));
+        nestl::set<int, std::less<int>, allocator_with_state<int> > s2(std::move(s1));
 
         CheckSetSize(s2, 1);
         CheckSetSize(s1, 0);

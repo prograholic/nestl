@@ -16,7 +16,7 @@ class basic_string
 };
 
 
-typedef basic_string<char, nestl::char_traits<char>, nestl::allocator<char> > string;
+typedef basic_string<char, std::char_traits<char>, nestl::allocator<char> > string;
 
 
 

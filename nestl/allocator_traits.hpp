@@ -3,7 +3,6 @@
 
 #include <nestl/config.hpp>
 #include <nestl/class_traits.hpp>
-#include <nestl/numeric_limits.hpp>
 #include <nestl/detail/select_type.hpp>
 
 #include <type_traits>

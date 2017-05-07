@@ -8,8 +8,6 @@
 namespace nestl
 {
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
-
 template <template <typename, typename ...> class Alloc, typename T1, typename T2, typename ... Args>
 struct allocator_rebind_helper
 {
@@ -30,32 +28,6 @@ struct allocator_rebind<Alloc<U, Args...>, T>
 {
     typedef typename allocator_rebind_helper<Alloc, T, U, Args...>::other other;
 };
-
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
-
-template <template <typename> class Alloc, typename T1, typename T2>
-struct allocator_rebind_helper
-{
-    typedef Alloc<T2> T2Alloc;
-    typedef Alloc<T1> T1Alloc;
-
-    NESTL_SELECT_NESTED_TYPE_TEMPLATE(T2Alloc, rebind<T1>::other, other, T1Alloc);
-
-    typedef nestl_nested_type_other other;
-};
-
-template <typename Alloc, typename T>
-struct allocator_rebind;
-
-
-template <template <typename> class Alloc, typename T, typename U>
-struct allocator_rebind<Alloc<U>, T>
-{
-    typedef typename allocator_rebind_helper<Alloc, T, U>::other other;
-};
-
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
-
 
 namespace detail
 {

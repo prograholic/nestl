@@ -74,23 +74,10 @@ public:
         return m_val;
     }
 
-#if NESTL_HAS_EXPLICIT_OPERATOR
-
     explicit operator bool() const NESTL_NOEXCEPT_SPEC
     {
         return m_error ? true : false;
     }
-
-#else /* NESTL_HAS_EXPLICIT_OPERATOR */
-
-    typedef OperationError result_with_operation_error::*unspecified_bool_type;
-
-    operator unspecified_bool_type() const NESTL_NOEXCEPT_SPEC
-    {
-        return m_error ? &result_with_operation_error::m_error : 0;
-    }
-
-#endif /* NESTL_HAS_EXPLICIT_OPERATOR */
 
 private:
     Type m_val;

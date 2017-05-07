@@ -8,7 +8,6 @@
 #include <nestl/system_error.hpp>
 #include <nestl/operation_error.hpp>
 #include <nestl/detail/red_black_tree.hpp>
-#include <nestl/pair.hpp>
 
 namespace nestl
 {
@@ -21,7 +20,7 @@ namespace detail
 } // namespace detail
 
 
-template<typename Key, typename Compare = nestl::less<Key>, typename Alloc = nestl::allocator<Key> >
+template<typename Key, typename Compare = std::less<Key>, typename Alloc = nestl::allocator<Key> >
 class set : private nestl::noncopyable
 {
 public:
@@ -52,7 +51,7 @@ public:
     typedef typename impl_type::reverse_iterator                                    reverse_iterator;
     typedef typename impl_type::const_reverse_iterator                              const_reverse_iterator;
 
-    typedef nestl::pair<iterator, bool>                                             iterator_with_flag;
+    typedef std::pair<iterator, bool>                                               iterator_with_flag;
 
     typedef nestl::result_with_operation_error<iterator, operation_error>           iterator_with_operation_error;
     typedef nestl::result_with_operation_error<iterator_with_flag, operation_error> iterator_with_flag_with_operation_error;
@@ -62,17 +61,13 @@ public:
     explicit set(const Compare& comp = Compare(), const Alloc& alloc = Alloc()) NESTL_NOEXCEPT_SPEC;
     explicit set(const Alloc& alloc) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
     set(set&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
 // allocator support
     allocator_type get_allocator() const NESTL_NOEXCEPT_SPEC;
 
 // assignment operators and functions
-#if NESTL_HAS_RVALUE_REF
     set& operator=(set&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
     operation_error assign_copy(const set& other) NESTL_NOEXCEPT_SPEC;
 
@@ -116,9 +111,7 @@ public:
 
     iterator_with_flag_with_operation_error insert(const value_type& val) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
     iterator_with_flag_with_operation_error insert(value_type&& val) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
     iterator erase(const_iterator pos) NESTL_NOEXCEPT_SPEC;
 
@@ -152,13 +145,11 @@ set<T, C, A>::set(const A& alloc) NESTL_NOEXCEPT_SPEC
 {
 }
 
-#if NESTL_HAS_RVALUE_REF
 template <typename T, typename C, typename A>
 set<T, C, A>::set(set&& other) NESTL_NOEXCEPT_SPEC
 	: m_impl(std::move(other.m_impl))
 {
 }
-#endif /* NESTL_HAS_RVALUE_REF */
 
 template <typename T, typename C, typename A>
 typename set<T, C, A>::allocator_type
@@ -169,7 +160,6 @@ set<T, C, A>::get_allocator() const NESTL_NOEXCEPT_SPEC
 
 
 
-#if NESTL_HAS_RVALUE_REF
 template <typename T, typename C, typename A>
 set<T, C, A>&
 set<T, C, A>::operator=(set&& other) NESTL_NOEXCEPT_SPEC
@@ -185,7 +175,6 @@ set<T, C, A>::operator=(set&& other) NESTL_NOEXCEPT_SPEC
       }
         return *this;
 }
-#endif /* NESTL_HAS_RVALUE_REF */
 
 template <typename T, typename C, typename A>
 typename set<T, C, A>::operation_error
@@ -319,14 +308,12 @@ set<T, C, A>::insert(const value_type& val) NESTL_NOEXCEPT_SPEC
     return m_impl.m_insert_unique(val);
 }
 
-#if NESTL_HAS_RVALUE_REF
 template <typename T, typename C, typename A>
 typename set<T, C, A>::iterator_with_flag_with_operation_error
 set<T, C, A>::insert(value_type&& val) NESTL_NOEXCEPT_SPEC
 {
 	return m_impl.m_insert_unique(std::forward<value_type>(val));
 }
-#endif /* NESTL_HAS_RVALUE_REF */
 
 template <typename T, typename C, typename A>
 typename set<T, C, A>::iterator

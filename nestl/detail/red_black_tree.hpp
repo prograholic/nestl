@@ -14,8 +14,9 @@
 #include <nestl/allocator_traits_helper.hpp>
 #include <nestl/system_error.hpp>
 #include <nestl/operation_error.hpp>
-#include <nestl/pair.hpp>
 #include <nestl/algorithm.hpp>
+
+#include <cassert>
 
 namespace nestl
 {
@@ -649,21 +650,6 @@ rb_tree_rebalance_for_erase(rb_tree_node_base* const z,
   }
 
 
-#if NESTL_HAS_RVALUE_REF
-
-#   define NESTL_RB_TEMPLATE_ARG(Type) template <typename Type>
-#   define NESTL_RB_RV_ARG(TypeIfSupported, TypeIfNotSupported) TypeIfSupported&&
-#   define NESTL_RB_FORWARD(Type, arg) std::forward<Type>(arg)
-
-#else /* NESTL_HAS_RVALUE_REF */
-
-#   define NESTL_RB_TEMPLATE_ARG(Type)
-#   define NESTL_RB_RV_ARG(TypeIfSupported, TypeIfNotSupported) const TypeIfNotSupported&
-#   define NESTL_RB_FORWARD(Type, arg) arg
-
-#endif /* NESTL_HAS_RVALUE_REF */
-
-
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc = allocator<Val> >
 class rb_tree
@@ -698,7 +684,7 @@ public:
     typedef result_with_operation_error<iterator, operation_error> iterator_with_operation_error;
 
 
-    typedef pair<iterator, bool>     iterator_with_flag;
+    typedef std::pair<iterator, bool>     iterator_with_flag;
     typedef result_with_operation_error<iterator_with_flag, operation_error> iterator_with_flag_with_operation_error;
 
     node_allocator&
@@ -735,7 +721,6 @@ protected:
 
     typedef result_with_operation_error<link_type, operation_error> link_type_with_error;
 
-#if NESTL_HAS_VARIADIC_TEMPLATES && NESTL_HAS_RVALUE_REF
     template<typename... Args>
     link_type_with_error m_create_node(Args&&... args) NESTL_NOEXCEPT_SPEC
     {
@@ -757,32 +742,6 @@ protected:
         guard.release();
         return make_result_with_operation_error(l, operation_error());
     }
-
-#else /* NESTL_HAS_VARIADIC_TEMPLATES && NESTL_HAS_RVALUE_REF */
-
-    link_type_with_error
-    m_create_node(const value_type& x) NESTL_NOEXCEPT_SPEC
-    {
-        node_allocator& node_alloc = m_get_node_allocator();
-        link_type l = node_allocator_traits::allocate(node_alloc, 1);
-        if (!l)
-        {
-            return make_result_with_operation_error(l, operation_error(nestl::errc::not_enough_memory));
-        }
-
-        nestl::detail::allocation_scoped_guard<link_type, node_allocator> guard(node_alloc, l, 1);
-
-        operation_error error = nestl::detail::construct<operation_error>(l, node_alloc, x);
-        if (error)
-        {
-            return make_result_with_operation_error(l, error);
-        }
-
-        guard.release();
-        return make_result_with_operation_error(l, operation_error());
-    }
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES && NESTL_HAS_RVALUE_REF */
-
 
     void
     m_destroy_node(link_type p) NESTL_NOEXCEPT_SPEC
@@ -840,8 +799,6 @@ protected:
             m_initialize();
         }
 
-#if NESTL_HAS_RVALUE_REF
-
         rb_tree_impl(const KeyCompare& comp, node_allocator&& a)
 			: node_allocator(std::move(a))
             , m_key_compare(comp)
@@ -850,8 +807,6 @@ protected:
         {
             m_initialize();
         }
-
-#endif /* NESTL_HAS_RVALUE_REF */
 
     private:
 
@@ -1001,32 +956,32 @@ protected:
     }
 
 private:
-    pair<base_ptr, base_ptr>
+    std::pair<base_ptr, base_ptr>
     m_get_insert_unique_pos(const key_type& k) NESTL_NOEXCEPT_SPEC;
 
-    pair<base_ptr, base_ptr>
+    std::pair<base_ptr, base_ptr>
     m_get_insert_equal_pos(const key_type& k) NESTL_NOEXCEPT_SPEC;
 
-    pair<base_ptr, base_ptr>
+    std::pair<base_ptr, base_ptr>
     m_get_insert_hint_unique_pos(const_iterator pos, const key_type& k) NESTL_NOEXCEPT_SPEC;
 
-    pair<base_ptr, base_ptr>
+    std::pair<base_ptr, base_ptr>
     m_get_insert_hint_equal_pos(const_iterator pos, const key_type& k) NESTL_NOEXCEPT_SPEC;
 
-    NESTL_RB_TEMPLATE_ARG(Arg)
+    template <typename Arg>
     iterator_with_operation_error
-    m_insert_(base_ptr x, base_ptr y, NESTL_RB_RV_ARG(Arg, value_type) v) NESTL_NOEXCEPT_SPEC;
+    m_insert_(base_ptr x, base_ptr y, Arg&& v) NESTL_NOEXCEPT_SPEC;
 
     iterator
     m_insert_node(base_ptr x, base_ptr y, link_type z) NESTL_NOEXCEPT_SPEC;
 
-    NESTL_RB_TEMPLATE_ARG(Arg)
+    template <typename Arg>
     iterator_with_operation_error
-    m_insert_lower(base_ptr y, NESTL_RB_RV_ARG(Arg, value_type) v) NESTL_NOEXCEPT_SPEC;
+    m_insert_lower(base_ptr y, Arg&& v) NESTL_NOEXCEPT_SPEC;
 
-    NESTL_RB_TEMPLATE_ARG(Arg)
+    template <typename Arg>
     iterator_with_operation_error
-    m_insert_equal_lower(NESTL_RB_RV_ARG(Arg, value_type) x) NESTL_NOEXCEPT_SPEC;
+    m_insert_equal_lower(Arg&& x) NESTL_NOEXCEPT_SPEC;
 
     iterator
     m_insert_lower_node(base_ptr p, link_type z) NESTL_NOEXCEPT_SPEC;
@@ -1207,23 +1162,21 @@ public:
     swap(rb_tree& t) NESTL_NOEXCEPT_SPEC;
 
     // Insert/erase.
-    NESTL_RB_TEMPLATE_ARG(Arg)
+    template <typename Arg>
     iterator_with_flag_with_operation_error
-    m_insert_unique(NESTL_RB_RV_ARG(Arg, value_type) x) NESTL_NOEXCEPT_SPEC;
+    m_insert_unique(Arg&& x) NESTL_NOEXCEPT_SPEC;
 
-    NESTL_RB_TEMPLATE_ARG(Arg)
+    template <typename Arg>
     iterator
-    m_insert_equal(NESTL_RB_RV_ARG(Arg, value_type) x) NESTL_NOEXCEPT_SPEC;
+    m_insert_equal(Arg&& x) NESTL_NOEXCEPT_SPEC;
 
-    NESTL_RB_TEMPLATE_ARG(Arg)
+    template <typename Arg>
     iterator_with_operation_error
-    m_insert_unique_at(const_iterator position, NESTL_RB_RV_ARG(Arg, value_type) x) NESTL_NOEXCEPT_SPEC;
+    m_insert_unique_at(const_iterator position, Arg&& x) NESTL_NOEXCEPT_SPEC;
 
-    NESTL_RB_TEMPLATE_ARG(Arg)
+    template <typename Arg>
     iterator
-    m_insert_equal_at(const_iterator position, NESTL_RB_RV_ARG(Arg, value_type) x) NESTL_NOEXCEPT_SPEC;
-
-#if NESTL_HAS_VARIADIC_TEMPLATES
+    m_insert_equal_at(const_iterator position, Arg&& x) NESTL_NOEXCEPT_SPEC;
 
     template<typename... Args>
     iterator_with_flag_with_operation_error
@@ -1240,9 +1193,6 @@ public:
     template<typename... Args>
     iterator_with_operation_error
     m_emplace_hint_equal(const_iterator pos, Args&&... args) NESTL_NOEXCEPT_SPEC;
-
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
-
 
     template<typename InputIterator>
     operation_error
@@ -1328,10 +1278,10 @@ public:
     upper_bound(const key_type& k) const NESTL_NOEXCEPT_SPEC
     { return m_upper_bound(m_begin(), m_end(), k); }
 
-    pair<iterator, iterator>
+    std::pair<iterator, iterator>
     equal_range(const key_type& k) NESTL_NOEXCEPT_SPEC;
 
-    pair<const_iterator, const_iterator>
+    std::pair<const_iterator, const_iterator>
     equal_range(const key_type& k) const NESTL_NOEXCEPT_SPEC;
 
     // Debugging.
@@ -1492,15 +1442,15 @@ m_move_assign(rb_tree& x) NESTL_NOEXCEPT_SPEC
 
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
-NESTL_RB_TEMPLATE_ARG(Arg)
+template <typename Arg>
 typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::iterator_with_operation_error
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
-m_insert_(base_ptr x, base_ptr p, NESTL_RB_RV_ARG(Arg, Val) v) NESTL_NOEXCEPT_SPEC
+m_insert_(base_ptr x, base_ptr p, Arg&& v) NESTL_NOEXCEPT_SPEC
 {
     bool insert_left = (x != 0 || p == m_end()
                         || m_impl.m_key_compare(KeyOfValue()(v), s_key(p)));
 
-    link_type_with_error err = m_create_node(NESTL_RB_FORWARD(Arg, v));
+    link_type_with_error err = m_create_node(std::forward<Arg>(v));
     if (err)
     {
         return iterator_with_operation_error(iterator(err.result()), err.error());// err;
@@ -1514,14 +1464,14 @@ m_insert_(base_ptr x, base_ptr p, NESTL_RB_RV_ARG(Arg, Val) v) NESTL_NOEXCEPT_SP
 
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
-NESTL_RB_TEMPLATE_ARG(Arg)
+template <typename Arg>
 typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::iterator_with_operation_error
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
-m_insert_lower(base_ptr p, NESTL_RB_RV_ARG(Arg, Val) v) NESTL_NOEXCEPT_SPEC
+m_insert_lower(base_ptr p, Arg&& v) NESTL_NOEXCEPT_SPEC
 {
     bool insert_left = (p == m_end() || !m_impl.m_key_compare(s_key(p), KeyOfValue()(v)));
 
-    link_type_with_error err = m_create_node(NESTL_RB_FORWARD(Arg, v));
+    link_type_with_error err = m_create_node(std::forward<Arg>(v));
     if (err)
     {
         return err;
@@ -1535,10 +1485,10 @@ m_insert_lower(base_ptr p, NESTL_RB_RV_ARG(Arg, Val) v) NESTL_NOEXCEPT_SPEC
 
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
-NESTL_RB_TEMPLATE_ARG(Arg)
+template <typename Arg>
 typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::iterator_with_operation_error
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
-m_insert_equal_lower(NESTL_RB_RV_ARG(Arg, Val) v) NESTL_NOEXCEPT_SPEC
+m_insert_equal_lower(Arg&& v) NESTL_NOEXCEPT_SPEC
 {
     link_type x = m_begin();
     link_type y = m_end();
@@ -1547,7 +1497,7 @@ m_insert_equal_lower(NESTL_RB_RV_ARG(Arg, Val) v) NESTL_NOEXCEPT_SPEC
         y = x;
         x = !m_impl.m_key_compare(s_key(x), KeyOfValue()(v)) ? s_left(x) : s_right(x);
     }
-    return m_insert_lower(y, NESTL_RB_FORWARD(Arg, v));
+    return m_insert_lower(y, std::forward<Arg>(v));
 }
 
 template<typename Key, typename Val, typename KeyOfValue,
@@ -1731,8 +1681,8 @@ m_upper_bound(const_link_type x, const_link_type y, const Key& k) const NESTL_NO
 
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
-pair<typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::iterator,
-     typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::iterator>
+std::pair<typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::iterator,
+          typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::iterator>
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
 equal_range(const Key& k) NESTL_NOEXCEPT_SPEC
 {
@@ -1753,16 +1703,16 @@ equal_range(const Key& k) NESTL_NOEXCEPT_SPEC
             link_type xu(x), yu(y);
             y = x, x = s_left(x);
             xu = s_right(xu);
-            return pair<iterator, iterator>(m_lower_bound(x, y, k), m_upper_bound(xu, yu, k));
+            return std::pair<iterator, iterator>(m_lower_bound(x, y, k), m_upper_bound(xu, yu, k));
         }
     }
-    return pair<iterator, iterator>(iterator(y), iterator(y));
+    return std::pair<iterator, iterator>(iterator(y), iterator(y));
 }
 
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
-pair<typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::const_iterator,
-     typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::const_iterator>
+std::pair<typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::const_iterator,
+          typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::const_iterator>
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
 equal_range(const Key& k) const NESTL_NOEXCEPT_SPEC
 {
@@ -1783,10 +1733,10 @@ equal_range(const Key& k) const NESTL_NOEXCEPT_SPEC
             const_link_type xu(x), yu(y);
             y = x, x = s_left(x);
             xu = s_right(xu);
-            return pair<const_iterator, const_iterator>(m_lower_bound(x, y, k), m_upper_bound(xu, yu, k));
+            return std::pair<const_iterator, const_iterator>(m_lower_bound(x, y, k), m_upper_bound(xu, yu, k));
         }
     }
-    return pair<const_iterator, const_iterator>(const_iterator(y), const_iterator(y));
+    return std::pair<const_iterator, const_iterator>(const_iterator(y), const_iterator(y));
 }
 
 template<typename Key, typename Val, typename KeyOfValue,
@@ -1839,12 +1789,12 @@ swap(rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>& t) NESTL_NOE
 
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
-pair<typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr,
-     typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr>
+std::pair<typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr,
+          typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr>
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
 m_get_insert_unique_pos(const key_type& k) NESTL_NOEXCEPT_SPEC
 {
-    typedef pair<base_ptr, base_ptr> result_type;
+    typedef std::pair<base_ptr, base_ptr> result_type;
     link_type x = m_begin();
     link_type y = m_end();
     bool comp = true;
@@ -1875,12 +1825,12 @@ m_get_insert_unique_pos(const key_type& k) NESTL_NOEXCEPT_SPEC
 
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
-pair<typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr,
-     typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr>
+std::pair<typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr,
+          typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr>
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
 m_get_insert_equal_pos(const key_type& k) NESTL_NOEXCEPT_SPEC
 {
-    typedef pair<base_ptr, base_ptr> result_type;
+    typedef std::pair<base_ptr, base_ptr> result_type;
     link_type x = m_begin();
     link_type y = m_end();
     while (x != 0)
@@ -1893,19 +1843,19 @@ m_get_insert_equal_pos(const key_type& k) NESTL_NOEXCEPT_SPEC
 
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
-NESTL_RB_TEMPLATE_ARG(Arg)
+template <typename Arg>
 typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::iterator_with_flag_with_operation_error
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
-m_insert_unique(NESTL_RB_RV_ARG(Arg, Val) v) NESTL_NOEXCEPT_SPEC
+m_insert_unique(Arg&& v) NESTL_NOEXCEPT_SPEC
 {
     typedef iterator_with_flag_with_operation_error result_type;
 
-    pair<base_ptr, base_ptr> res = m_get_insert_unique_pos(KeyOfValue()(v));
+    std::pair<base_ptr, base_ptr> res = m_get_insert_unique_pos(KeyOfValue()(v));
 
     if (res.second)
     {
         iterator_with_operation_error insert_error =
-                m_insert_(res.first, res.second, NESTL_RB_FORWARD(Arg, v));
+            m_insert_(res.first, res.second, std::forward<Arg>(v));
         if (insert_error)
         {
             return result_type(iterator_with_flag(), insert_error.error());
@@ -1918,24 +1868,24 @@ m_insert_unique(NESTL_RB_RV_ARG(Arg, Val) v) NESTL_NOEXCEPT_SPEC
 
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
-NESTL_RB_TEMPLATE_ARG(Arg)
+template <typename Arg>
 typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::iterator
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
-m_insert_equal(NESTL_RB_RV_ARG(Arg, Val) v) NESTL_NOEXCEPT_SPEC
+m_insert_equal(Arg&& v) NESTL_NOEXCEPT_SPEC
 {
-    pair<base_ptr, base_ptr> res = m_get_insert_equal_pos(KeyOfValue()(v));
-    return m_insert_(res.first, res.second, NESTL_RB_FORWARD(Arg, v));
+    std::pair<base_ptr, base_ptr> res = m_get_insert_equal_pos(KeyOfValue()(v));
+    return m_insert_(res.first, res.second, std::forward<Arg>(v));
 }
 
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
-pair<typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr,
-     typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr>
+std::pair<typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr,
+          typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr>
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
 m_get_insert_hint_unique_pos(const_iterator position, const key_type& k) NESTL_NOEXCEPT_SPEC
 {
     iterator pos = position.m_const_cast();
-    typedef pair<base_ptr, base_ptr> result_type;
+    typedef std::pair<base_ptr, base_ptr> result_type;
 
     // end()
     if (pos.m_node == m_end())
@@ -2006,29 +1956,29 @@ m_get_insert_hint_unique_pos(const_iterator position, const key_type& k) NESTL_N
 
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
-NESTL_RB_TEMPLATE_ARG(Arg)
+template <typename Arg>
 typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::iterator_with_operation_error
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
-m_insert_unique_at(const_iterator position, NESTL_RB_RV_ARG(Arg, Val) v) NESTL_NOEXCEPT_SPEC
+m_insert_unique_at(const_iterator position, Arg&& v) NESTL_NOEXCEPT_SPEC
 {
-    pair<base_ptr, base_ptr> res = m_get_insert_hint_unique_pos(position, KeyOfValue()(v));
+    std::pair<base_ptr, base_ptr> res = m_get_insert_hint_unique_pos(position, KeyOfValue()(v));
 
     if (res.second)
     {
-        return m_insert_(res.first, res.second, NESTL_RB_FORWARD(Arg, v));
+        return m_insert_(res.first, res.second, std::forward<Arg>(v));
     }
     return make_result_with_operation_error(iterator(static_cast<link_type>(res.first)), operation_error());
 }
 
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
-pair<typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr,
-     typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr>
+std::pair<typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr,
+          typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::base_ptr>
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
 m_get_insert_hint_equal_pos(const_iterator position, const key_type& k) NESTL_NOEXCEPT_SPEC
 {
     iterator pos = position.m_const_cast();
-    typedef pair<base_ptr, base_ptr> result_type;
+    typedef std::pair<base_ptr, base_ptr> result_type;
 
     // end()
     if (pos.m_node == m_end())
@@ -2094,18 +2044,18 @@ m_get_insert_hint_equal_pos(const_iterator position, const key_type& k) NESTL_NO
 
 template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
-NESTL_RB_TEMPLATE_ARG(Arg)
+template <typename Arg>
 typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::iterator
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
-m_insert_equal_at(const_iterator position, NESTL_RB_RV_ARG(Arg, Val) v) NESTL_NOEXCEPT_SPEC
+m_insert_equal_at(const_iterator position, Arg&& v) NESTL_NOEXCEPT_SPEC
 {
-    pair<base_ptr, base_ptr> res = m_get_insert_hint_equal_pos(position, KeyOfValue()(v));
+    std::pair<base_ptr, base_ptr> res = m_get_insert_hint_equal_pos(position, KeyOfValue()(v));
     if (res.second)
     {
-        return m_insert_(res.first, res.second, NESTL_RB_FORWARD(Arg, v));
+        return m_insert_(res.first, res.second, std::forward<Arg>(v));
     }
 
-    return m_insert_equal_lower(NESTL_RB_FORWARD(Arg, v));
+    return m_insert_equal_lower(std::forward<Arg>(v));
 }
 
 
@@ -2166,7 +2116,7 @@ m_emplace_unique(Args&&... args) NESTL_NOEXCEPT_SPEC
     }
 
     link_type z = err.result();
-    typedef pair<iterator, bool> result_type;
+    typedef std::pair<iterator, bool> result_type;
     auto res = m_get_insert_unique_pos(s_key(z));
     if (res.second)
     {
@@ -2341,7 +2291,7 @@ typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::size_typ
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
 erase(const Key& x) NESTL_NOEXCEPT_SPEC
 {
-    pair<iterator, iterator> p = equal_range(x);
+    std::pair<iterator, iterator> p = equal_range(x);
     const size_type old_size = size();
     erase(p.first, p.second);
     return old_size - size();
@@ -2385,7 +2335,7 @@ typename rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::size_typ
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
 count(const Key& k) const NESTL_NOEXCEPT_SPEC
 {
-    pair<const_iterator, const_iterator> p = equal_range(k);
+    std::pair<const_iterator, const_iterator> p = equal_range(k);
     const size_type n = nestl::distance(p.first, p.second);
     return n;
 }

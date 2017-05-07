@@ -13,13 +13,11 @@ set (nestl_sources
     nestl/alignment.hpp
     nestl/allocator.hpp
     nestl/allocator_traits.hpp
-    nestl/char_traits.hpp
     nestl/class_traits.hpp
     nestl/config.hpp
     nestl/list.hpp
     nestl/memory.hpp
     nestl/noncopyable.hpp
-    nestl/numeric_limits.hpp
     nestl/operation_error.hpp
     nestl/set.hpp
     nestl/shared_ptr.hpp

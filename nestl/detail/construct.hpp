@@ -7,6 +7,7 @@
 #include <nestl/allocator_traits.hpp>
 
 #include <type_traits>
+#include <cstddef>
 
 namespace nestl
 {
@@ -59,7 +60,7 @@ private:
 template<typename PointerType, typename Allocator>
 struct allocation_scoped_guard : private nestl::noncopyable
 {
-    allocation_scoped_guard(Allocator& alloc, PointerType ptr, size_t size) NESTL_NOEXCEPT_SPEC
+    allocation_scoped_guard(Allocator& alloc, PointerType ptr, std::size_t size) NESTL_NOEXCEPT_SPEC
         : m_alloc(alloc)
         , m_ptr(ptr)
         , m_size(size)
@@ -79,7 +80,7 @@ struct allocation_scoped_guard : private nestl::noncopyable
 private:
     Allocator& m_alloc;
     PointerType m_ptr;
-    size_t m_size;
+    std::size_t m_size;
 
     allocation_scoped_guard(const allocation_scoped_guard& );
     allocation_scoped_guard& operator =(const allocation_scoped_guard& );

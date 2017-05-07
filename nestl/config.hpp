@@ -22,22 +22,6 @@
 #   error Unknown compiler, please provide corresponding header
 #endif /* NESTL_COMPILER */
 
-
-#if !defined(NESTL_NO_STD)
-
-#   define NESTL_PLATFORM_HEADER <nestl/std_platform.hpp>
-
-#endif /* !defined(NESTL_NO_STD) */
-
-
-
-#   if !defined NESTL_PLATFORM_HEADER
-#       error "NESTL is not usable without platform-specific header, see nestl/platform.hpp.sample for details"
-#   endif /* NESTL_PLATFORM_HEADER */
-
-#   include NESTL_PLATFORM_HEADER
-
-
 #define NESTL_JOIN_(x, y) x ## y
 #define NESTL_JOIN(x, y) NESTL_JOIN_(x, y)
 

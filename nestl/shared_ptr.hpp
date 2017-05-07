@@ -10,6 +10,7 @@
 
 #include <nestl/detail/construct.hpp>
 
+#include <cassert>
 
 namespace nestl
 {
@@ -171,9 +172,7 @@ public:
     template <typename Y>
     shared_ptr(const shared_ptr<Y>& other) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
     shared_ptr(shared_ptr&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
     /// destructor
     ~shared_ptr() NESTL_NOEXCEPT_SPEC;
@@ -184,10 +183,8 @@ public:
     template <typename Y>
     shared_ptr& operator=(const shared_ptr<Y>& other) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
     template <typename Y>
     shared_ptr& operator=(shared_ptr<Y>&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
     /// assign_copy
     template <typename Y>
@@ -208,18 +205,10 @@ public:
 
     bool unique() const NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_EXPLICIT_OPERATOR
     explicit operator bool() const NESTL_NOEXCEPT_SPEC
     {
         return (use_count() > 0);
     }
-#else /* NESTL_HAS_EXPLICIT_OPERATOR */
-    typedef element_type* shared_ptr::*unspecified_bool_type;
-    operator unspecified_bool_type() const NESTL_NOEXCEPT_SPEC
-    {
-        return use_count() == 0 ? 0 : &shared_ptr::m_ptr;
-    }
-#endif /* NESTL_HAS_EXPLICIT_OPERATOR */
 
 private:
     element_type* m_ptr;
@@ -238,19 +227,9 @@ private:
     template <typename Type>
     friend class weak_ptr;
 
-#if NESTL_HAS_VARIADIC_TEMPLATES
     template <typename Type, typename Allocator, typename Y, typename ... Args>
     friend
     typename shared_ptr<Type>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, Args&& ... args);
-#else /* NESTL_HAS_VARIADIC_TEMPLATES */
-    template <typename Type, typename Allocator, typename Y>
-    friend
-    typename shared_ptr<Type>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc);
-
-    template <typename Type, typename Allocator, typename Y, typename Arg>
-    friend
-    typename shared_ptr<Type>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, const Arg& arg);
-#endif /* NESTL_HAS_VARIADIC_TEMPLATES */
 };
 
 
@@ -268,7 +247,6 @@ public:
     {
     }
 
-#if NESTL_HAS_RVALUE_REF
     weak_ptr(weak_ptr&& other) NESTL_NOEXCEPT_SPEC
         : m_ptr(other.m_ptr)
         , m_refcount(other.m_refcount)
@@ -276,7 +254,6 @@ public:
         other.m_ptr = 0;
         other.m_refcount = 0;
     }
-#endif /* NESTL_HAS_RVALUE_REF */
 
     weak_ptr(const shared_ptr<T>& sp) NESTL_NOEXCEPT_SPEC
         : m_ptr(sp.m_ptr)
@@ -423,7 +400,6 @@ shared_ptr<T>::shared_ptr(const shared_ptr<Y>& other) NESTL_NOEXCEPT_SPEC
     }
 }
 
-#if NESTL_HAS_RVALUE_REF
 template <typename T>
 shared_ptr<T>::shared_ptr(shared_ptr&& other) NESTL_NOEXCEPT_SPEC
     : m_ptr(0)
@@ -431,7 +407,6 @@ shared_ptr<T>::shared_ptr(shared_ptr&& other) NESTL_NOEXCEPT_SPEC
 {
     this->swap(other);
 }
-#endif /* NESTL_HAS_RVALUE_REF */
 
 template <typename T>
 shared_ptr<T>::~shared_ptr() NESTL_NOEXCEPT_SPEC
@@ -482,7 +457,6 @@ shared_ptr<T>& shared_ptr<T>::operator=(const shared_ptr<Y>& other) NESTL_NOEXCE
     return *this;
 }
 
-#if NESTL_HAS_RVALUE_REF
 template <typename T>
 template <typename Y>
 shared_ptr<T>& shared_ptr<T>::operator=(shared_ptr<Y>&& other) NESTL_NOEXCEPT_SPEC
@@ -496,7 +470,6 @@ shared_ptr<T>& shared_ptr<T>::operator=(shared_ptr<Y>&& other) NESTL_NOEXCEPT_SP
 
     return *this;
 }
-#endif /* NESTL_HAS_RVALUE_REF */
 
 template <typename T>
 template <typename Y>
