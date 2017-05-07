@@ -2,10 +2,10 @@
 #define NESTL_TESTS_TEST_COMMON_HPP
 
 #include "tests/nestl_printers.hpp"
-#include "tests/allocators.hpp"
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
+#include <tuple>
+#include <iostream>
+
 
 namespace nestl
 {
@@ -13,58 +13,60 @@ namespace nestl
 namespace test
 {
 
-
-/**
- * @note We use initialize function to init int values,
- * otherwise g++ sometimes emit warning about using uninitialized value
- */
-namespace init_workaround
+template <typename ...Args>
+void print_tuple(std::ostream& ostream, Args&&... args)
 {
-
-template <typename T>
-void initialize(T& /* val */)
-{
+    ostream << "not implemented";
+    ostream << std::endl;
 }
 
-void initialize(int& val)
+template <typename ...Args>
+void fatal_failure(Args&&... args)
 {
-    val = 0;
+    print_tuple(std::cerr, std::forward<Args>(args)...);
+
+    std::abort();
 }
 
-} // namespace init_workaround
 
 
-struct checker
+void check_ec(const nestl::error_condition& ec, const char* msg)
 {
-    ::testing::AssertionResult operator()(const nestl::error_condition& ec)
+    if (ec)
     {
-        if (ec)
-        {
-            return ::testing::AssertionFailure() <<
-                "operation failed with following error: " << ec;
-        }
-
-        return ::testing::AssertionSuccess();
+        fatal_failure("operation ", msg, " failed with following error: ", ec);
     }
+}
 
-    template <typename Result, typename OperationError>
-    ::testing::AssertionResult operator()(const nestl::result_with_operation_error<Result, OperationError>& ec)
+template <typename Result, typename OperationError>
+void check_ec(const nestl::result_with_operation_error<Result, OperationError>& ec, const char* msg)
+{
+    if (ec)
     {
-        if (ec)
-        {
-            return ::testing::AssertionFailure() <<
-                "operation failed with following error: " << ec.error();
-        }
-
-        return ::testing::AssertionSuccess();
+        fatal_failure("operation ", msg, " failed with following error: ", ec);
     }
-};
+}
+
+#define ASSERT_OPERATION_SUCCESS(val) \
+do \
+{ \
+ \
+    check_ec(val, #val); \
+} while(0) \
 
 
-#define EXPECT_OPERATION_SUCCESS(val) EXPECT_PRED1(checker(), val)
-#define ASSERT_OPERATION_SUCCESS(val) ASSERT_PRED1(checker(), val)
 
-
+#define EXPECT_EQ(left, right) \
+do \
+{ \
+ \
+    auto left_c = (left); \
+    auto right_c = (right); \
+    if (left_c != right_c) \
+    { \
+        fatal_failure("expected " #left " == " #right ", left:", left_c, ", right: ", right_c); \
+    } \
+} while(0) \
 
 /**
  * @brief Special type which wraps type and corresponding allocator

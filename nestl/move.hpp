@@ -11,7 +11,8 @@
 #include <nestl/config.hpp>
 
 #include <nestl/detail/select_type.hpp>
-#include <nestl/type_traits.hpp>
+
+#include <type_traits>
 
 #if NESTL_HAS_RVALUE_REF
 
@@ -19,10 +20,10 @@ namespace nestl
 {
 
 template<typename T>
-NESTL_CONSTEXPR typename nestl::remove_reference<T>::type&&
+NESTL_CONSTEXPR typename std::remove_reference<T>::type&&
 move(T&& t) NESTL_NOEXCEPT_SPEC
 {
-    return static_cast<typename nestl::remove_reference<T>::type&&>(t);
+    return static_cast<typename std::remove_reference<T>::type&&>(t);
 }
 
 

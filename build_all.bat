@@ -1,18 +1,14 @@
 echo off
 
-set OUT_DIR=%1
-
-if [%OUT_DIR%] == [] goto usage
-
 set NESTL_SRC=%cd%
 set NESTL_BUILD_ROOT=%NESTL_SRC%\..
 
 
 
-call :build %NESTL_BUILD_ROOT%\build\C++-03\%OUT_DIR%
-call :build %NESTL_BUILD_ROOT%\build\C++-03-no-std\%OUT_DIR%
-call :build %NESTL_BUILD_ROOT%\build\C++-11\%OUT_DIR%
-call :build %NESTL_BUILD_ROOT%\build\C++-11-no-std\%OUT_DIR%
+call :build %NESTL_BUILD_ROOT%\build\msvc-2013
+call :build %NESTL_BUILD_ROOT%\build\msvc-2015
+call :build %NESTL_BUILD_ROOT%\build\msvc-2017
+call :build %NESTL_BUILD_ROOT%\build\mingw-gcc-5.3
 
 goto end
 
@@ -20,12 +16,12 @@ goto end
 :build
 cmake --build %1
 cd %1
-ctest
+ctest -C Debug
 cd %NESTL_SRC%
 
 goto end
 
 :usage
-echo %0 ^<toolchain_dir^>
+echo %0
 
 :end

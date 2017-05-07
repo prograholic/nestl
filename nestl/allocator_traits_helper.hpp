@@ -61,7 +61,7 @@ namespace detail
 {
 
 template <typename Alloc>
-void alloc_on_move(Alloc& src, Alloc& dst, nestl::true_type) NESTL_NOEXCEPT_SPEC
+void alloc_on_move(Alloc& src, Alloc& dst, std::true_type) NESTL_NOEXCEPT_SPEC
 {
     /// @todo provide move for c++-03 version
 
@@ -69,7 +69,7 @@ void alloc_on_move(Alloc& src, Alloc& dst, nestl::true_type) NESTL_NOEXCEPT_SPEC
 }
 
 template <typename Alloc>
-void alloc_on_move(Alloc& /* src */, Alloc& /* dst */, nestl::false_type) NESTL_NOEXCEPT_SPEC
+void alloc_on_move(Alloc& /* src */, Alloc& /* dst */, std::false_type) NESTL_NOEXCEPT_SPEC
 {
 }
 
@@ -83,13 +83,13 @@ void alloc_on_move(Alloc& src, Alloc& dst) NESTL_NOEXCEPT_SPEC
 
 
 template <typename Alloc, typename OperationError>
-OperationError alloc_on_copy(Alloc& src, const Alloc& dst, nestl::true_type) NESTL_NOEXCEPT_SPEC
+OperationError alloc_on_copy(Alloc& src, const Alloc& dst, std::true_type) NESTL_NOEXCEPT_SPEC
 {
     return nestl::detail::assign(src, dst);
 }
 
 template <typename Alloc, typename OperationError>
-OperationError alloc_on_copy(Alloc& /* src */, const Alloc& /* dst */, nestl::false_type) NESTL_NOEXCEPT_SPEC
+OperationError alloc_on_copy(Alloc& /* src */, const Alloc& /* dst */, std::false_type) NESTL_NOEXCEPT_SPEC
 {
     return OperationError();
 }

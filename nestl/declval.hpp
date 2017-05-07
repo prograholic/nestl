@@ -3,6 +3,6 @@
 
 #include <nestl/config.hpp>
 
-#include <nestl/type_traits.hpp>
+#include <type_traits>
 
 #endif /* NESTL_ALLOCATOR_TRAITS_HPP */

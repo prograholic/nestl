@@ -10,13 +10,11 @@
 #include <nestl/config.hpp>
 #include <nestl/alignment.hpp>
 #include <nestl/allocator.hpp>
-#include <nestl/iterator.hpp>
 #include <nestl/allocator_traits.hpp>
 #include <nestl/allocator_traits_helper.hpp>
 #include <nestl/system_error.hpp>
 #include <nestl/operation_error.hpp>
 #include <nestl/pair.hpp>
-#include <nestl/type_traits.hpp>
 #include <nestl/algorithm.hpp>
 #include <nestl/swap.hpp>
 
@@ -198,13 +196,10 @@ template <typename T, typename OperationError>
 struct rb_tree_iterator
 {
     typedef nestl::ptrdiff_t                  difference_type;
-    typedef nestl::bidirectional_iterator_tag iterator_category;
+    typedef std::bidirectional_iterator_tag   iterator_category;
     typedef T                                 value_type;
     typedef T&                                reference;
     typedef T*                                pointer;
-    typedef OperationError                    operation_error;
-
-
 
     typedef rb_tree_node_base*                base_ptr;
     typedef rb_tree_node<T>*                  link_type;
@@ -277,8 +272,8 @@ struct rb_tree_iterator
 template <typename T, typename OperationError>
 struct rb_tree_const_iterator
 {
-    typedef nestl::ptrdiff_t                    difference_type;
-    typedef nestl::bidirectional_iterator_tag   iterator_category;
+    typedef std::ptrdiff_t                      difference_type;
+    typedef std::bidirectional_iterator_tag     iterator_category;
     typedef T                                   value_type;
     typedef const T&                            reference;
     typedef const T*                            pointer;
@@ -290,14 +285,20 @@ struct rb_tree_const_iterator
     typedef const rb_tree_node<T>*              link_type;
 
     rb_tree_const_iterator() NESTL_NOEXCEPT_SPEC
-    : m_node() { }
+        : m_node()
+    {
+    }
 
     explicit
     rb_tree_const_iterator(link_type x) NESTL_NOEXCEPT_SPEC
-    : m_node(x) { }
+        : m_node(x)
+    {
+    }
 
     rb_tree_const_iterator(const iterator& it) NESTL_NOEXCEPT_SPEC
-    : m_node(it.m_node) { }
+        : m_node(it.m_node)
+    {
+    }
 
     iterator
     m_const_cast() const NESTL_NOEXCEPT_SPEC
@@ -713,8 +714,8 @@ public:
     typedef rb_tree_iterator<value_type, operation_error>       iterator;
     typedef rb_tree_const_iterator<value_type, operation_error> const_iterator;
 
-    typedef nestl::reverse_iterator<iterator>       reverse_iterator;
-    typedef nestl::reverse_iterator<const_iterator> const_reverse_iterator;
+    typedef std::reverse_iterator<iterator>       reverse_iterator;
+    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     typedef result_with_operation_error<iterator, operation_error> iterator_with_operation_error;
 
@@ -1100,7 +1101,7 @@ public:
     {
         if (x.m_root() != 0)
         {
-            m_move_data(x, nestl::true_type());
+			m_move_data(x, std::true_type());
         }
     }
 
@@ -1368,12 +1369,12 @@ public:
 private:
     // Move elements from container with equal allocator.
     void
-    m_move_data(rb_tree& other, nestl::true_type) NESTL_NOEXCEPT_SPEC;
+    m_move_data(rb_tree& other, std::true_type) NESTL_NOEXCEPT_SPEC;
 
     // Move elements from container with possibly non-equal allocator,
     // which might result in a copy not a move.
     void
-    m_move_data(rb_tree& other, nestl::false_type) NESTL_NOEXCEPT_SPEC;
+    m_move_data(rb_tree& other, std::false_type) NESTL_NOEXCEPT_SPEC;
 };
 
 template<typename Key, typename Val, typename KeyOfValue,
@@ -1439,7 +1440,7 @@ rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
 rb_tree(rb_tree&& x, node_allocator&& a) NESTL_NOEXCEPT_SPEC
     : m_impl(x.m_impl.m_key_compare, nestl::move(a))
 {
-    typedef nestl::integral_constant<bool, node_allocator_traits::s_always_equal()> eq_t;
+    typedef std::integral_constant<bool, node_allocator_traits::s_always_equal()> eq_t;
     if (x.m_root() != 0)
     {
         m_move_data(x, eq_t());
@@ -1452,7 +1453,7 @@ template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
 void
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
-m_move_data(rb_tree& x, nestl::true_type) NESTL_NOEXCEPT_SPEC
+m_move_data(rb_tree& x, std::true_type) NESTL_NOEXCEPT_SPEC
 {
     m_root() = x.m_root();
     m_leftmost() = x.m_leftmost();
@@ -1471,11 +1472,11 @@ template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename OperationError, typename Alloc>
 void
 rb_tree<Key, Val, KeyOfValue, Compare, OperationError, Alloc>::
-m_move_data(rb_tree& x, nestl::false_type) NESTL_NOEXCEPT_SPEC
+m_move_data(rb_tree& x, std::false_type) NESTL_NOEXCEPT_SPEC
 {
     if (m_get_node_allocator() == x.m_get_node_allocator())
     {
-        m_move_data(x, nestl::true_type());
+        m_move_data(x, std::true_type());
     }
     else
     {
@@ -1501,7 +1502,7 @@ m_move_assign(rb_tree& x) NESTL_NOEXCEPT_SPEC
         clear();
         if (x.m_root() != 0)
         {
-            m_move_data(x, nestl::true_type());
+            m_move_data(x, std::true_type());
         }
         nestl::detail::alloc_on_move(m_get_node_allocator(), x.m_get_node_allocator());
         return true;

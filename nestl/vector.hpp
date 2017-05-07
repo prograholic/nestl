@@ -10,11 +10,9 @@
 #include <nestl/noncopyable.hpp>
 #include <nestl/class_traits.hpp>
 #include <nestl/operation_error.hpp>
-#include <nestl/initializer_list.hpp>
 #include <nestl/assert.hpp>
 #include <nestl/move.hpp>
 #include <nestl/system_error.hpp>
-#include <nestl/iterator.hpp>
 #include <nestl/swap.hpp>
 
 
@@ -40,8 +38,8 @@ public:
 
     typedef pointer                                                         iterator;
     typedef const_pointer                                                   const_iterator;
-    typedef nestl::reverse_iterator<iterator>                               reverse_iterator;
-    typedef nestl::reverse_iterator<const_iterator>                         const_reverse_iterator;
+    typedef std::reverse_iterator<iterator>                                 reverse_iterator;
+    typedef std::reverse_iterator<const_iterator>                           const_reverse_iterator;
 
     typedef nestl::error_condition                                          operation_error;
 
@@ -190,16 +188,16 @@ private:
     void swap_data(vector& other) NESTL_NOEXCEPT_SPEC;
 
 #if NESTL_HAS_RVALUE_REF
-    void move_assign(const nestl::true_type& /* true_val */, vector&& other) NESTL_NOEXCEPT_SPEC;
+	void move_assign(const std::true_type& /* true_val */, vector&& other) NESTL_NOEXCEPT_SPEC;
 #endif /* NESTL_HAS_RVALUE_REF */
 
     template <typename InputIterator>
-    operation_error assign_iterator(nestl::random_access_iterator_tag /* tag */,
+    operation_error assign_iterator(std::random_access_iterator_tag /* tag */,
                                     InputIterator first,
                                     InputIterator last) NESTL_NOEXCEPT_SPEC;
 
     template <typename InputIterator>
-    operation_error assign_iterator(nestl::input_iterator_tag /* tag */,
+    operation_error assign_iterator(std::input_iterator_tag /* tag */,
                                     InputIterator first,
                                     InputIterator last) NESTL_NOEXCEPT_SPEC;
 
@@ -397,7 +395,7 @@ vector<T, A>::assign(InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPE
 {
     vector tmp; tmp.swap(*this);
 
-    return assign_iterator(typename nestl::iterator_traits<InputIterator>::iterator_category(), first, last);
+    return assign_iterator(typename std::iterator_traits<InputIterator>::iterator_category(), first, last);
 }
 
 template <typename T, typename A>
@@ -711,7 +709,7 @@ void vector<T, A>::swap_data(vector& other) NESTL_NOEXCEPT_SPEC
 
 #if NESTL_HAS_RVALUE_REF
 template <typename T, typename A>
-void vector<T, A>::move_assign(const nestl::true_type& /* true_val */, vector&& other) NESTL_NOEXCEPT_SPEC
+void vector<T, A>::move_assign(const std::true_type& /* true_val */, vector&& other) NESTL_NOEXCEPT_SPEC
 {
     const vector tmp(nestl::move(*this));
     this->swap_data(other);
@@ -721,7 +719,7 @@ void vector<T, A>::move_assign(const nestl::true_type& /* true_val */, vector&& 
 template <typename T, typename A>
 template <typename InputIterator>
 typename vector<T, A>::operation_error
-vector<T, A>::assign_iterator(nestl::random_access_iterator_tag /* tag */,
+vector<T, A>::assign_iterator(std::random_access_iterator_tag /* tag */,
                               InputIterator first,
                               InputIterator last) NESTL_NOEXCEPT_SPEC
 {
@@ -734,13 +732,13 @@ vector<T, A>::assign_iterator(nestl::random_access_iterator_tag /* tag */,
         return err;
     }
 
-    return this->assign_iterator(nestl::input_iterator_tag(), first, last);
+    return this->assign_iterator(std::input_iterator_tag(), first, last);
 }
 
 template <typename T, typename A>
 template <typename InputIterator>
 typename vector<T, A>::operation_error
-vector<T, A>::assign_iterator(nestl::input_iterator_tag /* tag */,
+vector<T, A>::assign_iterator(std::input_iterator_tag /* tag */,
                               InputIterator first,
                               InputIterator last) NESTL_NOEXCEPT_SPEC
 {

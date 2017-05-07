@@ -11,19 +11,6 @@ struct is_function : public false_type
 
 #if NESTL_HAS_VARIADIC_TEMPLATES
 
-/**
- * @bug gcc-4.7.2 fails to compile specialization of is_function with ref qualifiers
- * so we explicitly forbide such specializations
- */
-#if (NESTL_COMPILER != NESTL_COMPILER_GCC) || (NESTL_GCC_VERSION >= NESTL_COMPILER_GCC_48)
-
-#	define NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS	1
-
-#else /* (NESTL_COMPILER != NESTL_COMPILER_GCC) || (NESTL_GCC_VERSION >= NESTL_COMPILER_GCC_48) */
-
-#	define NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS	0
-
-#endif /* (NESTL_COMPILER != NESTL_COMPILER_GCC) || (NESTL_GCC_VERSION >= NESTL_COMPILER_GCC_48) */
 
 
 template<typename Res, typename... ArgTypes>
@@ -31,7 +18,12 @@ struct is_function<Res(ArgTypes...)> : public true_type
 {
 };
 
-#if NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS
+template<typename Res, typename... ArgTypes>
+struct is_function<Res(ArgTypes..., ...)> : public true_type
+{
+};
+
+#if NESTL_FUNCTION_CAN_HAVE_QUALIFIERS
 
 template<typename Res, typename... ArgTypes>
 struct is_function<Res(ArgTypes...) &> : public true_type
@@ -43,15 +35,6 @@ struct is_function<Res(ArgTypes...) &&> : public true_type
 {
 };
 
-#endif /* NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS */
-
-template<typename Res, typename... ArgTypes>
-struct is_function<Res(ArgTypes..., ...)> : public true_type
-{
-};
-
-#if NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS
-
 template<typename Res, typename... ArgTypes>
 struct is_function<Res(ArgTypes..., ...) &> : public true_type
 {
@@ -62,14 +45,10 @@ struct is_function<Res(ArgTypes..., ...) &&> : public true_type
 {
 };
 
-#endif /* NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS */
-
 template<typename Res, typename... ArgTypes>
 struct is_function<Res(ArgTypes...) const>  : public true_type
 {
 };
-
-#if NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS
 
 template<typename Res, typename... ArgTypes>
 struct is_function<Res(ArgTypes...) const &> : public true_type
@@ -81,14 +60,10 @@ struct is_function<Res(ArgTypes...) const &&> : public true_type
 {
 };
 
-#endif /* NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS */
-
 template<typename Res, typename... ArgTypes>
 struct is_function<Res(ArgTypes..., ...) const> : public true_type
 {
 };
-
-#if NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS
 
 template<typename Res, typename... ArgTypes>
 struct is_function<Res(ArgTypes..., ...) const &> : public true_type
@@ -100,14 +75,10 @@ struct is_function<Res(ArgTypes..., ...) const &&> : public true_type
 {
 };
 
-#endif /* NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS */
-
 template<typename Res, typename... ArgTypes>
 struct is_function<Res(ArgTypes...) volatile> : public true_type
 {
 };
-
-#if NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS
 
 template<typename Res, typename... ArgTypes>
 struct is_function<Res(ArgTypes...) volatile &> : public true_type
@@ -119,14 +90,10 @@ struct is_function<Res(ArgTypes...) volatile &&> : public true_type
 {
 };
 
-#endif /* NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS */
-
 template<typename Res, typename... ArgTypes>
 struct is_function<Res(ArgTypes..., ...) volatile> : public true_type
 {
 };
-
-#if NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS
 
 template<typename Res, typename... ArgTypes>
 struct is_function<Res(ArgTypes..., ...) volatile &> : public true_type
@@ -138,14 +105,10 @@ struct is_function<Res(ArgTypes..., ...) volatile &&> : public true_type
 {
 };
 
-#endif /* NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS */
-
 template<typename Res, typename... ArgTypes>
 struct is_function<Res(ArgTypes...) const volatile> : public true_type
 {
 };
-
-#if NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS
 
 template<typename Res, typename... ArgTypes>
 struct is_function<Res(ArgTypes...) const volatile &> : public true_type
@@ -157,14 +120,10 @@ struct is_function<Res(ArgTypes...) const volatile &&> : public true_type
 {
 };
 
-#endif /* NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS */
-
 template<typename Res, typename... ArgTypes>
 struct is_function<Res(ArgTypes..., ...) const volatile> : public true_type
 {
 };
-
-#if NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS
 
 template<typename Res, typename... ArgTypes>
 struct is_function<Res(ArgTypes..., ...) const volatile &> : public true_type
@@ -176,7 +135,7 @@ struct is_function<Res(ArgTypes..., ...) const volatile &&> : public true_type
 {
 };
 
-#endif /* NESTL_IS_FUNCTION_CAN_HAVE_REF_QUALIFIERS */
+#endif /* NESTL_FUNCTION_CAN_HAVE_REF_QUALIFIERS */
 
 #else /* NESTL_HAS_VARIADIC_TEMPLATES */
 

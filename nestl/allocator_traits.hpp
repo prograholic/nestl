@@ -3,7 +3,6 @@
 
 #include <nestl/config.hpp>
 #include <nestl/cstddef.hpp>
-#include <nestl/type_traits.hpp>
 #include <nestl/move.hpp>
 #include <nestl/class_traits.hpp>
 #include <nestl/declval.hpp>
@@ -11,6 +10,9 @@
 #include <nestl/assert.hpp>
 #include <nestl/detail/select_type.hpp>
 #include <nestl/forward.hpp>
+
+#include <type_traits>
+#include <limits>
 
 namespace nestl
 {
@@ -46,7 +48,7 @@ struct max_size_helper
 {
     static SizeType max_size(const Allocator& /* alloc */) NESTL_NOEXCEPT_SPEC
     {
-        return nestl::numeric_limits<SizeType>::max();
+        return std::numeric_limits<SizeType>::max();
     }
 };
 
@@ -132,10 +134,10 @@ struct allocator_traits
     NESTL_SELECT_NESTED_TYPE(Allocator, const_pointer, const value_type*);
     typedef nestl_nested_type_const_pointer const_pointer;
 
-    NESTL_SELECT_NESTED_TYPE(Allocator, propagate_on_container_move_assignment, nestl::false_type);
+	NESTL_SELECT_NESTED_TYPE(Allocator, propagate_on_container_move_assignment, std::false_type);
     typedef nestl_nested_type_propagate_on_container_move_assignment propagate_on_container_move_assignment;
 
-    NESTL_SELECT_NESTED_TYPE(Allocator, size_type, nestl::size_t);
+	NESTL_SELECT_NESTED_TYPE(Allocator, size_type, std::size_t);
     typedef nestl_nested_type_size_type size_type;
 
 

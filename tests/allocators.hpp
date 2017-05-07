@@ -6,8 +6,7 @@
 #include <nestl/move.hpp>
 #include <nestl/set.hpp>
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
+#include "tests/test_common.hpp"
 
 namespace nestl
 {
@@ -102,11 +101,7 @@ public:
     allocator_with_state() NESTL_NOEXCEPT_SPEC
         : m_allocated_storage()
     {
-         nestl::error_condition err = nestl::make_shared(m_allocated_storage);
-         if (err)
-         {
-             ADD_FAILURE() << "make_shared failed";
-         }
+		ASSERT_OPERATION_SUCCESS(nestl::make_shared(m_allocated_storage));
     }
 
     allocator_with_state(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
@@ -121,22 +116,18 @@ public:
     }
 
 
-#if NESTL_HAS_RVALUE_REF
     allocator_with_state(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
         : m_allocated_storage(nestl::move(other.m_allocated_storage))
     {
         NESTL_ASSERT(!other.m_allocated_storage);
     }
-#endif /* NESTL_HAS_RVALUE_REF */
 
-#if NESTL_HAS_RVALUE_REF
     template <typename Y>
     allocator_with_state(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
         : m_allocated_storage(nestl::move(other.m_allocated_storage))
     {
         NESTL_ASSERT(!other.m_allocated_storage);
     }
-#endif /* NESTL_HAS_RVALUE_REF */
 
     allocator_with_state& operator=(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
     {
@@ -151,16 +142,13 @@ public:
         return *this;
     }
 
-#if NESTL_HAS_RVALUE_REF
     allocator_with_state& operator=(allocator_with_state&& other) NESTL_NOEXCEPT_SPEC
     {
         m_allocated_storage = nestl::move(other.m_allocated_storage);
         NESTL_ASSERT(!other.m_allocated_storage);
         return *this;
     }
-#endif /* NESTL_HAS_RVALUE_REF */
 
-#if NESTL_HAS_RVALUE_REF
     template <typename Y>
     allocator_with_state& operator=(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
     {
@@ -168,13 +156,12 @@ public:
         NESTL_ASSERT(!other.m_allocated_storage);
         return *this;
     }
-#endif /* NESTL_HAS_RVALUE_REF */
 
     ~allocator_with_state() NESTL_NOEXCEPT_SPEC
     {
         if (m_allocated_storage && !m_allocated_storage->empty())
         {
-            ADD_FAILURE() << "memory leaks detected!!!";
+            fatal_failure("memory leaks detected!!!");
         }
     }
 
@@ -186,7 +173,7 @@ public:
         nestl::set<void*>::const_iterator pos = m_allocated_storage->find(res);
         if (pos != m_allocated_storage->end())
         {
-            ADD_FAILURE() << "pointer [" << static_cast<void*>(res) << "] already belong to this allocator";
+            fatal_failure("pointer [", static_cast<void*>(res), "] already belong to this allocator");
 
             /**
              * @note Maybe it`s a error in test. Do we need assert here ???
@@ -205,7 +192,7 @@ public:
         {
             if (p)
             {
-                ADD_FAILURE() << "pointer [" << static_cast<void*>(p) << "] does not belong to this allocator";
+                fatal_failure("pointer [", static_cast<void*>(p), "] does not belong to this allocator");
 
                 /**
                  * @note possible memory leak here, because we do not know how to deallocate

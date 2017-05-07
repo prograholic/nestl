@@ -8,7 +8,8 @@
 #include <nestl/config.hpp>
 #include <nestl/class_traits.hpp>
 #include <nestl/operation_error.hpp>
-#include <nestl/iterator.hpp>
+
+#include <iterator>
 
 namespace nestl
 {
@@ -17,17 +18,17 @@ namespace detail
 {
 
 template <typename InputIterator>
-typename nestl::iterator_traits<InputIterator>::difference_type
-distance(InputIterator first, InputIterator last, const nestl::random_access_iterator_tag& /* tag */)
+typename std::iterator_traits<InputIterator>::difference_type
+distance(InputIterator first, InputIterator last, const std::random_access_iterator_tag& /* tag */)
 {
     return last - first;
 }
 
 template <typename InputIterator>
-typename nestl::iterator_traits<InputIterator>::difference_type
-distance(InputIterator first, InputIterator last, const nestl::input_iterator_tag& /* tag */)
+typename std::iterator_traits<InputIterator>::difference_type
+distance(InputIterator first, InputIterator last, const std::input_iterator_tag& /* tag */)
 {
-    typedef typename nestl::iterator_traits<InputIterator>::difference_type difference_type;
+    typedef typename std::iterator_traits<InputIterator>::difference_type difference_type;
 
     difference_type dist = 0;
 
@@ -82,7 +83,7 @@ copy(InputIterator first, InputIterator last, OutputIterator d_first)
 template <typename InputIterator>
 size_t distance(InputIterator first, InputIterator last)
 {
-    typedef typename nestl::iterator_traits<InputIterator>::iterator_category iterator_category;
+    typedef typename std::iterator_traits<InputIterator>::iterator_category iterator_category;
     return detail::distance(first, last, iterator_category());
 }
 

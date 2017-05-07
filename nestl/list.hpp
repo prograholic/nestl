@@ -16,8 +16,6 @@
 #include <nestl/operation_error.hpp>
 #include <nestl/algorithm.hpp>
 #include <nestl/system_error.hpp>
-#include <nestl/initializer_list.hpp>
-#include <nestl/iterator.hpp>
 #include <nestl/alignment.hpp>
 #include <nestl/move.hpp>
 #include <nestl/swap.hpp>
@@ -42,7 +40,7 @@ namespace detail
         NESTL_ASSERT((node)->m_prev->m_next == (node)); \
         NESTL_ASSERT((node)->m_next->m_prev == (node)); \
     } \
-    while ((bool)(void*)0)\
+    while ((void)0,0)\
 
 #else /* NDEBUG */
 
@@ -229,11 +227,10 @@ template <typename T, typename OperationError>
 struct list_iterator
 {
     typedef nestl::ptrdiff_t                  difference_type;
-    typedef nestl::bidirectional_iterator_tag iterator_category;
+    typedef std::bidirectional_iterator_tag   iterator_category;
     typedef T                                 value_type;
     typedef T*                                pointer;
     typedef T&                                reference;
-    typedef OperationError                    operation_error;
 
     typedef list_node<T>                      node_t;
 
@@ -334,8 +331,8 @@ private:
 template <typename T, typename OperationError>
 struct list_const_iterator
 {
-    typedef nestl::ptrdiff_t                  difference_type;
-    typedef nestl::bidirectional_iterator_tag iterator_category;
+    typedef std::ptrdiff_t                    difference_type;
+    typedef std::bidirectional_iterator_tag   iterator_category;
     typedef T                                 value_type;
     typedef const T*                          pointer;
     typedef const T&                          reference;
@@ -462,8 +459,8 @@ public:
 
     typedef detail::list_iterator<value_type, operation_error>              iterator;
     typedef detail::list_const_iterator<value_type, operation_error>        const_iterator;
-    typedef nestl::reverse_iterator<iterator>                               reverse_iterator;
-    typedef nestl::reverse_iterator<const_iterator>                         const_reverse_iterator;
+    typedef std::reverse_iterator<iterator>                                 reverse_iterator;
+    typedef std::reverse_iterator<const_iterator>                           const_reverse_iterator;
 
 
     typedef nestl::result_with_operation_error<iterator, operation_error>   iterator_with_operation_error;
@@ -471,9 +468,7 @@ public:
     // constructors
     explicit list(const allocator_type& alloc = allocator_type()) NESTL_NOEXCEPT_SPEC;
 
-#if NESTL_HAS_RVALUE_REF
     explicit list(list&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
     // destructor
     ~list() NESTL_NOEXCEPT_SPEC;
@@ -482,9 +477,7 @@ public:
     allocator_type get_allocator() const NESTL_NOEXCEPT_SPEC;
 
     // assignment operators and functions
-#if NESTL_HAS_RVALUE_REF
     list& operator=(list&& other) NESTL_NOEXCEPT_SPEC;
-#endif /* NESTL_HAS_RVALUE_REF */
 
     operation_error assign_copy(const list& other) NESTL_NOEXCEPT_SPEC;
 
@@ -674,7 +667,7 @@ private:
     void swap_data(list& other) NESTL_NOEXCEPT_SPEC;
 
 #if NESTL_HAS_RVALUE_REF
-    void move_assign(const nestl::true_type& /* true_val */, list&& other) NESTL_NOEXCEPT_SPEC;
+	void move_assign(const std::true_type& /* true_val */, list&& other) NESTL_NOEXCEPT_SPEC;
 #endif /* NESTL_HAS_RVALUE_REF */
 
 #if NESTL_HAS_VARIADIC_TEMPLATES
@@ -1499,7 +1492,7 @@ list<T, A>::swap_data(list& other) NESTL_NOEXCEPT_SPEC
 #if NESTL_HAS_RVALUE_REF
 template <typename T, typename A>
 void
-list<T, A>::move_assign(const nestl::true_type& /* true_val */, list&& other) NESTL_NOEXCEPT_SPEC
+list<T, A>::move_assign(const std::true_type& /* true_val */, list&& other) NESTL_NOEXCEPT_SPEC
 {
     const list tmp(nestl::move(*this));
     this->swap_data(other);

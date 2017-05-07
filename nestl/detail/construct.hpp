@@ -4,11 +4,12 @@
 #include <nestl/config.hpp>
 
 #include <nestl/addressof.hpp>
-#include <nestl/type_traits.hpp>
 #include <nestl/noncopyable.hpp>
 #include <nestl/allocator_traits.hpp>
 #include <nestl/addressof.hpp>
 #include <nestl/forward.hpp>
+
+#include <type_traits>
 
 namespace nestl
 {

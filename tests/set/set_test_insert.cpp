@@ -5,25 +5,22 @@ namespace nestl
 namespace test
 {
 
-
-class SetTestInsertBase : public SetTestBase
+void run_tests()
 {
-};
 
-class SetTestInsertWithDefaultAllocator : public SetTestInsertBase
-{
-};
+    {
+        nestl::set<int> s;
 
+        s.insert(10);
 
-TEST_F(SetTestInsertWithDefaultAllocator, InsertOneElement)
-{
-    nestl::set<int> s;
-
-    s.insert(10);
-
-    EXPECT_TRUE(CheckSetSize(s, 1));
+        CheckSetSize(s, 1);
+    }
 }
 
 } // namespace test
-
 } // namespace nestl
+
+int main()
+{
+    nestl::test::run_tests();
+}

@@ -9,6 +9,8 @@
 #define NESTL_COMPILER_MSVC_2010                 1600
 #define NESTL_COMPILER_MSVC_2012                 1700
 #define NESTL_COMPILER_MSVC_2013                 1800
+#define NESTL_COMPILER_MSVC_2015                 1900
+#define NESTL_COMPILER_MSVC_2017                 1910
 
 /**
  * @note MSVC by default supports c++-11.
@@ -31,67 +33,121 @@
 
 #if (_MSC_VER <= NESTL_COMPILER_MSVC_2008)
 
-#   define NESTL_HAS_NOEXCEPT                    0
-#   define NESTL_HAS_DECLTYPE                    0
-#   define NESTL_HAS_STATIC_ASSERT               0
-#   define NESTL_HAS_CONSTEXPR                   0
-#   define NESTL_HAS_VARIADIC_TEMPLATES          0
-#   define NESTL_HAS_RVALUE_REF                  0
-#   define NESTL_HAS_EXPLICIT_OPERATOR           0
-#   define NESTL_HAS_CXX11_ALIGNMENT_SUPPORT     0
-#   define NESTL_HAS_NATIVE_CHAR16_TYPE          0
-#   define NESTL_HAS_NATIVE_CHAR32_TYPE          0
-#   define NESTL_CONFIG_HAS_STATIC_ASSERT        0
+#   define NESTL_HAS_NOEXCEPT                     0
+#   define NESTL_HAS_DECLTYPE                     0
+#   define NESTL_HAS_STATIC_ASSERT                0
+#   define NESTL_HAS_CONSTEXPR                    0
+#   define NESTL_HAS_VARIADIC_TEMPLATES           0
+#   define NESTL_HAS_RVALUE_REF                   0
+#   define NESTL_HAS_EXPLICIT_OPERATOR            0
+#   define NESTL_HAS_CXX11_ALIGNMENT_SUPPORT      0
+#   define NESTL_HAS_NATIVE_CHAR16_TYPE           0
+#   define NESTL_HAS_NATIVE_CHAR32_TYPE           0
+#   define NESTL_CONFIG_HAS_STATIC_ASSERT         0
 
 #   define NESTL_CONSTEXPR
-#   define NESTL_COMPILER_GENERATED_IMPL         {}
 #   define NESTL_DELETED_IMPL
-#   define NESTL_NOEXCEPT_OPERATOR(x)            true
+#   define NESTL_NOEXCEPT_OPERATOR(x)             true
 #   define NESTL_NOEXCEPT_SPEC
 
 #elif (_MSC_VER <= NESTL_COMPILER_MSVC_2010)
 
-#   define NESTL_HAS_NOEXCEPT                    1
-#   define NESTL_HAS_DECLTYPE                    1
-#   define NESTL_HAS_STATIC_ASSERT               1
-#   define NESTL_HAS_CONSTEXPR                   0
-#   define NESTL_HAS_VARIADIC_TEMPLATES          0
-#   define NESTL_HAS_RVALUE_REF                  1
-#   define NESTL_HAS_EXPLICIT_OPERATOR           0
-#   define NESTL_HAS_CXX11_ALIGNMENT_SUPPORT     0
-#   define NESTL_HAS_NATIVE_CHAR16_TYPE          1
-#   define NESTL_HAS_NATIVE_CHAR32_TYPE          1
-#   define NESTL_CONFIG_HAS_STATIC_ASSERT        1
+#   define NESTL_HAS_NOEXCEPT                     1
+#   define NESTL_HAS_DECLTYPE                     1
+#   define NESTL_HAS_STATIC_ASSERT                1
+#   define NESTL_HAS_CONSTEXPR                    0
+#   define NESTL_HAS_VARIADIC_TEMPLATES           0
+#   define NESTL_HAS_RVALUE_REF                   1
+#   define NESTL_HAS_EXPLICIT_OPERATOR            0
+#   define NESTL_HAS_CXX11_ALIGNMENT_SUPPORT      0
+#   define NESTL_HAS_NATIVE_CHAR16_TYPE           1
+#   define NESTL_HAS_NATIVE_CHAR32_TYPE           1
+#   define NESTL_CONFIG_HAS_STATIC_ASSERT         1
 
 #   define NESTL_CONSTEXPR
-#   define NESTL_COMPILER_GENERATED_IMPL         {}
 #   define NESTL_DELETED_IMPL
-#   define NESTL_NOEXCEPT_OPERATOR(x)            true
+#   define NESTL_NOEXCEPT_OPERATOR(x)             true
 #   define NESTL_NOEXCEPT_SPEC
 
 #elif (_MSC_VER <= NESTL_COMPILER_MSVC_2012)
-#   define NESTL_HAS_NOEXCEPT                    1
-#   define NESTL_HAS_DECLTYPE                    1
-#   define NESTL_HAS_STATIC_ASSERT               1
-#   define NESTL_HAS_CONSTEXPR                   0
-#   define NESTL_HAS_VARIADIC_TEMPLATES          0
-#   define NESTL_HAS_RVALUE_REF                  1
-#   define NESTL_HAS_EXPLICIT_OPERATOR           0
-#   define NESTL_HAS_CXX11_ALIGNMENT_SUPPORT     0
-#   define NESTL_HAS_NATIVE_CHAR16_TYPE          1
-#   define NESTL_HAS_NATIVE_CHAR32_TYPE          1
-#   define NESTL_CONFIG_HAS_STATIC_ASSERT        1
+#   define NESTL_HAS_NOEXCEPT                     1
+#   define NESTL_HAS_DECLTYPE                     1
+#   define NESTL_HAS_STATIC_ASSERT                1
+#   define NESTL_HAS_CONSTEXPR                    0
+#   define NESTL_HAS_VARIADIC_TEMPLATES           0
+#   define NESTL_HAS_RVALUE_REF                   1
+#   define NESTL_HAS_EXPLICIT_OPERATOR            0
+#   define NESTL_HAS_CXX11_ALIGNMENT_SUPPORT      0
+#   define NESTL_HAS_NATIVE_CHAR16_TYPE           1
+#   define NESTL_HAS_NATIVE_CHAR32_TYPE           1
+#   define NESTL_CONFIG_HAS_STATIC_ASSERT         1
 
 #   define NESTL_CONSTEXPR
-#   define NESTL_COMPILER_GENERATED_IMPL         {}
 #   define NESTL_DELETED_IMPL
-#   define NESTL_NOEXCEPT_OPERATOR(x)            true
+#   define NESTL_NOEXCEPT_OPERATOR(x)             true
 #   define NESTL_NOEXCEPT_SPEC
 
 
 #elif (_MSC_VER <= NESTL_COMPILER_MSVC_2013)
 
-#   error msvc 2013 support is not implemented yet
+#   define NESTL_HAS_NOEXCEPT                     0
+#   define NESTL_HAS_DECLTYPE                     1
+#   define NESTL_HAS_STATIC_ASSERT                1
+#   define NESTL_HAS_CONSTEXPR                    0 
+#   define NESTL_HAS_VARIADIC_TEMPLATES           1
+#   define NESTL_HAS_RVALUE_REF                   1 
+#   define NESTL_HAS_EXPLICIT_OPERATOR            1
+#   define NESTL_HAS_CXX11_ALIGNMENT_SUPPORT      0
+#   define NESTL_HAS_NATIVE_CHAR16_TYPE           1
+#   define NESTL_HAS_NATIVE_CHAR32_TYPE           1
+#   define NESTL_CONFIG_HAS_STATIC_ASSERT         1
+#	define NESTL_FUNCTION_CAN_HAVE_QUALIFIERS     0
+
+#   define NESTL_CONSTEXPR
+#   define NESTL_COMPILER_GENERATED_IMPL          = default
+#   define NESTL_DELETED_IMPL                     = delete
+#   define NESTL_NOEXCEPT_OPERATOR(x)             true
+#   define NESTL_NOEXCEPT_SPEC                   
+
+#elif (_MSC_VER <= NESTL_COMPILER_MSVC_2015)
+#   define NESTL_HAS_NOEXCEPT                     1
+#   define NESTL_HAS_DECLTYPE                     1
+#   define NESTL_HAS_STATIC_ASSERT                1
+#   define NESTL_HAS_CONSTEXPR                    1
+#   define NESTL_HAS_VARIADIC_TEMPLATES           1
+#   define NESTL_HAS_RVALUE_REF                   1
+#   define NESTL_HAS_EXPLICIT_OPERATOR            1
+#   define NESTL_HAS_CXX11_ALIGNMENT_SUPPORT      1
+#   define NESTL_HAS_NATIVE_CHAR16_TYPE           1
+#   define NESTL_HAS_NATIVE_CHAR32_TYPE           1
+#   define NESTL_CONFIG_HAS_STATIC_ASSERT         1
+#	define NESTL_FUNCTION_CAN_HAVE_QUALIFIERS     1
+
+#   define NESTL_CONSTEXPR                        constexpr
+#   define NESTL_COMPILER_GENERATED_IMPL          = default
+#   define NESTL_DELETED_IMPL                     = delete
+#   define NESTL_NOEXCEPT_OPERATOR(x)             noexcept(x)
+#   define NESTL_NOEXCEPT_SPEC                    noexcept
+
+#elif (_MSC_VER <= NESTL_COMPILER_MSVC_2017)
+#   define NESTL_HAS_NOEXCEPT                     1
+#   define NESTL_HAS_DECLTYPE                     1
+#   define NESTL_HAS_STATIC_ASSERT                1
+#   define NESTL_HAS_CONSTEXPR                    1
+#   define NESTL_HAS_VARIADIC_TEMPLATES           1
+#   define NESTL_HAS_RVALUE_REF                   1
+#   define NESTL_HAS_EXPLICIT_OPERATOR            1
+#   define NESTL_HAS_CXX11_ALIGNMENT_SUPPORT      1
+#   define NESTL_HAS_NATIVE_CHAR16_TYPE           1
+#   define NESTL_HAS_NATIVE_CHAR32_TYPE           1
+#   define NESTL_CONFIG_HAS_STATIC_ASSERT         1
+#	define NESTL_FUNCTION_CAN_HAVE_QUALIFIERS     1
+
+#   define NESTL_CONSTEXPR                        constexpr
+#   define NESTL_COMPILER_GENERATED_IMPL          = default
+#   define NESTL_DELETED_IMPL                     = delete
+#   define NESTL_NOEXCEPT_OPERATOR(x)             noexcept(x)
+#   define NESTL_NOEXCEPT_SPEC                    noexcept
 
 #else /* MSC_VER */
 

@@ -7,230 +7,168 @@ namespace nestl
 namespace test
 {
 
-
-
-
-
-template <typename TypeWithAllocator>
-class VectorTestCommon : public VectorTestBase<TypeWithAllocator>
+void run_tests()
 {
-};
-
-
-TYPED_TEST_CASE_P(VectorTestCommon);
-
-
-TYPED_TEST_P(VectorTestCommon, CheckAssignWithSize0)
-{
-    typename TestFixture::vector_t vec;
-
-    ASSERT_OPERATION_SUCCESS(vec.assign(0));
-
-    EXPECT_TRUE(CheckVectorSize(vec, 0));
-}
-
-TYPED_TEST_P(VectorTestCommon, CheckAssignWithSize1)
-{
-    const size_t expectedSize = 1;
-    typename TestFixture::vector_t vec;
-    typename TestFixture::value_type defaultParam;
-
-    ASSERT_OPERATION_SUCCESS(vec.assign(expectedSize, defaultParam));
-
-    ASSERT_TRUE(CheckVectorSize(vec, expectedSize));
-
-    EXPECT_EQ(defaultParam, *(vec.begin()));
-    EXPECT_EQ(defaultParam, *(vec.cbegin()));
-    EXPECT_EQ(defaultParam, vec[0]);
-    EXPECT_EQ(defaultParam, vec.front());
-    EXPECT_EQ(defaultParam, vec.back());
-}
-
-TYPED_TEST_P(VectorTestCommon, CheckAssignWithSize1024)
-{
-    const size_t expectedSize = 1024;
-    typename TestFixture::vector_t vec;
-    typename TestFixture::value_type defaultParam;
-
-    ASSERT_OPERATION_SUCCESS(vec.assign(expectedSize, defaultParam));
-
-    ASSERT_TRUE(CheckVectorSize(vec, expectedSize));
-
-    typename TestFixture::vector_t::const_iterator constIt = vec.cbegin();
-    typename TestFixture::vector_t::iterator it = vec.begin();
-    for (size_t i = 0; i != expectedSize; ++i)
     {
-        EXPECT_EQ(defaultParam, *constIt);
-        EXPECT_EQ(defaultParam, *it);
-        EXPECT_EQ(defaultParam, vec[i]);
+        vector<int> vec;
 
-        ++constIt;
-        ++it;
+        ASSERT_OPERATION_SUCCESS(vec.assign(0));
+
+        CheckVectorSize(vec, 0);
+    }
+
+    {
+        const size_t expectedSize = 1;
+        vector<int> vec;
+        int defaultParam = 0;
+
+        ASSERT_OPERATION_SUCCESS(vec.assign(expectedSize, defaultParam));
+
+        CheckVectorSize(vec, expectedSize);
+
+        EXPECT_EQ(defaultParam, *(vec.begin()));
+        EXPECT_EQ(defaultParam, *(vec.cbegin()));
+        EXPECT_EQ(defaultParam, vec[0]);
+        EXPECT_EQ(defaultParam, vec.front());
+        EXPECT_EQ(defaultParam, vec.back());
+    }
+
+    {
+        const size_t expectedSize = 1024;
+        vector<int> vec;
+        int defaultParam = 0;
+
+        ASSERT_OPERATION_SUCCESS(vec.assign(expectedSize, defaultParam));
+
+        CheckVectorSize(vec, expectedSize);
+
+        vector<int>::const_iterator constIt = vec.cbegin();
+        vector<int>::iterator it = vec.begin();
+        for (size_t i = 0; i != expectedSize; ++i)
+        {
+            EXPECT_EQ(defaultParam, *constIt);
+            EXPECT_EQ(defaultParam, *it);
+            EXPECT_EQ(defaultParam, vec[i]);
+
+            ++constIt;
+            ++it;
+        }
+    }
+
+    {
+        vector<int> vec;
+        int val = 0;
+
+        ASSERT_OPERATION_SUCCESS(vec.insert(vec.begin(), val));
+
+        CheckVectorSize(vec, 1);
+
+        EXPECT_EQ(val, *(vec.begin()));
+        EXPECT_EQ(val, *(vec.cbegin()));
+        EXPECT_EQ(val, vec[0]);
+        EXPECT_EQ(val, vec.front());
+        EXPECT_EQ(val, vec.back());
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+
+    {
+        typedef vector<int>::const_iterator const_iterator;
+        typedef vector<int>::iterator       iterator;
+
+        vector<int> vec;
+        int values [] = {0, 1, 2, 3, 4, 5};
+        const size_t expectedSize = nestl::distance(std::begin(values), std::end(values));
+
+        ASSERT_OPERATION_SUCCESS(vec.assign(std::begin(values), std::end(values)));
+
+        CheckVectorSize(vec, expectedSize);
+
+        const_iterator constIt = vec.cbegin();
+        iterator it = vec.begin();
+        for (size_t i = 0; i != expectedSize; ++i)
+        {
+            EXPECT_EQ(values[i], *constIt);
+            EXPECT_EQ(values[i], *it);
+            EXPECT_EQ(values[i], vec[i]);
+
+            ++constIt;
+            ++it;
+        }
+    }
+
+
+    {
+        typedef vector<int>::iterator_with_operation_error iterator_with_operation_error;
+
+        vector<int> vec;
+
+        ASSERT_OPERATION_SUCCESS(vec.push_back(1));
+        ASSERT_OPERATION_SUCCESS(vec.push_back(2));
+        ASSERT_OPERATION_SUCCESS(vec.push_back(3));
+        ASSERT_OPERATION_SUCCESS(vec.push_back(4));
+
+        iterator_with_operation_error st = vec.insert(vec.begin(), 0);
+        ASSERT_OPERATION_SUCCESS(st);
+        CheckVectorSize(vec, 5);
+        EXPECT_EQ(vec.begin(), st.result());
+
+        EXPECT_EQ(0, vec[0]);
+        EXPECT_EQ(1, vec[1]);
+        EXPECT_EQ(2, vec[2]);
+        EXPECT_EQ(3, vec[3]);
+        EXPECT_EQ(4, vec[4]);
+    }
+
+    {
+        typedef vector<int>::iterator_with_operation_error iterator_with_operation_error;
+
+        vector<int> vec;
+
+        ASSERT_OPERATION_SUCCESS(vec.push_back(0));
+        ASSERT_OPERATION_SUCCESS(vec.push_back(1));
+        ASSERT_OPERATION_SUCCESS(vec.push_back(2));
+        ASSERT_OPERATION_SUCCESS(vec.push_back(3));
+
+        iterator_with_operation_error st = vec.insert(vec.end(), 4);
+        ASSERT_OPERATION_SUCCESS(st);
+        CheckVectorSize(vec, 5);
+        EXPECT_EQ(vec.end() - 1, st.result());
+
+        EXPECT_EQ(0, vec[0]);
+        EXPECT_EQ(1, vec[1]);
+        EXPECT_EQ(2, vec[2]);
+        EXPECT_EQ(3, vec[3]);
+        EXPECT_EQ(4, vec[4]);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+
+    {
+        vector<int> vec;
+        int val = 0;
+
+        ASSERT_OPERATION_SUCCESS(vec.push_back(val));
+
+        CheckVectorSize(vec, 1);
+    }
+
+
+    {
+        vector<int> vec;
+        int val = 0;
+
+        ASSERT_OPERATION_SUCCESS(vec.emplace_back(val));
+
+        CheckVectorSize(vec, 1);
     }
 }
-
-TYPED_TEST_P(VectorTestCommon, CheckInsertIntoEmptyVector)
-{
-    typename TestFixture::vector_t vec;
-    typename TestFixture::value_type val;
-
-    ASSERT_OPERATION_SUCCESS(vec.insert(vec.begin(), val));
-
-    ASSERT_TRUE(CheckVectorSize(vec, 1));
-
-    EXPECT_EQ(val, *(vec.begin()));
-    EXPECT_EQ(val, *(vec.cbegin()));
-    EXPECT_EQ(val, vec[0]);
-    EXPECT_EQ(val, vec.front());
-    EXPECT_EQ(val, vec.back());
-}
-
-
-REGISTER_TYPED_TEST_CASE_P(VectorTestCommon,
-                           CheckAssignWithSize0,
-                           CheckAssignWithSize1,
-                           CheckAssignWithSize1024,
-                           CheckInsertIntoEmptyVector);
-
-INSTANTIATE_TYPED_TEST_CASE_P(common_vector_test,
-                              VectorTestCommon,
-                              VectorCommonTypesWithDefaultAllocator);
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <typename TypeWithAllocator>
-class VectorTestNumeric : public VectorTestBase<TypeWithAllocator>
-{
-};
-
-TYPED_TEST_CASE_P(VectorTestNumeric);
-
-
-TYPED_TEST_P(VectorTestNumeric, CheckAssignFromIterators)
-{
-    typedef typename TestFixture::vector_t::const_iterator const_iterator;
-    typedef typename TestFixture::vector_t::iterator       iterator;
-
-    typename TestFixture::vector_t vec;
-    typename TestFixture::value_type values [] = {0, 1, 2, 3, 4, 5};
-    const size_t expectedSize = nestl::distance(nestl::begin(values), nestl::end(values));
-
-    ASSERT_OPERATION_SUCCESS(vec.assign(nestl::begin(values), nestl::end(values)));
-
-    ASSERT_TRUE(CheckVectorSize(vec, expectedSize));
-
-    const_iterator constIt = vec.cbegin();
-    iterator it = vec.begin();
-    for (size_t i = 0; i != expectedSize; ++i)
-    {
-        EXPECT_EQ(values[i], *constIt);
-        EXPECT_EQ(values[i], *it);
-        EXPECT_EQ(values[i], vec[i]);
-
-        ++constIt;
-        ++it;
-    }
-}
-
-
-TYPED_TEST_P(VectorTestNumeric, InsertOneElementBeforeBeginToNonEmptyVector)
-{
-    typedef typename TestFixture::vector_t::iterator_with_operation_error iterator_with_operation_error;
-
-    typename TestFixture::vector_t vec;
-
-    ASSERT_OPERATION_SUCCESS(vec.push_back(1));
-    ASSERT_OPERATION_SUCCESS(vec.push_back(2));
-    ASSERT_OPERATION_SUCCESS(vec.push_back(3));
-    ASSERT_OPERATION_SUCCESS(vec.push_back(4));
-
-    iterator_with_operation_error st = vec.insert(vec.begin(), 0);
-    ASSERT_OPERATION_SUCCESS(st);
-    ASSERT_TRUE(CheckVectorSize(vec, 5));
-    ASSERT_EQ(vec.begin(), st.result());
-
-    EXPECT_EQ(0, vec[0]);
-    EXPECT_EQ(1, vec[1]);
-    EXPECT_EQ(2, vec[2]);
-    EXPECT_EQ(3, vec[3]);
-    EXPECT_EQ(4, vec[4]);
-}
-
-TYPED_TEST_P(VectorTestNumeric, InsertOneElementBeforeEndToNonEmptyVector)
-{
-    typedef typename TestFixture::vector_t::iterator_with_operation_error iterator_with_operation_error;
-
-    typename TestFixture::vector_t vec;
-
-    ASSERT_OPERATION_SUCCESS(vec.push_back(0));
-    ASSERT_OPERATION_SUCCESS(vec.push_back(1));
-    ASSERT_OPERATION_SUCCESS(vec.push_back(2));
-    ASSERT_OPERATION_SUCCESS(vec.push_back(3));
-
-    iterator_with_operation_error st = vec.insert(vec.end(), 4);
-    ASSERT_OPERATION_SUCCESS(st);
-    ASSERT_TRUE(CheckVectorSize(vec, 5));
-    ASSERT_EQ(vec.end() - 1, st.result());
-
-    EXPECT_EQ(0, vec[0]);
-    EXPECT_EQ(1, vec[1]);
-    EXPECT_EQ(2, vec[2]);
-    EXPECT_EQ(3, vec[3]);
-    EXPECT_EQ(4, vec[4]);
-}
-
-REGISTER_TYPED_TEST_CASE_P(VectorTestNumeric,
-                           CheckAssignFromIterators,
-                           InsertOneElementBeforeBeginToNonEmptyVector,
-                           InsertOneElementBeforeEndToNonEmptyVector);
-
-INSTANTIATE_TYPED_TEST_CASE_P(numeric_vector_test, VectorTestNumeric, VectorNumericTypes);
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <typename TypeWithAllocator>
-class VectorTestWithCopyableObjects : public VectorTestBase<TypeWithAllocator>
-{
-};
-
-TYPED_TEST_CASE_P(VectorTestWithCopyableObjects);
-
-TYPED_TEST_P(VectorTestWithCopyableObjects, PushBackOneElement)
-{
-    typename TestFixture::vector_t vec;
-    typename TestFixture::value_type val;
-
-    ASSERT_OPERATION_SUCCESS(vec.push_back(val));
-
-    EXPECT_TRUE(CheckVectorSize(vec, 1));
-}
-
-
-TYPED_TEST_P(VectorTestWithCopyableObjects, EmplaceBackOneElement)
-{
-    typename TestFixture::vector_t vec;
-    typename TestFixture::value_type val;
-
-    ASSERT_OPERATION_SUCCESS(vec.emplace_back(val));
-
-    EXPECT_TRUE(CheckVectorSize(vec, 1));
-}
-
-
-REGISTER_TYPED_TEST_CASE_P(VectorTestWithCopyableObjects,
-                           PushBackOneElement,
-                           EmplaceBackOneElement);
-
-INSTANTIATE_TYPED_TEST_CASE_P(copyable_vector_test, VectorTestWithCopyableObjects, VectorCopyableTypes);
-
-
-
-
 
 } // namespace test
-
 } // namespace nestl
 
+int main()
+{
+    nestl::test::run_tests();
+}

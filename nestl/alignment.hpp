@@ -3,7 +3,7 @@
 
 #include <nestl/config.hpp>
 
-#include <nestl/type_traits.hpp>
+#include <type_traits>
 
 namespace nestl
 {
@@ -19,7 +19,7 @@ struct aligned_storage
 
 
 template<class T>
-struct alignment_of : public nestl::integral_constant<size_t, NESTL_ALIGNOF(T)>
+struct alignment_of : public std::integral_constant<size_t, NESTL_ALIGNOF(T)>
 {
 };
 
@@ -29,9 +29,9 @@ namespace nestl
 {
 
 template <typename T>
-struct aligned_buffer : public nestl::aligned_storage<sizeof(T), nestl::alignment_of<T>::value>
+struct aligned_buffer : public std::aligned_storage<sizeof(T), std::alignment_of<T>::value>
 {
-    typedef typename nestl::aligned_storage<sizeof(T), nestl::alignment_of<T>::value>::type storage_type;
+    typedef typename std::aligned_storage<sizeof(T), std::alignment_of<T>::value>::type storage_type;
 
     storage_type m_storage;
 

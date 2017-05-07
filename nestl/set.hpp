@@ -6,7 +6,6 @@
 #include <nestl/allocator.hpp>
 #include <nestl/allocator_traits.hpp>
 #include <nestl/cstddef.hpp>
-#include <nestl/iterator.hpp>
 #include <nestl/system_error.hpp>
 #include <nestl/operation_error.hpp>
 #include <nestl/detail/red_black_tree.hpp>
@@ -181,8 +180,8 @@ set<T, C, A>::operator=(set&& other) NESTL_NOEXCEPT_SPEC
         // The rvalue's allocator cannot be moved and is not equal,
         // so we need to individually move each element.
         clear();
-        insert(nestl::make_move_iterator(other.m_impl.begin()),
-               nestl::make_move_iterator(other.m_impl.end()));
+        insert(std::make_move_iterator(other.m_impl.begin()),
+               std::make_move_iterator(other.m_impl.end()));
         other.clear();
       }
         return *this;

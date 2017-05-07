@@ -1,3 +1,4 @@
 project(shared_ptr_test)
 
-cxx_test2(shared_ptr_test gmock_main)
+nestl_add_simple_test(shared_ptr_test)
+
