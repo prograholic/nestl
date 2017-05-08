@@ -5,6 +5,7 @@
 
 #include <nestl/class_traits.hpp>
 #include <nestl/detail/construct.hpp>
+#include <nestl/system_error.hpp>
 
 
 
@@ -13,26 +14,26 @@ namespace nestl
 {
 
 
-template <typename OperationError, typename InputIterator, typename ForwardIterator, typename Allocator>
-OperationError uninitialised_copy(InputIterator first,
-                                  InputIterator last,
-                                  ForwardIterator output,
-                                  Allocator& alloc) NESTL_NOEXCEPT_SPEC
+template <typename InputIterator, typename ForwardIterator, typename Allocator>
+error_condition uninitialised_copy(InputIterator first,
+                                   InputIterator last,
+                                   ForwardIterator output,
+                                   Allocator& alloc) NESTL_NOEXCEPT_SPEC
 {
     ForwardIterator cur = output;
     nestl::detail::destruction_scoped_guard<ForwardIterator, Allocator> guard(output, cur, alloc);
 
     for ( ; first != last; ++first, ++cur)
     {
-		OperationError err = nestl::detail::construct<OperationError>(std::addressof(*cur), alloc, *first);
-        if (err)
+		error_condition ec = nestl::detail::construct<error_condition>(std::addressof(*cur), alloc, *first);
+        if (ec)
         {
-            return err;
+            return ec;
         }
     }
 
     guard.release();
-    return OperationError();
+    return error_condition();
 }
 
 } // namespace nestl

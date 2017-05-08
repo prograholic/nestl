@@ -11,7 +11,7 @@ void run_tests()
     {
         shared_ptr<int> sp;
 
-        ASSERT_OPERATION_SUCCESS(make_shared(sp));
+        ASSERT_OPERATION_SUCCESS(sp = make_shared_nothrow<int>(ec));
         CheckSharedPtr(sp, 1);
     }
 }

@@ -2,7 +2,6 @@
 #define NESTL_TESTS_NESTL_PRINTERS_HPP
 
 #include <nestl/system_error.hpp>
-#include <nestl/noncopyable.hpp>
 #include <nestl/operation_error.hpp>
 
 #include <ostream>

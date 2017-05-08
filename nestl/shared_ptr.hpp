@@ -18,8 +18,10 @@ namespace nestl
 namespace detail
 {
 
-class shared_count_base : private nestl::noncopyable
+class shared_count_base
 {
+    shared_count_base(const shared_count_base& ) = delete;
+    shared_count_base& operator=(const shared_count_base& ) = delete;
 public:
 
     shared_count_base() NESTL_NOEXCEPT_SPEC
@@ -84,12 +86,10 @@ private:
 };
 
 
-template <typename T, typename TypeAllocator, typename OperationError>
+template <typename T, typename TypeAllocator>
 class type_stored_by_value : public shared_count_base
 {
 public:
-
-    typedef OperationError operation_error;
 
     typedef typename TypeAllocator:: template rebind<type_stored_by_value>::other allocator_type;
 
@@ -119,31 +119,11 @@ public:
         alloc.deallocate(this, 1);
     }
 
-#if defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES)
-
     template <typename ... Args>
-    operation_error initialize(Args&& ... args) NESTL_NOEXCEPT_SPEC
+    void initialize(error_condition& ec, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
-        operation_error err = nestl::detail::construct<operation_error>(get(), m_allocator, nestl::forward<Args>(args) ...);
-        return err;
+        ec = nestl::detail::construct<error_condition>(get(), m_allocator, std::forward<Args>(args) ...);
     }
-
-#else /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
-
-    operation_error initialize() NESTL_NOEXCEPT_SPEC
-    {
-        operation_error err = nestl::detail::construct<operation_error>(get(), m_allocator);
-        return err;
-    }
-
-    template <typename Arg>
-    operation_error initialize(const Arg& arg) NESTL_NOEXCEPT_SPEC
-    {
-        operation_error err = nestl::detail::construct<operation_error>(get(), m_allocator, arg);
-        return err;
-    }
-
-#endif /* defined(NESTL_CONFIG_HAS_VARIADIC_TEMPLATES) */
 
 private:
     nestl::aligned_buffer<T> m_value;
@@ -162,10 +142,11 @@ public:
 
     typedef T                      element_type;
     typedef T*                     pointer_type;
-    typedef nestl::error_condition operation_error;
 
     /// constructors
     shared_ptr() NESTL_NOEXCEPT_SPEC;
+
+    shared_ptr(std::nullptr_t) NESTL_NOEXCEPT_SPEC;
 
     shared_ptr(const shared_ptr& other) NESTL_NOEXCEPT_SPEC;
 
@@ -185,10 +166,6 @@ public:
 
     template <typename Y>
     shared_ptr& operator=(shared_ptr<Y>&& other) NESTL_NOEXCEPT_SPEC;
-
-    /// assign_copy
-    template <typename Y>
-    operation_error assign_copy(const shared_ptr<Y>& other) NESTL_NOEXCEPT_SPEC;
 
     void reset() NESTL_NOEXCEPT_SPEC;
 
@@ -227,9 +204,12 @@ private:
     template <typename Type>
     friend class weak_ptr;
 
-    template <typename Type, typename Allocator, typename Y, typename ... Args>
+    template <typename Y>
+    friend class shared_ptr;
+
+    template <typename Type, typename Allocator, typename ... Args>
     friend
-    typename shared_ptr<Type>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& alloc, Args&& ... args);
+    shared_ptr<Type> make_shared_a_nothrow(error_condition& ec, Allocator& alloc, Args&& ... args);
 };
 
 
@@ -239,7 +219,6 @@ class weak_ptr
 public:
     typedef T                      element_type;
     typedef T*                     pointer_type;
-    typedef nestl::error_condition operation_error;
 
     weak_ptr() NESTL_NOEXCEPT_SPEC
         : m_ptr(0)
@@ -378,6 +357,13 @@ shared_ptr<T>::shared_ptr() NESTL_NOEXCEPT_SPEC
 }
 
 template <typename T>
+shared_ptr<T>::shared_ptr(std::nullptr_t) NESTL_NOEXCEPT_SPEC
+    : m_ptr(0)
+    , m_refcount(0)
+{
+}
+
+template <typename T>
 shared_ptr<T>::shared_ptr(const shared_ptr& other) NESTL_NOEXCEPT_SPEC
     : m_ptr(other.m_ptr)
     , m_refcount(other.m_refcount)
@@ -441,17 +427,15 @@ template <typename T>
 template <typename Y>
 shared_ptr<T>& shared_ptr<T>::operator=(const shared_ptr<Y>& other) NESTL_NOEXCEPT_SPEC
 {
-    if (&other != this)
+    shared_ptr tmp;
+    tmp.swap(*this);
+
+    m_ptr = other.m_ptr;
+    m_refcount = other.m_refcount;
+
+    if (m_refcount)
     {
-        shared_ptr tmp; tmp.swap(*this);
-
-        m_ptr = other.m_ptr;
-        m_refcount = other.m_refcount;
-
-        if (m_refcount)
-        {
-            m_refcount->add_ref();
-        }
+        m_refcount->add_ref();
     }
 
     return *this;
@@ -461,29 +445,24 @@ template <typename T>
 template <typename Y>
 shared_ptr<T>& shared_ptr<T>::operator=(shared_ptr<Y>&& other) NESTL_NOEXCEPT_SPEC
 {
-    if (&other != this)
     {
-		const shared_ptr tmp(std::move(*this));
-
-        this->swap(other);
+        const shared_ptr tmp(std::move(*this));
     }
+    
+    m_ptr = other.m_ptr;
+    other.m_ptr = nullptr;
+
+    m_refcount = other.m_refcount;
+    other.m_refcount = nullptr;
 
     return *this;
 }
 
 template <typename T>
-template <typename Y>
-typename shared_ptr<T>::operation_error shared_ptr<T>::assign_copy(const shared_ptr<Y>& other) NESTL_NOEXCEPT_SPEC
-{
-    *this = other;
-    return operation_error();
-}
-
-
-template <typename T>
 void shared_ptr<T>::reset() NESTL_NOEXCEPT_SPEC
 {
-    shared_ptr tmp; tmp.swap(*this);
+    shared_ptr tmp;
+    tmp.swap(*this);
 }
 
 template <typename T>
@@ -525,53 +504,43 @@ bool shared_ptr<T>::unique() const NESTL_NOEXCEPT_SPEC
     return (use_count() == 1);
 }
 
-template <typename T, typename Allocator, typename Y, typename ... Args>
-typename shared_ptr<T>::operation_error make_shared_ex_a(shared_ptr<Y>& sp, Allocator& /* alloc */, Args&& ... args)
+template <typename T, typename Allocator, typename ... Args>
+shared_ptr<T> make_shared_a_nothrow(error_condition& ec, Allocator& /* alloc */, Args&& ... args)
 {
     static_assert(sizeof(T), "T must be complete type");
-    typedef typename shared_ptr<T>::operation_error operation_error;
-
-    typedef detail::type_stored_by_value<T, Allocator, operation_error> shared_count_t;
+    typedef detail::type_stored_by_value<T, Allocator> shared_count_t;
     typedef typename shared_count_t::allocator_type SharedCountAllocator;
     SharedCountAllocator sharedCountAlloc;
 
     shared_count_t* ptr = sharedCountAlloc.allocate(1);
     if (!ptr)
     {
-        return operation_error(nestl::errc::not_enough_memory);
+        ec = error_condition(nestl::errc::not_enough_memory);
+        return {nullptr};
     }
     detail::allocation_scoped_guard<shared_count_t*, SharedCountAllocator> allocationGuard(sharedCountAlloc, ptr, 1);
 
-    operation_error err = nestl::detail::construct<operation_error>(ptr, sharedCountAlloc, sharedCountAlloc);
-    if (err)
+    ec = nestl::detail::construct<error_condition>(ptr, sharedCountAlloc, sharedCountAlloc);
+    if (ec)
     {
-        return err;
+        return {nullptr};
     }
 
-    err = ptr->initialize(std::forward<Args>(args) ...);
-    if (err)
+    ptr->initialize(ec, std::forward<Args>(args) ...);
+    if (ec)
     {
-        return err;
+        return {nullptr};
     }
-
-    sp = shared_ptr<Y>(ptr->get(), ptr);
 
     allocationGuard.release();
-    return operation_error();
-}
-
-
-template <typename T, typename Y, typename ... Args>
-typename shared_ptr<T>::operation_error make_shared_ex(shared_ptr<Y>& sp, Args&& ... args)
-{
-    nestl::allocator<T> alloc;
-	return make_shared_ex_a<T>(sp, alloc, std::forward<Args>(args) ...);
+    return shared_ptr<T>(ptr->get(), ptr);
 }
 
 template <typename T, typename ... Args>
-typename shared_ptr<T>::operation_error make_shared(shared_ptr<T>& sp, Args&& ... args)
+shared_ptr<T> make_shared_nothrow(error_condition& ec, Args&& ... args)
 {
-	return make_shared_ex<T>(sp, std::forward<Args>(args) ...);
+    nestl::allocator<T> alloc;
+	return make_shared_a_nothrow<T>(ec, alloc, std::forward<Args>(args) ...);
 }
 
 } // namespace nestl

@@ -100,7 +100,7 @@ public:
     allocator_with_state() NESTL_NOEXCEPT_SPEC
         : m_allocated_storage()
     {
-		ASSERT_OPERATION_SUCCESS(nestl::make_shared(m_allocated_storage));
+		ASSERT_OPERATION_SUCCESS(m_allocated_storage = nestl::make_shared_nothrow<storage_t>(ec));
     }
 
     allocator_with_state(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
@@ -179,7 +179,7 @@ public:
              */
         }
 
-        m_allocated_storage->insert(res);
+        ASSERT_OPERATION_SUCCESS(m_allocated_storage->insert_nothrow(ec, res));
 
         return res;
     }
@@ -205,7 +205,8 @@ public:
         }
     }
 
-    nestl::shared_ptr<nestl::set<void*> > m_allocated_storage;
+    typedef nestl::set<void*> storage_t;
+    nestl::shared_ptr<storage_t> m_allocated_storage;
 };
 
 

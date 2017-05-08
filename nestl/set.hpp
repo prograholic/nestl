@@ -21,15 +21,16 @@ namespace detail
 
 
 template<typename Key, typename Compare = std::less<Key>, typename Alloc = nestl::allocator<Key> >
-class set : private nestl::noncopyable
+class set
 {
+    set(const set& ) = delete;
+    set& operator=(const set& ) = delete;
 public:
 
     typedef Alloc                                                                   allocator_type;
 
     typedef nestl::detail::identity<Key>                                            key_of_value;
-    typedef nestl::error_condition                                                  operation_error;
-    typedef nestl::detail::rb_tree<Key, Key, key_of_value, Compare, operation_error, allocator_type> impl_type;
+    typedef nestl::detail::rb_tree<Key, Key, key_of_value, Compare, allocator_type> impl_type;
 
     typedef typename impl_type::key_type                                            key_type;
     typedef typename impl_type::value_type                                          value_type;
@@ -53,10 +54,6 @@ public:
 
     typedef std::pair<iterator, bool>                                               iterator_with_flag;
 
-    typedef nestl::result_with_operation_error<iterator, operation_error>           iterator_with_operation_error;
-    typedef nestl::result_with_operation_error<iterator_with_flag, operation_error> iterator_with_flag_with_operation_error;
-
-
 // constructors
     explicit set(const Compare& comp = Compare(), const Alloc& alloc = Alloc()) NESTL_NOEXCEPT_SPEC;
     explicit set(const Alloc& alloc) NESTL_NOEXCEPT_SPEC;
@@ -69,7 +66,7 @@ public:
 // assignment operators and functions
     set& operator=(set&& other) NESTL_NOEXCEPT_SPEC;
 
-    operation_error assign_copy(const set& other) NESTL_NOEXCEPT_SPEC;
+    void copy_nothrow(error_condition& ec, const set& other) NESTL_NOEXCEPT_SPEC;
 
 
 // iterators
@@ -109,9 +106,9 @@ public:
 // modifiers
     void clear() NESTL_NOEXCEPT_SPEC;
 
-    iterator_with_flag_with_operation_error insert(const value_type& val) NESTL_NOEXCEPT_SPEC;
+    iterator_with_flag insert_nothrow(error_condition& ec, const value_type& val) NESTL_NOEXCEPT_SPEC;
 
-    iterator_with_flag_with_operation_error insert(value_type&& val) NESTL_NOEXCEPT_SPEC;
+    iterator_with_flag insert_nothrow(error_condition& ec, value_type&& val) NESTL_NOEXCEPT_SPEC;
 
     iterator erase(const_iterator pos) NESTL_NOEXCEPT_SPEC;
 
@@ -127,7 +124,6 @@ public:
 
 private:
     impl_type m_impl;
-
 };
 
 
@@ -177,10 +173,10 @@ set<T, C, A>::operator=(set&& other) NESTL_NOEXCEPT_SPEC
 }
 
 template <typename T, typename C, typename A>
-typename set<T, C, A>::operation_error
-set<T, C, A>::assign_copy(const set& other) NESTL_NOEXCEPT_SPEC
+void
+set<T, C, A>::copy_nothrow(error_condition& ec, const set& other) NESTL_NOEXCEPT_SPEC
 {
-    return m_impl.assign_copy(other.m_impl);
+    m_impl.copy_nothrow(ec, other.m_impl);
 }
 
 
@@ -302,17 +298,17 @@ set<T, C, A>::clear() NESTL_NOEXCEPT_SPEC
 }
 
 template <typename T, typename C, typename A>
-typename set<T, C, A>::iterator_with_flag_with_operation_error
-set<T, C, A>::insert(const value_type& val) NESTL_NOEXCEPT_SPEC
+typename set<T, C, A>::iterator_with_flag
+set<T, C, A>::insert_nothrow(error_condition& ec, const value_type& val) NESTL_NOEXCEPT_SPEC
 {
-    return m_impl.m_insert_unique(val);
+    return m_impl.m_insert_unique(ec, val);
 }
 
 template <typename T, typename C, typename A>
-typename set<T, C, A>::iterator_with_flag_with_operation_error
-set<T, C, A>::insert(value_type&& val) NESTL_NOEXCEPT_SPEC
+typename set<T, C, A>::iterator_with_flag
+set<T, C, A>::insert_nothrow(error_condition& ec, value_type&& val) NESTL_NOEXCEPT_SPEC
 {
-	return m_impl.m_insert_unique(std::forward<value_type>(val));
+	return m_impl.m_insert_unique(ec, std::forward<value_type>(val));
 }
 
 template <typename T, typename C, typename A>

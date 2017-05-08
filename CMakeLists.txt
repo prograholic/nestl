@@ -17,7 +17,6 @@ set (nestl_sources
     nestl/config.hpp
     nestl/list.hpp
     nestl/memory.hpp
-    nestl/noncopyable.hpp
     nestl/operation_error.hpp
     nestl/set.hpp
     nestl/shared_ptr.hpp

@@ -38,22 +38,14 @@ void check_ec(const nestl::error_condition& ec, const char* msg)
     }
 }
 
-template <typename Result, typename OperationError>
-void check_ec(const nestl::result_with_operation_error<Result, OperationError>& ec, const char* msg)
-{
-    if (ec)
-    {
-        fatal_failure("operation ", msg, " failed with following error: ", ec);
-    }
-}
-
 #define ASSERT_OPERATION_SUCCESS(val) \
 do \
 { \
  \
-    check_ec(val, #val); \
+    error_condition ec; \
+    val; \
+    check_ec(ec, #val); \
 } while(0) \
-
 
 
 #define EXPECT_EQ(left, right) \
@@ -81,7 +73,7 @@ struct type_with_allocator
 
 
 
-struct non_copyable : private nestl::noncopyable
+struct non_copyable
 {
     non_copyable() NESTL_NOEXCEPT_SPEC
         : v(0)
@@ -100,6 +92,9 @@ struct non_copyable : private nestl::noncopyable
     }
 
     int v;
+
+    non_copyable(const non_copyable&) = delete;
+    non_copyable& operator=(const non_copyable&) = delete;
 };
 
 bool operator == (const non_copyable& left, const non_copyable& right)
