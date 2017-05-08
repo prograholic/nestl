@@ -3,10 +3,10 @@
 
 #include <nestl/config.hpp>
 
-#include <nestl/system_error.hpp>
 #include <nestl/memory.hpp>
 #include <nestl/allocator.hpp>
 #include <nestl/alignment.hpp>
+#include <nestl/operation_error.hpp>
 
 #include <nestl/detail/construct.hpp>
 
@@ -120,9 +120,9 @@ public:
     }
 
     template <typename ... Args>
-    void initialize(error_condition& ec, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    void initialize(typename allocator_type::operation_error& err, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
-        ec = nestl::detail::construct<error_condition>(get(), m_allocator, std::forward<Args>(args) ...);
+        nestl::detail::construct(err, get(), m_allocator, std::forward<Args>(args) ...);
     }
 
 private:
@@ -209,7 +209,7 @@ private:
 
     template <typename Type, typename Allocator, typename ... Args>
     friend
-    shared_ptr<Type> make_shared_a_nothrow(error_condition& ec, Allocator& alloc, Args&& ... args);
+    shared_ptr<Type> make_shared_a_nothrow(typename Allocator::operation_error& err, Allocator& alloc, Args&& ... args);
 };
 
 
@@ -505,29 +505,28 @@ bool shared_ptr<T>::unique() const NESTL_NOEXCEPT_SPEC
 }
 
 template <typename T, typename Allocator, typename ... Args>
-shared_ptr<T> make_shared_a_nothrow(error_condition& ec, Allocator& /* alloc */, Args&& ... args)
+shared_ptr<T> make_shared_a_nothrow(typename Allocator::operation_error& err, Allocator& /* alloc */, Args&& ... args)
 {
     static_assert(sizeof(T), "T must be complete type");
     typedef detail::type_stored_by_value<T, Allocator> shared_count_t;
     typedef typename shared_count_t::allocator_type SharedCountAllocator;
     SharedCountAllocator sharedCountAlloc;
 
-    shared_count_t* ptr = sharedCountAlloc.allocate(1);
-    if (!ptr)
+    shared_count_t* ptr = allocator_traits<SharedCountAllocator>::allocate(err, sharedCountAlloc, 1);
+    if (err)
     {
-        ec = error_condition(nestl::errc::not_enough_memory);
         return {nullptr};
     }
     detail::allocation_scoped_guard<shared_count_t*, SharedCountAllocator> allocationGuard(sharedCountAlloc, ptr, 1);
 
-    ec = nestl::detail::construct<error_condition>(ptr, sharedCountAlloc, sharedCountAlloc);
-    if (ec)
+    nestl::detail::construct(err, ptr, sharedCountAlloc, sharedCountAlloc);
+    if (err)
     {
         return {nullptr};
     }
 
-    ptr->initialize(ec, std::forward<Args>(args) ...);
-    if (ec)
+    ptr->initialize(err, std::forward<Args>(args) ...);
+    if (err)
     {
         return {nullptr};
     }
@@ -537,10 +536,10 @@ shared_ptr<T> make_shared_a_nothrow(error_condition& ec, Allocator& /* alloc */,
 }
 
 template <typename T, typename ... Args>
-shared_ptr<T> make_shared_nothrow(error_condition& ec, Args&& ... args)
+shared_ptr<T> make_shared_nothrow(operation_error& err, Args&& ... args)
 {
     nestl::allocator<T> alloc;
-	return make_shared_a_nothrow<T>(ec, alloc, std::forward<Args>(args) ...);
+	return make_shared_a_nothrow<T>(err, alloc, std::forward<Args>(args) ...);
 }
 
 } // namespace nestl

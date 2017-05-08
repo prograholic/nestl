@@ -12,8 +12,9 @@
 #define NESTL_COMPILER_MSVC_2015                 1900
 #define NESTL_COMPILER_MSVC_2017                 1910
 
-
 #define NESTL_UNUSED
+
+#define NESTL_HAS_EXCEPTIONS                     (_CPPUNWIND == 1)
 
 #if (_MSC_VER < NESTL_COMPILER_MSVC_2013)
 

@@ -3,11 +3,8 @@
 
 #include <nestl/config.hpp>
 
-#include <nestl/class_traits.hpp>
+#include <nestl/class_operations.hpp>
 #include <nestl/detail/construct.hpp>
-#include <nestl/system_error.hpp>
-
-
 
 
 namespace nestl
@@ -15,7 +12,8 @@ namespace nestl
 
 
 template <typename InputIterator, typename ForwardIterator, typename Allocator>
-error_condition uninitialised_copy(InputIterator first,
+ForwardIterator uninitialised_copy(typename Allocator::operation_error& err,
+                                   InputIterator first,
                                    InputIterator last,
                                    ForwardIterator output,
                                    Allocator& alloc) NESTL_NOEXCEPT_SPEC
@@ -25,15 +23,15 @@ error_condition uninitialised_copy(InputIterator first,
 
     for ( ; first != last; ++first, ++cur)
     {
-		error_condition ec = nestl::detail::construct<error_condition>(std::addressof(*cur), alloc, *first);
-        if (ec)
+		nestl::detail::construct(err, std::addressof(*cur), alloc, *first);
+        if (err)
         {
-            return ec;
+            return cur;
         }
     }
 
     guard.release();
-    return error_condition();
+    return cur;
 }
 
 } // namespace nestl

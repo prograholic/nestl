@@ -20,7 +20,7 @@ void run_tests()
     {
         nestl::vector<int> vec1;
         nestl::vector<int> vec2;
-        ASSERT_OPERATION_SUCCESS(vec2.assign_nothrow(ec, 10));
+        ASSERT_OPERATION_SUCCESS(vec2.assign_nothrow(_, 10));
 
 		vec2 = std::move(vec1);
         CheckVectorSize(vec2, 0);
@@ -30,7 +30,7 @@ void run_tests()
 
     {
         nestl::vector<int> vec1;
-        ASSERT_OPERATION_SUCCESS(vec1.assign_nothrow(ec, 10));
+        ASSERT_OPERATION_SUCCESS(vec1.assign_nothrow(_, 10));
 
         nestl::vector<int> vec2;
 
@@ -42,10 +42,10 @@ void run_tests()
 
     {
         nestl::vector<int> vec1;
-        ASSERT_OPERATION_SUCCESS(vec1.assign_nothrow(ec, 10));
+        ASSERT_OPERATION_SUCCESS(vec1.assign_nothrow(_, 10));
 
         nestl::vector<int> vec2;
-        ASSERT_OPERATION_SUCCESS(vec2.assign_nothrow(ec, 5));
+        ASSERT_OPERATION_SUCCESS(vec2.assign_nothrow(_, 5));
 
 		vec2 = std::move(vec1);
         CheckVectorSize(vec2, 10);

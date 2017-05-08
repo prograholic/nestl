@@ -17,6 +17,8 @@
 
 #define NESTL_UNUSED                             __attribute__((unused))
 
+#define NESTL_HAS_EXCEPTIONS                     (__EXCEPTIONS == 1)
+
 
 #if !defined(__GXX_EXPERIMENTAL_CXX0X__)
 

@@ -5,23 +5,25 @@
 #include <nestl/shared_ptr.hpp>
 #include <nestl/set.hpp>
 
+#include <nestl/operation_error.hpp>
+
 #include "tests/test_common.hpp"
 
 namespace nestl
 {
-
 namespace test
 {
 
 /**
  * @brief Minimal allocator implementation
  */
-template <typename T>
+template <typename T, typename OperationError = operation_error>
 class minimal_allocator
 {
 public:
 
     typedef T value_type;
+    typedef OperationError operation_error;
 
     minimal_allocator() NESTL_NOEXCEPT_SPEC
     {
@@ -36,9 +38,15 @@ public:
     {
     }
 
-    T* allocate(std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    T* allocate(operation_error& err, std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
-        return static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
+        auto res = static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
+        if (!res)
+        {
+            build_bad_alloc(err);
+        }
+        
+        return res;
     }
 
     void deallocate(T* p, std::size_t /* n */) NESTL_NOEXCEPT_SPEC
@@ -51,12 +59,13 @@ public:
 /**
  * Allocator which always fail (return zero)
  */
-template <typename T>
+template <typename T, typename OperationError = operation_error>
 class zero_allocator
 {
 public:
 
     typedef T               value_type;
+    typedef OperationError operation_error;
 
     zero_allocator() NESTL_NOEXCEPT_SPEC
     {
@@ -75,9 +84,11 @@ public:
     {
     }
 
-    T* allocate(std::size_t /* n */, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    T* allocate(operation_error& err, std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
-        return 0;
+        build_bad_alloc(err);
+
+        return nullptr;
     }
 
     void deallocate(T* p, std::size_t /* n */) NESTL_NOEXCEPT_SPEC
@@ -90,17 +101,18 @@ public:
 /**
  * Allocator which has its own state (remember who allocate memory)
  */
-template <typename T>
+template <typename T, typename OperationError = operation_error>
 class allocator_with_state
 {
 public:
 
     typedef T               value_type;
+    typedef OperationError  operation_error;
 
     allocator_with_state() NESTL_NOEXCEPT_SPEC
         : m_allocated_storage()
     {
-		ASSERT_OPERATION_SUCCESS(m_allocated_storage = nestl::make_shared_nothrow<storage_t>(ec));
+		ASSERT_OPERATION_SUCCESS(m_allocated_storage = nestl::make_shared_nothrow<storage_t>(_));
     }
 
     allocator_with_state(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
@@ -164,22 +176,22 @@ public:
         }
     }
 
-	T* allocate(std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    T* allocate(operation_error& err, std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
-        T* res = static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
-
+        auto res = static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
+        if (!res)
+        {
+            build_bad_alloc(err);
+            return nullptr;
+        }
 
         nestl::set<void*>::const_iterator pos = m_allocated_storage->find(res);
         if (pos != m_allocated_storage->end())
         {
             fatal_failure("pointer [", static_cast<void*>(res), "] already belong to this allocator");
-
-            /**
-             * @note Maybe it`s a error in test. Do we need assert here ???
-             */
         }
 
-        ASSERT_OPERATION_SUCCESS(m_allocated_storage->insert_nothrow(ec, res));
+        ASSERT_OPERATION_SUCCESS(m_allocated_storage->insert_nothrow(_, res));
 
         return res;
     }
@@ -223,7 +235,6 @@ bool operator != (const allocator_with_state<T>& left, const allocator_with_stat
 }
 
 } // namespace test
-
 } // namespace nestl
 
 

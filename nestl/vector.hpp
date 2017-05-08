@@ -7,9 +7,8 @@
 #include <nestl/allocator_traits.hpp>
 #include <nestl/algorithm.hpp>
 #include <nestl/memory.hpp>
-#include <nestl/class_traits.hpp>
+#include <nestl/class_operations.hpp>
 #include <nestl/operation_error.hpp>
-#include <nestl/system_error.hpp>
 
 
 namespace nestl
@@ -41,9 +40,7 @@ public:
     typedef std::reverse_iterator<iterator>                                 reverse_iterator;
     typedef std::reverse_iterator<const_iterator>                           const_reverse_iterator;
 
-    //typedef nestl::error_condition                                          operation_error;
-
-    //typedef nestl::result_with_operation_error<iterator, operation_error>   iterator_with_operation_error;
+    typedef typename allocator_type::operation_error                        operation_error;
 
 
 // constructors
@@ -60,12 +57,12 @@ public:
 // assignment operators and functions
     vector& operator=(vector&& other) NESTL_NOEXCEPT_SPEC;
 
-    void copy_nothrow(error_condition& ec, const vector& other) NESTL_NOEXCEPT_SPEC;
+    void copy_nothrow(operation_error& err, const vector& other) NESTL_NOEXCEPT_SPEC;
 
-    void assign_nothrow(error_condition& ec, size_type n, const_reference val = value_type()) NESTL_NOEXCEPT_SPEC;
+    void assign_nothrow(operation_error& err, size_type n, const_reference val = value_type()) NESTL_NOEXCEPT_SPEC;
 
     template <typename InputIterator>
-    void assign_nothrow(error_condition& ec, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
+    void assign_nothrow(operation_error& err, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
 
 
 // element access
@@ -117,43 +114,43 @@ public:
 
     size_type max_size() const NESTL_NOEXCEPT_SPEC;
 
-    void reserve_nothrow(error_condition& ec, size_type new_cap) NESTL_NOEXCEPT_SPEC;
+    void reserve_nothrow(operation_error& err, size_type new_cap) NESTL_NOEXCEPT_SPEC;
 
     size_type capacity() const NESTL_NOEXCEPT_SPEC;
 
-    void shrink_to_fit_nothrow(error_condition& ec) NESTL_NOEXCEPT_SPEC;
+    void shrink_to_fit_nothrow(operation_error& err) NESTL_NOEXCEPT_SPEC;
 
 // modifiers
     void clear() NESTL_NOEXCEPT_SPEC;
 
-    iterator insert_nothrow(error_condition& ec, const_iterator pos, const value_type& value) NESTL_NOEXCEPT_SPEC;
+    iterator insert_nothrow(operation_error& err, const_iterator pos, const value_type& value) NESTL_NOEXCEPT_SPEC;
 
-    iterator insert_nothrow(error_condition& ec, const_iterator pos, value_type&& value) NESTL_NOEXCEPT_SPEC;
+    iterator insert_nothrow(operation_error& err, const_iterator pos, value_type&& value) NESTL_NOEXCEPT_SPEC;
 
-    void insert_nothrow(error_condition& ec, const_iterator pos, size_type count, const value_type& value) NESTL_NOEXCEPT_SPEC;
+    void insert_nothrow(operation_error& err, const_iterator pos, size_type count, const value_type& value) NESTL_NOEXCEPT_SPEC;
 
     template<typename InputIterator>
-    void insert_nothrow(error_condition& ec, const_iterator pos, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
+    void insert_nothrow(operation_error& err, const_iterator pos, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
 
     template<typename ... Args>
-    iterator emplace_nothrow(error_condition& ec, const_iterator pos, Args&&... args) NESTL_NOEXCEPT_SPEC;
+    iterator emplace_nothrow(operation_error& err, const_iterator pos, Args&&... args) NESTL_NOEXCEPT_SPEC;
 
-    iterator erase_nothrow(error_condition& ec, const_iterator pos) NESTL_NOEXCEPT_SPEC;
+    iterator erase_nothrow(operation_error& err, const_iterator pos) NESTL_NOEXCEPT_SPEC;
 
-    iterator erase_nothrow(error_condition& ec, const_iterator first, const_iterator last) NESTL_NOEXCEPT_SPEC;
+    iterator erase_nothrow(operation_error& err, const_iterator first, const_iterator last) NESTL_NOEXCEPT_SPEC;
 
-    void push_back_nothrow(error_condition& ec, const value_type& value) NESTL_NOEXCEPT_SPEC;
+    void push_back_nothrow(operation_error& err, const value_type& value) NESTL_NOEXCEPT_SPEC;
 
-    void push_back_nothrow(error_condition& ec, value_type&& value) NESTL_NOEXCEPT_SPEC;
+    void push_back_nothrow(operation_error& err, value_type&& value) NESTL_NOEXCEPT_SPEC;
 
     template<typename ... Args>
-    void emplace_back_nothrow(error_condition& ec, Args&&... args) NESTL_NOEXCEPT_SPEC;
+    void emplace_back_nothrow(operation_error& err, Args&&... args) NESTL_NOEXCEPT_SPEC;
 
     void pop_back() NESTL_NOEXCEPT_SPEC;
 
-    void resize_nothrow(error_condition& ec, size_type count) NESTL_NOEXCEPT_SPEC;
+    void resize_nothrow(operation_error& err, size_type count) NESTL_NOEXCEPT_SPEC;
 
-    void resize_nothrow(error_condition& ec, size_type count, const value_type& value) NESTL_NOEXCEPT_SPEC;
+    void resize_nothrow(operation_error& err, size_type count, const value_type& value) NESTL_NOEXCEPT_SPEC;
 
     void swap(vector& other) NESTL_NOEXCEPT_SPEC;
 
@@ -169,74 +166,60 @@ private:
     void move_assign(const std::true_type& /* true_val */, vector&& other) NESTL_NOEXCEPT_SPEC;
 
     template <typename InputIterator>
-    void assign_iterator(error_condition& ec,
+    void assign_iterator(operation_error& err,
                          std::random_access_iterator_tag /* tag */,
                          InputIterator first,
                          InputIterator last) NESTL_NOEXCEPT_SPEC;
 
     template <typename InputIterator>
-    void assign_iterator(error_condition& ec,
+    void assign_iterator(operation_error& err,
                          std::input_iterator_tag /* tag */,
                          InputIterator first,
                          InputIterator last) NESTL_NOEXCEPT_SPEC;
 
     template <typename ... Args>
-    iterator insert_value(error_condition& ec, const_iterator pos, Args&& ... args) NESTL_NOEXCEPT_SPEC;
+    iterator insert_value(operation_error& err, const_iterator pos, Args&& ... args) NESTL_NOEXCEPT_SPEC;
 
     template <typename InputIterator>
-    iterator insert_range(error_condition& ec, const_iterator pos, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
+    iterator insert_range(operation_error& err, const_iterator pos, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
 
     template <typename ... Args>
-    void do_resize(error_condition& ec, size_type count, Args&& ... args) NESTL_NOEXCEPT_SPEC;
+    void do_resize(operation_error& err, size_type count, Args&& ... args) NESTL_NOEXCEPT_SPEC;
 
-    void grow(error_condition& ec, size_type requiredCapacity) NESTL_NOEXCEPT_SPEC;
+    void grow(operation_error& err, size_type requiredCapacity) NESTL_NOEXCEPT_SPEC;
 
-    void do_reserve(error_condition& ec, size_type new_cap) NESTL_NOEXCEPT_SPEC;
+    void do_reserve(operation_error& err, size_type new_cap) NESTL_NOEXCEPT_SPEC;
 };
 
 /**
- * @brief specialization of class_traits for nestl::vector
+ * @brief specialization of class_operations for nestl::vector
  *
  * Allows construct one vector from another (emulate copy construction)
  */
 template <typename T, typename VectorAllocator>
-struct class_traits <nestl::vector<T, VectorAllocator> >
+struct class_operations <nestl::vector<T, VectorAllocator> >
 {
     typedef nestl::vector<T, VectorAllocator> vector_t;
 
-    template <typename OperationError, typename Allocator>
-    static OperationError construct(vector_t* ptr, Allocator& alloc) NESTL_NOEXCEPT_SPEC
+    template <typename Allocator>
+    static void construct(typename Allocator::operation_error& err, vector_t* ptr, Allocator& alloc, const vector_t& other) NESTL_NOEXCEPT_SPEC
     {
-        alloc.construct(ptr);
-
-        return OperationError();
-    }
-
-    template <typename OperationError, typename Allocator>
-    static OperationError construct(vector_t* ptr, Allocator& alloc, vector_t&& other) NESTL_NOEXCEPT_SPEC
-    {
-        alloc.construct(ptr, std::move(other));
-
-        return OperationError();
-    }
-
-    template <typename OperationError, typename Allocator>
-    static OperationError construct(vector_t* ptr, Allocator& alloc, const vector_t& other) NESTL_NOEXCEPT_SPEC
-    {
-        alloc.construct(ptr);
+        allocator_traits<Allocator>::construct(err, alloc, ptr);
+        if (err)
+        {
+            return;
+        }
 
         vector_t* end = ptr + 1;
         nestl::detail::destruction_scoped_guard<vector_t*, Allocator> guard(ptr, end, alloc);
 
-        OperationError err = ptr->assign_copy(other);
+        ptr->copy_nothrow(err, other);
         if (err)
         {
-            return err;
+            return;
         }
 
         guard.release();
-
-        return err;
     }
 };
 
@@ -319,29 +302,29 @@ vector<T, A>::operator=(vector&& other) NESTL_NOEXCEPT_SPEC
 
 template <typename T, typename A>
 void
-vector<T, A>::copy_nothrow(error_condition& ec, const vector& other) NESTL_NOEXCEPT_SPEC
+vector<T, A>::copy_nothrow(operation_error& err, const vector& other) NESTL_NOEXCEPT_SPEC
 {
-    this->assign_nothrow(ec, other.cbegin(), other.cend());
+    this->assign_nothrow(err, other.cbegin(), other.cend());
 }
 
 template <typename T, typename A>
 void
-vector<T, A>::assign_nothrow(error_condition& ec, size_type n, const_reference val) NESTL_NOEXCEPT_SPEC
+vector<T, A>::assign_nothrow(operation_error& err, size_type n, const_reference val) NESTL_NOEXCEPT_SPEC
 {
     vector tmp; tmp.swap(*this);
 
     assert(empty());
 
-    grow(ec, n);
-    if (ec)
+    grow(err, n);
+    if (err)
     {
         return;
     }
 
     while (n > 0)
     {
-        this->push_back_nothrow(ec, val);
-        if (ec)
+        this->push_back_nothrow(err, val);
+        if (err)
         {
             return;
         }
@@ -352,11 +335,11 @@ vector<T, A>::assign_nothrow(error_condition& ec, size_type n, const_reference v
 template <typename T, typename A>
 template <typename InputIterator>
 void
-vector<T, A>::assign_nothrow(error_condition& ec, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC
+vector<T, A>::assign_nothrow(operation_error& err, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC
 {
     vector tmp; tmp.swap(*this);
 
-    assign_iterator(ec, typename std::iterator_traits<InputIterator>::iterator_category(), first, last);
+    assign_iterator(err, typename std::iterator_traits<InputIterator>::iterator_category(), first, last);
 }
 
 template <typename T, typename A>
@@ -529,7 +512,7 @@ vector<T, A>::max_size() const NESTL_NOEXCEPT_SPEC
 
 template <typename T, typename A>
 void
-vector<T, A>::reserve_nothrow(error_condition& ec, size_type new_cap) NESTL_NOEXCEPT_SPEC
+vector<T, A>::reserve_nothrow(operation_error& err, size_type new_cap) NESTL_NOEXCEPT_SPEC
 {
     if (new_cap <= capacity())
     {
@@ -539,12 +522,12 @@ vector<T, A>::reserve_nothrow(error_condition& ec, size_type new_cap) NESTL_NOEX
     {
         if (new_cap > max_size())
         {
-            ec = error_condition(nestl::errc::value_too_large);
+            build_length_error(err);
             return;
         }
     }
 
-    do_reserve(ec, new_cap);
+    do_reserve(err, new_cap);
 }
 
 template <typename T, typename A>
@@ -556,11 +539,11 @@ vector<T, A>::capacity() const NESTL_NOEXCEPT_SPEC
 
 template <typename T, typename A>
 void
-vector<T, A>::shrink_to_fit_nothrow(error_condition& ec) NESTL_NOEXCEPT_SPEC
+vector<T, A>::shrink_to_fit_nothrow(operation_error& err) NESTL_NOEXCEPT_SPEC
 {
     if (capacity() > size())
     {
-        do_reserve(ec, size());
+        do_reserve(err, size());
     }
 }
 
@@ -574,65 +557,65 @@ void vector<T, A>::clear() NESTL_NOEXCEPT_SPEC
 
 template <typename T, typename A>
 typename vector<T, A>::iterator
-vector<T, A>::insert_nothrow(error_condition& ec, const_iterator pos, const value_type& value) NESTL_NOEXCEPT_SPEC
+vector<T, A>::insert_nothrow(operation_error& err, const_iterator pos, const value_type& value) NESTL_NOEXCEPT_SPEC
 {
-    return insert_value(ec, pos, value);
+    return insert_value(err, pos, value);
 }
 
 template <typename T, typename A>
 typename vector<T, A>::iterator
-vector<T, A>::insert_nothrow(error_condition& ec, const_iterator pos, value_type&& value) NESTL_NOEXCEPT_SPEC
+vector<T, A>::insert_nothrow(operation_error& err, const_iterator pos, value_type&& value) NESTL_NOEXCEPT_SPEC
 {
-	return insert_value(ec, pos, std::move(value));
+	return insert_value(err, pos, std::move(value));
 }
 
 template <typename T, typename A>
 template<typename InputIterator>
 void
-vector<T, A>::insert_nothrow(error_condition& ec,
+vector<T, A>::insert_nothrow(operation_error& err,
                              const_iterator pos,
                              InputIterator first,
                              InputIterator last) NESTL_NOEXCEPT_SPEC
 {
-    insert_range(ec, pos, first, last);
+    insert_range(err, pos, first, last);
 }
 
 
 template <typename T, typename A>
 void
-vector<T, A>::push_back_nothrow(error_condition& ec, const value_type& value) NESTL_NOEXCEPT_SPEC
+vector<T, A>::push_back_nothrow(operation_error& err, const value_type& value) NESTL_NOEXCEPT_SPEC
 {
-    insert_nothrow(ec, cend(), value);
+    insert_nothrow(err, cend(), value);
 }
 
 
 template <typename T, typename A>
 void
-vector<T, A>::push_back_nothrow(error_condition& ec, value_type&& value) NESTL_NOEXCEPT_SPEC
+vector<T, A>::push_back_nothrow(operation_error& err, value_type&& value) NESTL_NOEXCEPT_SPEC
 {
-	insert_nothrow(ec, cend(), std::move(value));
+	insert_nothrow(err, cend(), std::move(value));
 }
 
 template <typename T, typename A>
 template<typename ... Args>
 void
-vector<T, A>::emplace_back_nothrow(error_condition& ec, Args&& ... args) NESTL_NOEXCEPT_SPEC
+vector<T, A>::emplace_back_nothrow(operation_error& err, Args&& ... args) NESTL_NOEXCEPT_SPEC
 {
-	insert_value(ec, cend(), std::forward<Args>(args) ...);
+	insert_value(err, cend(), std::forward<Args>(args) ...);
 }
 
 template <typename T, typename A>
 void
-vector<T, A>::resize_nothrow(error_condition& ec, size_type count) NESTL_NOEXCEPT_SPEC
+vector<T, A>::resize_nothrow(operation_error& err, size_type count) NESTL_NOEXCEPT_SPEC
 {
-    do_resize(ec, count);
+    do_resize(err, count);
 }
 
 template <typename T, typename A>
 void
-vector<T, A>::resize_nothrow(error_condition& ec, size_type count, const value_type& value) NESTL_NOEXCEPT_SPEC
+vector<T, A>::resize_nothrow(operation_error& err, size_type count, const value_type& value) NESTL_NOEXCEPT_SPEC
 {
-    do_resize(ec, count, value);
+    do_resize(err, count, value);
 }
 
 template <typename T, typename A>
@@ -662,7 +645,7 @@ void vector<T, A>::move_assign(const std::true_type& /* true_val */, vector&& ot
 template <typename T, typename A>
 template <typename InputIterator>
 void
-vector<T, A>::assign_iterator(error_condition& ec,
+vector<T, A>::assign_iterator(operation_error& err,
                               std::random_access_iterator_tag /* tag */,
                               InputIterator first,
                               InputIterator last) NESTL_NOEXCEPT_SPEC
@@ -670,19 +653,19 @@ vector<T, A>::assign_iterator(error_condition& ec,
     assert(empty());
     size_t required_size = nestl::distance(first, last);
 
-    grow(ec, required_size);
-    if (ec)
+    grow(err, required_size);
+    if (err)
     {
         return;
     }
 
-    assign_iterator(ec, std::input_iterator_tag(), first, last);
+    assign_iterator(err, std::input_iterator_tag(), first, last);
 }
 
 template <typename T, typename A>
 template <typename InputIterator>
 void
-vector<T, A>::assign_iterator(error_condition& ec,
+vector<T, A>::assign_iterator(operation_error& err,
                               std::input_iterator_tag /* tag */,
                               InputIterator first,
                               InputIterator last) NESTL_NOEXCEPT_SPEC
@@ -691,8 +674,8 @@ vector<T, A>::assign_iterator(error_condition& ec,
 
     while (first != last)
     {
-        push_back_nothrow(ec, *first);
-        if (ec)
+        push_back_nothrow(err, *first);
+        if (err)
         {
             return;
         }
@@ -704,7 +687,7 @@ vector<T, A>::assign_iterator(error_condition& ec,
 template <typename T, typename A>
 template <typename ... Args>
 typename vector<T, A>::iterator
-vector<T, A>::insert_value(error_condition& ec, const_iterator pos, Args&& ... args) NESTL_NOEXCEPT_SPEC
+vector<T, A>::insert_value(operation_error& err, const_iterator pos, Args&& ... args) NESTL_NOEXCEPT_SPEC
 {
     assert(pos >= m_start);
     assert(pos <= m_finish);
@@ -714,10 +697,10 @@ vector<T, A>::insert_value(error_condition& ec, const_iterator pos, Args&& ... a
 
     if (capacity() == size())
     {
-        grow(ec, capacity() + 1);
-        if (ec)
+        grow(err, capacity() + 1);
+        if (err)
         {
-            return begin();
+            return end();
         }
     }
     assert(capacity() > size());
@@ -727,19 +710,19 @@ vector<T, A>::insert_value(error_condition& ec, const_iterator pos, Args&& ... a
     for (value_type* val = last; val != first; --val)
     {
         value_type* oldLocation = val - 1;
-        ec = nestl::detail::construct<error_condition>(val, m_allocator, *oldLocation);
-        if (ec)
+        nestl::detail::construct(err, val, m_allocator, *oldLocation);
+        if (err)
         {
-            return begin();
+            return end();
         }
         nestl::detail::destroy(m_allocator, oldLocation, val);
     }
 
 
-	ec = nestl::detail::construct<error_condition>(first, m_allocator, std::forward<Args>(args) ...);
-    if (ec)
+	nestl::detail::construct(err, first, m_allocator, std::forward<Args>(args) ...);
+    if (err)
     {
-        return begin();
+        return end();
     }
 
     ++m_finish;
@@ -749,7 +732,7 @@ vector<T, A>::insert_value(error_condition& ec, const_iterator pos, Args&& ... a
 template <typename T, typename A>
 template <typename InputIterator>
 typename vector<T, A>::iterator
-vector<T, A>::insert_range(error_condition& ec, const_iterator pos, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC
+vector<T, A>::insert_range(operation_error& err, const_iterator pos, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC
 {
     NESTL_ASSERT(pos >= m_start);
     NESTL_ASSERT(pos <= m_finish);
@@ -761,10 +744,10 @@ vector<T, A>::insert_range(error_condition& ec, const_iterator pos, InputIterato
     for ( ; first != last; ++first, ++offset)
     {
         const_iterator newPos = m_start + offset;
-        res = insert_value(ec, newPos, *first);
-        if (ec)
+        res = insert_value(err, newPos, *first);
+        if (err)
         {
-            return begin();
+            return end();
         }
     }
 
@@ -774,7 +757,7 @@ vector<T, A>::insert_range(error_condition& ec, const_iterator pos, InputIterato
 template <typename T, typename A>
 template <typename ... Args>
 void
-vector<T, A>::do_resize(error_condition& ec, size_type count, Args&& ... args) NESTL_NOEXCEPT_SPEC
+vector<T, A>::do_resize(operation_error& err, size_type count, Args&& ... args) NESTL_NOEXCEPT_SPEC
 {
     if (count <= size())
     {
@@ -783,16 +766,16 @@ vector<T, A>::do_resize(error_condition& ec, size_type count, Args&& ... args) N
     }
     else
     {
-        grow(ec, count);
-        if (ec)
+        grow(err, count);
+        if (err)
         {
             return;
         }
 
         while (m_finish < m_start + count)
         {
-            ec = nestl::detail::construct<error_condition>(m_finish, m_allocator, std::forward<Args>(args) ...);
-            if (ec)
+            nestl::detail::construct(err, m_finish, m_allocator, std::forward<Args>(args) ...);
+            if (err)
             {
                 return;
             }
@@ -803,7 +786,7 @@ vector<T, A>::do_resize(error_condition& ec, size_type count, Args&& ... args) N
 
 template <typename T, typename A>
 void
-vector<T, A>::grow(error_condition& ec, size_type requiredCapacity) NESTL_NOEXCEPT_SPEC
+vector<T, A>::grow(operation_error& err, size_type requiredCapacity) NESTL_NOEXCEPT_SPEC
 {
     size_t newCapacity = (((capacity() + 1) * 3) / 2);
     if (newCapacity < requiredCapacity)
@@ -814,23 +797,22 @@ vector<T, A>::grow(error_condition& ec, size_type requiredCapacity) NESTL_NOEXCE
     /// @bug overflow error
     assert(newCapacity > capacity());
 
-    reserve_nothrow(ec, newCapacity);
+    reserve_nothrow(err, newCapacity);
 }
 
 template <typename T, typename A>
 void
-vector<T, A>::do_reserve(error_condition& ec, size_type new_cap) NESTL_NOEXCEPT_SPEC
+vector<T, A>::do_reserve(operation_error& err, size_type new_cap) NESTL_NOEXCEPT_SPEC
 {
-    value_type* ptr = m_allocator.allocate(new_cap);
-    if (!ptr)
+    auto ptr = allocator_traits<allocator_type>::allocate(err, m_allocator, new_cap);
+    if (err)
     {
-        ec = error_condition(nestl::errc::not_enough_memory);
         return;
     }
     nestl::detail::allocation_scoped_guard<value_type*, allocator_type> guard(m_allocator, ptr, new_cap);
 
-    ec = nestl::uninitialised_copy(m_start, m_finish, ptr, m_allocator);
-    if (ec)
+    nestl::uninitialised_copy(err, m_start, m_finish, ptr, m_allocator);
+    if (err)
     {
         return;
     }

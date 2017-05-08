@@ -12,7 +12,7 @@ void run_tests()
     {
         vector<int> vec;
 
-        ASSERT_OPERATION_SUCCESS(vec.assign_nothrow(ec, 0));
+        ASSERT_OPERATION_SUCCESS(vec.assign_nothrow(_, 0));
 
         CheckVectorSize(vec, 0);
     }
@@ -22,7 +22,7 @@ void run_tests()
         vector<int> vec;
         int defaultParam = 0;
 
-        ASSERT_OPERATION_SUCCESS(vec.assign_nothrow(ec, expectedSize, defaultParam));
+        ASSERT_OPERATION_SUCCESS(vec.assign_nothrow(_, expectedSize, defaultParam));
 
         CheckVectorSize(vec, expectedSize);
 
@@ -38,7 +38,7 @@ void run_tests()
         vector<int> vec;
         int defaultParam = 0;
 
-        ASSERT_OPERATION_SUCCESS(vec.assign_nothrow(ec, expectedSize, defaultParam));
+        ASSERT_OPERATION_SUCCESS(vec.assign_nothrow(_, expectedSize, defaultParam));
 
         CheckVectorSize(vec, expectedSize);
 
@@ -59,7 +59,7 @@ void run_tests()
         vector<int> vec;
         int val = 0;
 
-        ASSERT_OPERATION_SUCCESS(vec.insert_nothrow(ec, vec.begin(), val));
+        ASSERT_OPERATION_SUCCESS(vec.insert_nothrow(_, vec.begin(), val));
 
         CheckVectorSize(vec, 1);
 
@@ -81,7 +81,7 @@ void run_tests()
         int values [] = {0, 1, 2, 3, 4, 5};
         const size_t expectedSize = nestl::distance(std::begin(values), std::end(values));
 
-        ASSERT_OPERATION_SUCCESS(vec.assign_nothrow(ec, std::begin(values), std::end(values)));
+        ASSERT_OPERATION_SUCCESS(vec.assign_nothrow(_, std::begin(values), std::end(values)));
 
         CheckVectorSize(vec, expectedSize);
 
@@ -103,13 +103,13 @@ void run_tests()
         typedef vector<int>::iterator iterator_t;
         vector<int> vec;
 
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(ec, 1));
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(ec, 2));
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(ec, 3));
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(ec, 4));
+        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 1));
+        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 2));
+        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 3));
+        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 4));
 
         iterator_t st;
-        ASSERT_OPERATION_SUCCESS(st = vec.insert_nothrow(ec, vec.begin(), 0););
+        ASSERT_OPERATION_SUCCESS(st = vec.insert_nothrow(_, vec.begin(), 0););
         CheckVectorSize(vec, 5);
         EXPECT_EQ(vec.begin(), st);
 
@@ -124,13 +124,13 @@ void run_tests()
         typedef vector<int>::iterator iterator_t;
         vector<int> vec;
 
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(ec, 0));
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(ec, 1));
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(ec, 2));
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(ec, 3));
+        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 0));
+        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 1));
+        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 2));
+        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 3));
 
         iterator_t st;
-        ASSERT_OPERATION_SUCCESS(st = vec.insert_nothrow(ec, vec.end(), 4););
+        ASSERT_OPERATION_SUCCESS(st = vec.insert_nothrow(_, vec.end(), 4););
         CheckVectorSize(vec, 5);
         EXPECT_EQ(vec.end() - 1, st);
 
@@ -147,7 +147,7 @@ void run_tests()
         vector<int> vec;
         int val = 0;
 
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(ec, val));
+        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, val));
 
         CheckVectorSize(vec, 1);
     }
@@ -157,7 +157,7 @@ void run_tests()
         vector<int> vec;
         int val = 0;
 
-        ASSERT_OPERATION_SUCCESS(vec.emplace_back_nothrow(ec, val));
+        ASSERT_OPERATION_SUCCESS(vec.emplace_back_nothrow(_, val));
 
         CheckVectorSize(vec, 1);
     }

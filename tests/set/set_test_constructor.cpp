@@ -34,7 +34,7 @@ void run_tests()
     {
         nestl::set<int> s1;
 
-        ASSERT_OPERATION_SUCCESS(s1.insert_nothrow(ec, 10));
+        ASSERT_OPERATION_SUCCESS(s1.insert_nothrow(_, 10));
 
         nestl::set<int> s2(std::move(s1));
 
@@ -97,7 +97,7 @@ void run_tests()
     {
         nestl::set<int, std::less<int>, minimal_allocator<int> > s1;
 
-        ASSERT_OPERATION_SUCCESS(s1.insert_nothrow(ec, 10));
+        ASSERT_OPERATION_SUCCESS(s1.insert_nothrow(_, 10));
 
         nestl::set<int, std::less<int>, minimal_allocator<int> > s2(std::move(s1));
 
@@ -135,7 +135,7 @@ void run_tests()
     {
         nestl::set<int, std::less<int>, allocator_with_state<int> > s1;
 
-        ASSERT_OPERATION_SUCCESS(s1.insert_nothrow(ec, 10));
+        ASSERT_OPERATION_SUCCESS(s1.insert_nothrow(_, 10));
 
         nestl::set<int, std::less<int>, allocator_with_state<int> > s2(std::move(s1));
 

@@ -32,7 +32,7 @@ void run_tests()
     {
         nestl::vector<int> vec1;
 
-        ASSERT_OPERATION_SUCCESS(vec1.assign_nothrow(ec, 10));
+        ASSERT_OPERATION_SUCCESS(vec1.assign_nothrow(_, 10));
 
         nestl::vector<int> vec2(std::move(vec1));
 
@@ -95,7 +95,7 @@ void run_tests()
     {
         nestl::vector<int, minimal_allocator<int> > vec1;
 
-        ASSERT_OPERATION_SUCCESS(vec1.assign_nothrow(ec, 10));
+        ASSERT_OPERATION_SUCCESS(vec1.assign_nothrow(_, 10));
 
 		nestl::vector<int, minimal_allocator<int> > vec2(std::move(vec1));
 
@@ -132,7 +132,7 @@ void run_tests()
     {
         nestl::vector<int, allocator_with_state<int> > vec1;
 
-        ASSERT_OPERATION_SUCCESS(vec1.assign_nothrow(ec, 10));
+        ASSERT_OPERATION_SUCCESS(vec1.assign_nothrow(_, 10));
 
 		nestl::vector<int, allocator_with_state<int> > vec2(std::move(vec1));
 

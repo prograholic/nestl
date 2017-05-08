@@ -2,8 +2,12 @@
 #define NESTL_ALLOCATOR_TRAITS_HPP
 
 #include <nestl/config.hpp>
-#include <nestl/class_traits.hpp>
 #include <nestl/detail/select_type.hpp>
+
+#include <nestl/exception_support.hpp>
+
+#include <nestl/has_exceptions/allocator_traits.hpp>
+#include <nestl/no_exceptions/allocator_traits.hpp>
 
 #include <type_traits>
 #include <limits>
@@ -57,55 +61,39 @@ struct max_size_helper<Allocator, SizeType, true>
 };
 
 
-template <typename Allocator, bool>
-struct construct_helper
-{
-    template <typename U, typename ... Args>
-    static void construct(Allocator& /* alloc */, U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
-    {
-		::new(static_cast<void*>(ptr)) U(std::forward<Args>(args)...);
-    }
-};
-
-template <typename Allocator>
-struct construct_helper<Allocator, true>
-{
-    template <typename U, typename ... Args>
-    static void construct(Allocator& alloc, U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
-    {
-		alloc.construct(ptr, std::forward<Args>(args)...);
-    }
-};
-
-
+template <typename Allocator, bool test>
+using construct_helper = exception_support::dispatch<
+    has_exceptions::detail::construct_helper<Allocator, test>,
+    no_exceptions::detail::construct_helper<Allocator, test>>;
 
 } // namespace detail
 
 template <typename Allocator>
 struct allocator_traits
 {
-    typedef Allocator                           allocator_type;
-    typedef typename allocator_type::value_type value_type;
+    typedef Allocator                                 allocator_type;
+    typedef typename allocator_type::value_type       value_type;
+    typedef typename allocator_type::operation_error  operation_error;
 
     NESTL_SELECT_NESTED_TYPE(Allocator, pointer, value_type*);
-    typedef nestl_nested_type_pointer pointer;
+    typedef nestl_nested_type_pointer                 pointer;
 
     NESTL_SELECT_NESTED_TYPE(Allocator, const_pointer, const value_type*);
-    typedef nestl_nested_type_const_pointer const_pointer;
+    typedef nestl_nested_type_const_pointer           const_pointer;
 
 	NESTL_SELECT_NESTED_TYPE(Allocator, propagate_on_container_move_assignment, std::false_type);
     typedef nestl_nested_type_propagate_on_container_move_assignment propagate_on_container_move_assignment;
 
 	NESTL_SELECT_NESTED_TYPE(Allocator, size_type, std::size_t);
-    typedef nestl_nested_type_size_type size_type;
+    typedef nestl_nested_type_size_type               size_type;
 
 
     /**
      * @note Each allocator should provide method allocate
      */
-    static pointer allocate(Allocator& alloc, size_type n, void* hint = 0) NESTL_NOEXCEPT_SPEC
+    static pointer allocate(operation_error& err, Allocator& alloc, size_type n, void* hint = 0) NESTL_NOEXCEPT_SPEC
     {
-        return alloc.allocate(n, hint);
+        return alloc.allocate(err, n, hint);
     }
 
     /**
@@ -139,13 +127,11 @@ struct allocator_traits
     NESTL_CHECK_METHOD_WITH_SIGNATURE(Allocator, construct);
 
     template<typename U, typename ... Args>
-    static void construct(Allocator& alloc, U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    static void construct(operation_error& err, Allocator& alloc, U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
-        typedef has_construct_impl<Allocator, size_type(Allocator::*)(U*, Args...)> has_construct_method;
-		detail::construct_helper<Allocator, has_construct_method::value>::construct(alloc, ptr, std::forward<Args>(args) ...);
+        typedef has_construct_impl<Allocator, size_type(Allocator::*)(operation_error&, U*, Args...)> has_construct_method;
+		detail::construct_helper<Allocator, has_construct_method::value>::construct(err, alloc, ptr, std::forward<Args>(args) ...);
     }
-
-#undef NESTL_ALLOC_DECLARE_STATIC_METHOD
 };
 
 } // namespace nestl

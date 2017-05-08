@@ -54,25 +54,24 @@ void alloc_on_move(Alloc& src, Alloc& dst) NESTL_NOEXCEPT_SPEC
 }
 
 
-template <typename Alloc, typename OperationError>
-OperationError alloc_on_copy(Alloc& src, const Alloc& dst, std::true_type) NESTL_NOEXCEPT_SPEC
+template <typename Alloc>
+void alloc_on_copy(typename Alloc::operation_error& err, Alloc& src, const Alloc& dst, std::true_type) NESTL_NOEXCEPT_SPEC
 {
-    return nestl::detail::assign(src, dst);
+    nestl::detail::assign(err, src, dst);
 }
 
-template <typename Alloc, typename OperationError>
-OperationError alloc_on_copy(Alloc& /* src */, const Alloc& /* dst */, std::false_type) NESTL_NOEXCEPT_SPEC
+template <typename Alloc>
+void alloc_on_copy(typename Alloc::operation_error& /* err */, Alloc& /* src */, const Alloc& /* dst */, std::false_type) NESTL_NOEXCEPT_SPEC
 {
-    return OperationError();
 }
 
-template <typename Alloc, typename OperationError>
-void alloc_on_copy(Alloc& src, const Alloc& dst) NESTL_NOEXCEPT_SPEC
+template <typename Alloc>
+void alloc_on_copy(typename Alloc::operation_error& err, Alloc& src, const Alloc& dst) NESTL_NOEXCEPT_SPEC
 {
     typedef nestl::allocator_traits<Alloc> alloc_traits;
     typedef typename alloc_traits::propagate_on_container_copy_assignment copy_requred;
 
-    return alloc_on_copy(src, dst, copy_requred());
+    alloc_on_copy(err, src, dst, copy_requred());
 }
 
 } // namespace detail

@@ -85,8 +85,7 @@ private:
     allocation_scoped_guard& operator =(const allocation_scoped_guard& ) = delete;
 };
 
-}
-
+} // namespace detail
 } // namespace nestl
 
 #endif // NESTL_DETAIL_CONSTRUCT_HPP

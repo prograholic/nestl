@@ -11,7 +11,7 @@ void run_tests()
     {
         nestl::set<int> s;
 
-        ASSERT_OPERATION_SUCCESS(s.insert_nothrow(ec, 10));
+        ASSERT_OPERATION_SUCCESS(s.insert_nothrow(_, 10));
 
         CheckSetSize(s, 1);
     }

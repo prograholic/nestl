@@ -1,23 +1,31 @@
 #ifndef NESTL_TESTS_NESTL_PRINTERS_HPP
 #define NESTL_TESTS_NESTL_PRINTERS_HPP
 
-#include <nestl/system_error.hpp>
 #include <nestl/operation_error.hpp>
 
 #include <ostream>
 
 
-inline std::ostream& operator <<(std::ostream& strm, const nestl::error_condition& ec)
+inline std::ostream& operator <<(std::ostream& strm, const nestl::has_exceptions::operation_error& err)
 {
-    strm << "error_condition { message : " << ec.message() << ", value: " << ec.value() << " };";
+    try
+    {
+        std::rethrow_exception(err.value());
+    }
+    catch (const std::exception& e)
+    {
+        strm << "std::exception { message : " << e.what() << " };";
+    }
+    catch (...)
+    {
+        strm << "unknown exception";
+    }
     return strm;
 }
 
-
-template <typename Result, typename OperationError>
-inline std::ostream& operator <<(std::ostream& strm, const nestl::result_with_operation_error<Result, OperationError>& ec)
+inline std::ostream& operator <<(std::ostream& strm, const nestl::no_exceptions::operation_error& err)
 {
-    strm << "result_with_operation_error { message : " << ec.error().message() << ", value: " << ec.error().value() << " };";
+    strm << "operation_error {value: " << err.value() << " };";
     return strm;
 }
 

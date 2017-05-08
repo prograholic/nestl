@@ -30,11 +30,11 @@ void fatal_failure(Args&&... args)
 
 
 
-void check_ec(const nestl::error_condition& ec, const char* msg)
+void check_error(const nestl::operation_error& err, const char* msg)
 {
-    if (ec)
+    if (err)
     {
-        fatal_failure("operation ", msg, " failed with following error: ", ec);
+        fatal_failure("operation ", msg, " failed with following error: ", err);
     }
 }
 
@@ -42,9 +42,9 @@ void check_ec(const nestl::error_condition& ec, const char* msg)
 do \
 { \
  \
-    error_condition ec; \
+    nestl::operation_error _; \
     val; \
-    check_ec(ec, #val); \
+    check_error(_, #val); \
 } while(0) \
 
 
@@ -85,10 +85,9 @@ struct non_copyable
     {
     }
 
-    nestl::error_condition assign(const non_copyable& other) NESTL_NOEXCEPT_SPEC
+    void assign(nestl::operation_error& /* op */, const non_copyable& other) NESTL_NOEXCEPT_SPEC
     {
         v = other.v;
-        return nestl::error_condition();
     }
 
     int v;
@@ -113,33 +112,30 @@ inline std::ostream& operator << (std::ostream& strm, const non_copyable& val)
 
 
 template <>
-struct class_traits<test::non_copyable>
+struct class_operations<test::non_copyable>
 {
-    template <typename OperationError, typename Allocator>
-    static OperationError construct(test::non_copyable* ptr,
-                                    Allocator& alloc,
-                                    const test::non_copyable& other) NESTL_NOEXCEPT_SPEC
+    template <typename Allocator>
+    static void construct(typename Allocator::operation_error& err,
+                          test::non_copyable* ptr,
+                          Allocator& alloc,
+                          const test::non_copyable& other) NESTL_NOEXCEPT_SPEC
     {
-        alloc.construct(ptr);
+        allocator_traits<Allocator>::construct(err, ptr);
+        if (err)
+        {
+            return;
+        }
 
         test::non_copyable* end = ptr + 1;
         nestl::detail::destruction_scoped_guard<test::non_copyable*, Allocator> guard(ptr, end, alloc);
 
-        OperationError err = ptr->assign(other);
+        ptr->assign(err, other);
         if (err)
         {
-            return err;
+            return;
         }
 
         guard.release();
-        return err;
-    }
-
-    template <typename OperationError, typename Allocator>
-    static OperationError construct(test::non_copyable* ptr, Allocator& alloc) NESTL_NOEXCEPT_SPEC
-    {
-        alloc.construct(ptr);
-        return OperationError();
     }
 };
 
