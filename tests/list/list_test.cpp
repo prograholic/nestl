@@ -284,6 +284,26 @@ void run_tests()
 
         CheckListSize(l, 1);
     }
+
+#if NESTL_HAS_EXCEPTIONS
+
+    {
+        list<int> l;
+        l.push_back(42);
+
+        CheckListSize(l, 1);
+    }
+
+    {
+        list<int> l1;
+        l1.push_back(42);
+
+        list<int> l2(l1);
+
+        CheckListSize(l2, 1);
+    }
+
+#endif /* NESTL_HAS_EXCEPTIONS */
 }
 
 

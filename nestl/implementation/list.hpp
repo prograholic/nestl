@@ -513,7 +513,7 @@ public:
     void insert_nothrow(OperationError& err, const_iterator pos, size_type count, const value_type& value) NESTL_NOEXCEPT_SPEC;
 
     template<typename OperationError, typename InputIterator>
-    void insert(OperationError& err, const_iterator pos, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
+    void insert_nothrow(OperationError& err, const_iterator pos, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC;
 
     template<typename OperationError, typename ... Args>
     iterator emplace_nothrow(OperationError& err, const_iterator pos, Args&&... args) NESTL_NOEXCEPT_SPEC;
@@ -954,7 +954,7 @@ list<T, A>::insert_nothrow(OperationError& err, const_iterator pos, size_type co
 template <typename T, typename A>
 template<typename OperationError, typename InputIterator>
 void
-list<T, A>::insert(OperationError& err, const_iterator pos, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC
+list<T, A>::insert_nothrow(OperationError& err, const_iterator pos, InputIterator first, InputIterator last) NESTL_NOEXCEPT_SPEC
 {
     while (first != last)
     {

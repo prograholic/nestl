@@ -16,12 +16,12 @@ class exception_ptr_error
 {
 public:
 
-    exception_ptr_error()
+    exception_ptr_error() NESTL_NOEXCEPT_SPEC
         : m_exception()
     {
     }
 
-    explicit exception_ptr_error(::std::exception_ptr val)
+    explicit exception_ptr_error(::std::exception_ptr val) NESTL_NOEXCEPT_SPEC
         : m_exception(val)
     {
     }
@@ -42,7 +42,7 @@ private:
 
 inline
 void
-from_exception_ptr(exception_ptr_error& err, std::exception_ptr eptr)
+from_exception_ptr(exception_ptr_error& err, std::exception_ptr eptr) NESTL_NOEXCEPT_SPEC
 {
     err = exception_ptr_error(eptr);
 }
@@ -50,7 +50,7 @@ from_exception_ptr(exception_ptr_error& err, std::exception_ptr eptr)
 template <typename ExceptionType>
 inline
 void
-from_exception(exception_ptr_error& err, ExceptionType exc)
+from_exception(exception_ptr_error& err, ExceptionType exc) NESTL_NOEXCEPT_SPEC
 {
     from_exception_ptr(err, std::make_exception_ptr(exc));
 }
@@ -60,7 +60,7 @@ from_exception(exception_ptr_error& err, ExceptionType exc)
 
 inline
 void
-build_length_error(exception_ptr_error& err)
+build_length_error(exception_ptr_error& err) NESTL_NOEXCEPT_SPEC
 {
     from_exception(err, std::length_error("length error"));
 }
@@ -72,6 +72,13 @@ build_bad_alloc(exception_ptr_error& err)
     from_exception(err, std::bad_alloc());
 }
 
+
+inline
+void
+throw_exception(exception_ptr_error err)
+{
+    std::rethrow_exception(err.value());
+}
 
 
 } // namespace has_exceptions
