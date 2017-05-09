@@ -7,11 +7,6 @@ compiler:
 env:
   global:
     - BUILD_TYPE=Debug
-  matrix:
-    - DISABLE_STD=Yes CONFIG_HAS_CXX11=Yes
-    - DISABLE_STD=Yes CONFIG_HAS_CXX11=No
-    - DISABLE_STD=No  CONFIG_HAS_CXX11=Yes
-    - DISABLE_STD=No  CONFIG_HAS_CXX11=No
 
 before_install:
   - wget http://www.cmake.org/files/v3.1/cmake-3.1.1-Linux-x86_64.tar.gz
@@ -20,9 +15,6 @@ before_install:
   - rm -rf cmake-3.1.1-Linux-x86_64
   - rm cmake-3.1.1-Linux-x86_64.tar.gz
   - cmake --version
-  - wget https://googlemock.googlecode.com/files/gmock-1.7.0.zip
-  - unzip gmock-1.7.0.zip
-  - rm gmock-1.7.0.zip
 
 
 before_script:
@@ -30,7 +22,7 @@ before_script:
   - cd build
 
 script:
-  - cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DNESTL_DISABLE_STD=${DISABLE_STD} -DNESTL_CONFIG_HAS_CXX11=${CONFIG_HAS_CXX11}
+  - cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
   - make
   - make test
 

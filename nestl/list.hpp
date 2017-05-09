@@ -14,7 +14,6 @@
 #include <nestl/class_operations.hpp>
 #include <nestl/algorithm.hpp>
 #include <nestl/alignment.hpp>
-#include <nestl/functional.hpp>
 
 #include <cassert>
 

@@ -2,7 +2,6 @@
 #define NESTL_SET_HPP
 
 #include <nestl/config.hpp>
-#include <nestl/functional.hpp>
 
 #include <nestl/detail/red_black_tree.hpp>
 
@@ -12,6 +11,19 @@ namespace nestl
 namespace detail
 {
 
+template <typename T>
+struct identity : public std::unary_function<T, T>
+{
+    T& operator()(T& x) const
+    {
+        return x;
+    }
+
+    const T& operator()(const T& x) const
+    {
+        return x;
+    }
+};
 
 
 } // namespace detail
