@@ -2,7 +2,8 @@ language: cpp
 
 compiler:
   - clang
-  - gcc
+  # temporarily disable gcc, need to figure out minimal supported version
+  #- gcc
 
 env:
   global:

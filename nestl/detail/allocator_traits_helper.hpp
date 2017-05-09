@@ -1,11 +1,15 @@
-#ifndef NESTL_ALLOCATOR_TRAITS_HELPER_HPP
-#define NESTL_ALLOCATOR_TRAITS_HELPER_HPP
+#ifndef NESTL_DETAIL_ALLOCATOR_TRAITS_HELPER_HPP
+#define NESTL_DETAIL_ALLOCATOR_TRAITS_HELPER_HPP
 
 #include <nestl/config.hpp>
 
 #include <nestl/detail/select_type.hpp>
 
+#include <utility>
+
 namespace nestl
+{
+namespace detail
 {
 
 template <template <typename, typename ...> class Alloc, typename T1, typename T2, typename ... Args>
@@ -29,15 +33,10 @@ struct allocator_rebind<Alloc<U, Args...>, T>
     typedef typename allocator_rebind_helper<Alloc, T, U, Args...>::other other;
 };
 
-namespace detail
-{
-
 template <typename Alloc>
 void alloc_on_move(Alloc& src, Alloc& dst, std::true_type) NESTL_NOEXCEPT_SPEC
 {
-    /// @todo provide move for c++-03 version
-
-    src = NESTL_MOVE_IF_SUPPORTED(dst);
+    src = std::move(dst);
 }
 
 template <typename Alloc>
@@ -54,19 +53,19 @@ void alloc_on_move(Alloc& src, Alloc& dst) NESTL_NOEXCEPT_SPEC
 }
 
 
-template <typename Alloc>
-void alloc_on_copy(typename Alloc::operation_error& err, Alloc& src, const Alloc& dst, std::true_type) NESTL_NOEXCEPT_SPEC
+template <typename OperationError, typename Alloc>
+void alloc_on_copy(OperationError& err, Alloc& src, const Alloc& dst, std::true_type) NESTL_NOEXCEPT_SPEC
 {
     nestl::detail::assign(err, src, dst);
 }
 
-template <typename Alloc>
-void alloc_on_copy(typename Alloc::operation_error& /* err */, Alloc& /* src */, const Alloc& /* dst */, std::false_type) NESTL_NOEXCEPT_SPEC
+template <typename OperationError, typename Alloc>
+void alloc_on_copy(OperationError& /* err */, Alloc& /* src */, const Alloc& /* dst */, std::false_type) NESTL_NOEXCEPT_SPEC
 {
 }
 
-template <typename Alloc>
-void alloc_on_copy(typename Alloc::operation_error& err, Alloc& src, const Alloc& dst) NESTL_NOEXCEPT_SPEC
+template <typename OperationError, typename Alloc>
+void alloc_on_copy(OperationError& err, Alloc& src, const Alloc& dst) NESTL_NOEXCEPT_SPEC
 {
     typedef nestl::allocator_traits<Alloc> alloc_traits;
     typedef typename alloc_traits::propagate_on_container_copy_assignment copy_requred;
@@ -75,8 +74,7 @@ void alloc_on_copy(typename Alloc::operation_error& err, Alloc& src, const Alloc
 }
 
 } // namespace detail
-
 } // namespace nestl
 
 
-#endif /* NESTL_ALLOCATOR_TRAITS_HELPER_HPP */
+#endif /* NESTL_DETAIL_ALLOCATOR_TRAITS_HELPER_HPP */

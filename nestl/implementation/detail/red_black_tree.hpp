@@ -4,21 +4,23 @@
  * http://en.literateprograms.org/Red-black_tree_(C)
  */
 
-#ifndef NESTL_DETAIL_RED_BLACK_TREE_HPP
-#define NESTL_DETAIL_RED_BLACK_TREE_HPP
+#ifndef NESTL_IMPLEMENTATION_DETAIL_RED_BLACK_TREE_HPP
+#define NESTL_IMPLEMENTATION_DETAIL_RED_BLACK_TREE_HPP
 
 #include <nestl/config.hpp>
 #include <nestl/alignment.hpp>
 #include <nestl/allocator.hpp>
 #include <nestl/class_operations.hpp>
-#include <nestl/allocator_traits_helper.hpp>
 #include <nestl/algorithm.hpp>
+
+#include <nestl/detail/allocator_traits_helper.hpp>
 
 #include <cassert>
 
 namespace nestl
 {
-
+namespace impl
+{
 namespace detail
 {
 
@@ -99,11 +101,12 @@ struct rb_tree_node : public rb_tree_node_base
 };
 
 } // namespace detail
+} // namespace impl
 
 template <typename Val>
-struct class_operations<detail::rb_tree_node<Val> >
+struct class_operations<impl::detail::rb_tree_node<Val> >
 {
-    typedef detail::rb_tree_node<Val> link_type;
+    typedef impl::detail::rb_tree_node<Val> link_type;
 
     template <typename OperationError, typename Allocator, typename ... Args>
     static void construct(OperationError& err, link_type* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
@@ -112,7 +115,8 @@ struct class_operations<detail::rb_tree_node<Val> >
     }
 };
 
-
+namespace impl
+{
 namespace detail
 {
 
@@ -649,7 +653,7 @@ template<typename Key, typename Val, typename KeyOfValue,
          typename Compare, typename Alloc = allocator<Val> >
 class rb_tree
 {
-    typedef typename nestl::allocator_rebind<Alloc, rb_tree_node<Val> >::other node_allocator;
+    typedef typename nestl::detail::allocator_rebind<Alloc, rb_tree_node<Val> >::other node_allocator;
     typedef nestl::allocator_traits<node_allocator>            node_allocator_traits;
 
 protected:
@@ -2278,9 +2282,9 @@ rb_tree<Key, Val, KeyOfValue, Compare, Alloc>::__rb_verify() const NESTL_NOEXCEP
     return true;
 }
 
-
 } // namespace detail
+} // namespace impl
 } // namespace nestl
 
 
-#endif /* NESTL_DETAIL_RED_BLACK_TREE_HPP */
+#endif /* NESTL_IMPLEMENTATION_DETAIL_RED_BLACK_TREE_HPP */
