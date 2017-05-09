@@ -64,6 +64,7 @@ public:
         return *this;
     }
     // TODO: add missing ctors and methods;
+    // TODO: add ctors and operators from no_exceptions::list
 
     using base_t::get_allocator;
     using base_t::copy_nothrow;
