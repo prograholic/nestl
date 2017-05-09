@@ -6,8 +6,8 @@
 
 #include <nestl/exception_support.hpp>
 
-#include <nestl/has_exceptions/allocator_traits.hpp>
-#include <nestl/no_exceptions/allocator_traits.hpp>
+#include <nestl/has_exceptions/detail/allocator_traits_construct_helper.hpp>
+#include <nestl/no_exceptions/detail/allocator_traits_construct_helper.hpp>
 
 #include <type_traits>
 #include <limits>
@@ -38,9 +38,6 @@ struct destroy_helper<Allocator, true>
         alloc.destroy(ptr);
     }
 };
-
-
-
 
 template <typename Allocator, typename SizeType, bool>
 struct max_size_helper
@@ -73,7 +70,6 @@ struct allocator_traits
 {
     typedef Allocator                                 allocator_type;
     typedef typename allocator_type::value_type       value_type;
-    typedef typename allocator_type::operation_error  operation_error;
 
     NESTL_SELECT_NESTED_TYPE(Allocator, pointer, value_type*);
     typedef nestl_nested_type_pointer                 pointer;
@@ -91,7 +87,8 @@ struct allocator_traits
     /**
      * @note Each allocator should provide method allocate
      */
-    static pointer allocate(operation_error& err, Allocator& alloc, size_type n, void* hint = 0) NESTL_NOEXCEPT_SPEC
+    template <typename OperationError>
+    static pointer allocate(OperationError& err, Allocator& alloc, size_type n, void* hint = 0) NESTL_NOEXCEPT_SPEC
     {
         return alloc.allocate(err, n, hint);
     }
@@ -126,10 +123,10 @@ struct allocator_traits
 
     NESTL_CHECK_METHOD_WITH_SIGNATURE(Allocator, construct);
 
-    template<typename U, typename ... Args>
-    static void construct(operation_error& err, Allocator& alloc, U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    template<typename OperationError, typename U, typename ... Args>
+    static void construct(OperationError& err, Allocator& alloc, U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
-        typedef has_construct_impl<Allocator, size_type(Allocator::*)(operation_error&, U*, Args...)> has_construct_method;
+        typedef has_construct_impl<Allocator, size_type(Allocator::*)(OperationError&, U*, Args...)> has_construct_method;
 		detail::construct_helper<Allocator, has_construct_method::value>::construct(err, alloc, ptr, std::forward<Args>(args) ...);
     }
 };

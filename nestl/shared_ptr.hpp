@@ -6,7 +6,6 @@
 #include <nestl/memory.hpp>
 #include <nestl/allocator.hpp>
 #include <nestl/alignment.hpp>
-#include <nestl/operation_error.hpp>
 
 #include <nestl/detail/construct.hpp>
 
@@ -119,8 +118,8 @@ public:
         alloc.deallocate(this, 1);
     }
 
-    template <typename ... Args>
-    void initialize(typename allocator_type::operation_error& err, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    template <typename OperationError, typename ... Args>
+    void initialize(OperationError& err, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
         nestl::detail::construct(err, get(), m_allocator, std::forward<Args>(args) ...);
     }
@@ -207,9 +206,9 @@ private:
     template <typename Y>
     friend class shared_ptr;
 
-    template <typename Type, typename Allocator, typename ... Args>
+    template <typename Type, typename OperationError, typename Allocator, typename ... Args>
     friend
-    shared_ptr<Type> make_shared_a_nothrow(typename Allocator::operation_error& err, Allocator& alloc, Args&& ... args);
+    shared_ptr<Type> make_shared_a_nothrow(OperationError& err, Allocator& alloc, Args&& ... args);
 };
 
 
@@ -504,8 +503,8 @@ bool shared_ptr<T>::unique() const NESTL_NOEXCEPT_SPEC
     return (use_count() == 1);
 }
 
-template <typename T, typename Allocator, typename ... Args>
-shared_ptr<T> make_shared_a_nothrow(typename Allocator::operation_error& err, Allocator& /* alloc */, Args&& ... args)
+template <typename T, typename OperationError, typename Allocator, typename ... Args>
+shared_ptr<T> make_shared_a_nothrow(OperationError& err, Allocator& /* alloc */, Args&& ... args)
 {
     static_assert(sizeof(T), "T must be complete type");
     typedef detail::type_stored_by_value<T, Allocator> shared_count_t;
@@ -535,8 +534,8 @@ shared_ptr<T> make_shared_a_nothrow(typename Allocator::operation_error& err, Al
     return shared_ptr<T>(ptr->get(), ptr);
 }
 
-template <typename T, typename ... Args>
-shared_ptr<T> make_shared_nothrow(operation_error& err, Args&& ... args)
+template <typename T, typename OperationError, typename ... Args>
+shared_ptr<T> make_shared_nothrow(OperationError& err, Args&& ... args)
 {
     nestl::allocator<T> alloc;
 	return make_shared_a_nothrow<T>(err, alloc, std::forward<Args>(args) ...);

@@ -1,5 +1,5 @@
-#ifndef NESTL_NO_EXCEPTIONS_OPERATION_ERROR_HPP
-#define NESTL_NO_EXCEPTIONS_OPERATION_ERROR_HPP
+#ifndef NESTL_NO_EXCEPTIONS_ERRC_BASED_ERROR_HPP
+#define NESTL_NO_EXCEPTIONS_ERRC_BASED_ERROR_HPP
 
 #include <nestl/config.hpp>
 
@@ -19,20 +19,19 @@ enum
 
 } // namespace errc
 
-
 namespace no_exceptions
 {
 
-class operation_error
+class errc_based_error
 {
 public:
 
-    operation_error()
+    errc_based_error() NESTL_NOEXCEPT_SPEC
         : m_value(0)
     {
     }
 
-    explicit operation_error(int val)
+    explicit errc_based_error(int val) NESTL_NOEXCEPT_SPEC
         : m_value(val)
     {
     }
@@ -53,19 +52,19 @@ private:
 
 inline
 void
-build_length_error(operation_error& op)
+build_length_error(errc_based_error& op)
 {
-    op = operation_error(errc::value_too_large);
+    op = errc_based_error(errc::value_too_large);
 }
 
 inline
 void
-build_bad_alloc(operation_error& op)
+build_bad_alloc(errc_based_error& op)
 {
-    op = operation_error(errc::not_enough_memory);
+    op = errc_based_error(errc::not_enough_memory);
 }
 
 } // namespace no_exceptions
 } // namespace nestl
 
-#endif /* NESTL_NO_EXCEPTIONS_OPERATION_ERROR_HPP */
+#endif /* NESTL_NO_EXCEPTIONS_ERRC_BASED_ERROR_HPP */

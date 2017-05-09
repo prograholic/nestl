@@ -4,7 +4,6 @@
 #include <nestl/config.hpp>
 
 #include <nestl/memory.hpp>
-#include <nestl/no_exceptions/operation_error.hpp>
 
 #include <type_traits>
 #include <limits>
@@ -16,7 +15,7 @@ namespace nestl
 namespace no_exceptions
 {
 
-template <typename T, typename OperationError = operation_error>
+template <typename T>
 class allocator
 {
 public:
@@ -29,8 +28,6 @@ public:
     typedef std::ptrdiff_t  difference_type;
 
     typedef std::true_type  propagate_on_container_move_assignment;
-
-    typedef OperationError  operation_error;
 
     template<typename U>
     struct rebind
@@ -65,7 +62,8 @@ public:
         return std::addressof(x);
     }
 
-    pointer allocate(operation_error& err, size_type n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    template<typename OperationError>
+    pointer allocate(OperationError& err, size_type n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
         pointer res = static_cast<pointer>(::operator new(n * sizeof(value_type), std::nothrow));
         if (res == nullptr)
@@ -86,8 +84,8 @@ public:
         return std::numeric_limits<size_type>::max();
     }
 
-    template<typename U, typename ... Args>
-    void construct(operation_error& err, U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    template<typename OperationError, typename U, typename ... Args>
+    void construct(OperationError& /* err */, U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
         NESTL_ASSERT(ptr);
         ::new(static_cast<void*>(ptr)) U(std::forward<Args>(args)...);

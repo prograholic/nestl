@@ -5,8 +5,6 @@
 #include <nestl/shared_ptr.hpp>
 #include <nestl/set.hpp>
 
-#include <nestl/operation_error.hpp>
-
 #include "tests/test_common.hpp"
 
 namespace nestl
@@ -17,13 +15,12 @@ namespace test
 /**
  * @brief Minimal allocator implementation
  */
-template <typename T, typename OperationError = operation_error>
+template <typename T>
 class minimal_allocator
 {
 public:
 
     typedef T value_type;
-    typedef OperationError operation_error;
 
     minimal_allocator() NESTL_NOEXCEPT_SPEC
     {
@@ -38,7 +35,8 @@ public:
     {
     }
 
-    T* allocate(operation_error& err, std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    template <typename OperationError>
+    T* allocate(OperationError& err, std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
         auto res = static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
         if (!res)
@@ -59,13 +57,12 @@ public:
 /**
  * Allocator which always fail (return zero)
  */
-template <typename T, typename OperationError = operation_error>
+template <typename T>
 class zero_allocator
 {
 public:
 
     typedef T               value_type;
-    typedef OperationError operation_error;
 
     zero_allocator() NESTL_NOEXCEPT_SPEC
     {
@@ -84,7 +81,8 @@ public:
     {
     }
 
-    T* allocate(operation_error& err, std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    template <typename OperationError>
+    T* allocate(OperationError& err, std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
         build_bad_alloc(err);
 
@@ -101,13 +99,12 @@ public:
 /**
  * Allocator which has its own state (remember who allocate memory)
  */
-template <typename T, typename OperationError = operation_error>
+template <typename T>
 class allocator_with_state
 {
 public:
 
     typedef T               value_type;
-    typedef OperationError  operation_error;
 
     allocator_with_state() NESTL_NOEXCEPT_SPEC
         : m_allocated_storage()
@@ -176,7 +173,8 @@ public:
         }
     }
 
-    T* allocate(operation_error& err, std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
+    template <typename OperationError>
+    T* allocate(OperationError& err, std::size_t n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
         auto res = static_cast<T*>(::operator new(n * sizeof(value_type), std::nothrow));
         if (!res)

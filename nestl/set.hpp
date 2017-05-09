@@ -51,8 +51,6 @@ public:
 
     typedef std::pair<iterator, bool>                                               iterator_with_flag;
 
-    typedef typename allocator_type::operation_error                                operation_error;
-
 // constructors
     explicit set(const Compare& comp = Compare(), const Alloc& alloc = Alloc()) NESTL_NOEXCEPT_SPEC;
     explicit set(const Alloc& alloc) NESTL_NOEXCEPT_SPEC;
@@ -65,7 +63,8 @@ public:
 // assignment operators and functions
     set& operator=(set&& other) NESTL_NOEXCEPT_SPEC;
 
-    void copy_nothrow(operation_error& err, const set& other) NESTL_NOEXCEPT_SPEC;
+    template <typename OperationError>
+    void copy_nothrow(OperationError& err, const set& other) NESTL_NOEXCEPT_SPEC;
 
 
 // iterators
@@ -105,9 +104,11 @@ public:
 // modifiers
     void clear() NESTL_NOEXCEPT_SPEC;
 
-    iterator_with_flag insert_nothrow(operation_error& err, const value_type& val) NESTL_NOEXCEPT_SPEC;
+    template <typename OperationError>
+    iterator_with_flag insert_nothrow(OperationError& err, const value_type& val) NESTL_NOEXCEPT_SPEC;
 
-    iterator_with_flag insert_nothrow(operation_error& err, value_type&& val) NESTL_NOEXCEPT_SPEC;
+    template <typename OperationError>
+    iterator_with_flag insert_nothrow(OperationError& err, value_type&& val) NESTL_NOEXCEPT_SPEC;
 
     iterator erase(const_iterator pos) NESTL_NOEXCEPT_SPEC;
 
@@ -172,8 +173,9 @@ set<T, C, A>::operator=(set&& other) NESTL_NOEXCEPT_SPEC
 }
 
 template <typename T, typename C, typename A>
+template <typename OperationError>
 void
-set<T, C, A>::copy_nothrow(operation_error& err, const set& other) NESTL_NOEXCEPT_SPEC
+set<T, C, A>::copy_nothrow(OperationError& err, const set& other) NESTL_NOEXCEPT_SPEC
 {
     m_impl.copy_nothrow(err, other.m_impl);
 }
@@ -297,15 +299,17 @@ set<T, C, A>::clear() NESTL_NOEXCEPT_SPEC
 }
 
 template <typename T, typename C, typename A>
+template <typename OperationError>
 typename set<T, C, A>::iterator_with_flag
-set<T, C, A>::insert_nothrow(operation_error& err, const value_type& val) NESTL_NOEXCEPT_SPEC
+set<T, C, A>::insert_nothrow(OperationError& err, const value_type& val) NESTL_NOEXCEPT_SPEC
 {
     return m_impl.m_insert_unique(err, val);
 }
 
 template <typename T, typename C, typename A>
+template <typename OperationError>
 typename set<T, C, A>::iterator_with_flag
-set<T, C, A>::insert_nothrow(operation_error& err, value_type&& val) NESTL_NOEXCEPT_SPEC
+set<T, C, A>::insert_nothrow(OperationError& err, value_type&& val) NESTL_NOEXCEPT_SPEC
 {
 	return m_impl.m_insert_unique(err, std::forward<value_type>(val));
 }

@@ -11,8 +11,8 @@ namespace nestl
 {
 
 
-template <typename InputIterator, typename ForwardIterator, typename Allocator>
-ForwardIterator uninitialised_copy(typename Allocator::operation_error& err,
+template <typename OperationError, typename InputIterator, typename ForwardIterator, typename Allocator>
+ForwardIterator uninitialised_copy(OperationError& err,
                                    InputIterator first,
                                    InputIterator last,
                                    ForwardIterator output,

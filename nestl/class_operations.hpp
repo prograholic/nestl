@@ -15,8 +15,8 @@ namespace nestl
 template <typename T>
 struct class_operations
 {
-    template <typename Allocator, typename ... Args>
-    static void construct(typename Allocator::operation_error& err, T* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    template <typename OperationError, typename Allocator, typename ... Args>
+    static void construct(OperationError& err, T* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
 		nestl::allocator_traits<Allocator>::construct(err, alloc, ptr, std::forward<Args>(args) ...);
     }
@@ -32,8 +32,8 @@ struct class_operations
 namespace detail
 {
 
-template<typename T, typename Allocator, typename ... Args>
-void construct(typename Allocator::operation_error& err, T* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
+template<typename OperationError, typename T, typename Allocator, typename ... Args>
+void construct(OperationError& err, T* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
 {
 	nestl::class_operations<T>::construct(err, ptr, alloc, std::forward<Args>(args) ...);
 }

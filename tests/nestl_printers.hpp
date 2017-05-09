@@ -1,12 +1,13 @@
 #ifndef NESTL_TESTS_NESTL_PRINTERS_HPP
 #define NESTL_TESTS_NESTL_PRINTERS_HPP
 
-#include <nestl/operation_error.hpp>
+#include <nestl/default_operation_error.hpp>
 
 #include <ostream>
 
+#if NESTL_HAS_EXCEPTIONS
 
-inline std::ostream& operator <<(std::ostream& strm, const nestl::has_exceptions::operation_error& err)
+inline std::ostream& operator <<(std::ostream& strm, const nestl::has_exceptions::exception_ptr_error& err)
 {
     try
     {
@@ -23,7 +24,9 @@ inline std::ostream& operator <<(std::ostream& strm, const nestl::has_exceptions
     return strm;
 }
 
-inline std::ostream& operator <<(std::ostream& strm, const nestl::no_exceptions::operation_error& err)
+#endif /* NESTL_HAS_EXCEPTIONS */
+
+inline std::ostream& operator <<(std::ostream& strm, const nestl::no_exceptions::errc_based_error& err)
 {
     strm << "operation_error {value: " << err.value() << " };";
     return strm;

@@ -30,7 +30,7 @@ void fatal_failure(Args&&... args)
 
 
 
-void check_error(const nestl::operation_error& err, const char* msg)
+void check_error(const nestl::default_operation_error& err, const char* msg)
 {
     if (err)
     {
@@ -42,7 +42,7 @@ void check_error(const nestl::operation_error& err, const char* msg)
 do \
 { \
  \
-    nestl::operation_error _; \
+    nestl::default_operation_error _; \
     val; \
     check_error(_, #val); \
 } while(0) \
@@ -85,7 +85,8 @@ struct non_copyable
     {
     }
 
-    void assign(nestl::operation_error& /* op */, const non_copyable& other) NESTL_NOEXCEPT_SPEC
+    template <typename OperationError>
+    void assign(OperationError& /* err */, const non_copyable& other) NESTL_NOEXCEPT_SPEC
     {
         v = other.v;
     }
@@ -114,8 +115,8 @@ inline std::ostream& operator << (std::ostream& strm, const non_copyable& val)
 template <>
 struct class_operations<test::non_copyable>
 {
-    template <typename Allocator>
-    static void construct(typename Allocator::operation_error& err,
+    template <typename OperationError, typename Allocator>
+    static void construct(OperationError& err,
                           test::non_copyable* ptr,
                           Allocator& alloc,
                           const test::non_copyable& other) NESTL_NOEXCEPT_SPEC

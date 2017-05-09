@@ -14,7 +14,13 @@
 
 #define NESTL_UNUSED
 
-#define NESTL_HAS_EXCEPTIONS                     (_CPPUNWIND == 1)
+#if !defined(_CPPUNWIND)
+#   define NESTL_HAS_EXCEPTIONS                  0
+#else /* _CPPUNWIND */
+#   define NESTL_HAS_EXCEPTIONS                  1
+#endif /* _CPPUNWIND */
+
+
 
 #if (_MSC_VER < NESTL_COMPILER_MSVC_2013)
 
