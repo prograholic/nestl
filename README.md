@@ -165,7 +165,7 @@ Nestl needs following dependencies for running tests:
 * CMake (http://www.cmake.org/), minimal version is 3.0
 
 For configuring building and running nestl test suite one should perform following commands:
-```sh
+```
 mkdir build
 cd build
 cmake

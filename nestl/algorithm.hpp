@@ -48,7 +48,7 @@ copy_if(OperationError& err, InputIterator first, InputIterator last, OutputIter
     {
         if (pred(*first))
         {
-            nestl::detail::assign(err, *d_first, *first);
+            nestl::class_operations::assign(err, *d_first, *first);
             if (err)
             {
                 return d_first;
@@ -66,7 +66,7 @@ copy(OperationError& err, InputIterator first, InputIterator last, OutputIterato
 {
     while (first != last)
     {
-        nestl::detail::assign(err, *d_first, *first);
+        nestl::class_operations::assign(err, *d_first, *first);
         if (err)
         {
             return d_first;

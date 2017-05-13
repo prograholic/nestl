@@ -98,27 +98,13 @@ struct rb_tree_node : public rb_tree_node_base
     {
         return m_storage.ptr();
     }
-};
 
-} // namespace detail
-} // namespace impl
-
-template <typename Val>
-struct class_operations<impl::detail::rb_tree_node<Val> >
-{
-    typedef impl::detail::rb_tree_node<Val> link_type;
-
-    template <typename OperationError, typename Allocator, typename ... Args>
-    static void construct(OperationError& err, link_type* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    template <typename OperationError, typename ... Args>
+    void construct_val(OperationError& err, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
-		return nestl::detail::construct(err, ptr->m_valptr(), alloc, std::forward<Args>(args) ...);
+        return nestl::class_operations::construct(err, m_valptr(), std::forward<Args>(args) ...);
     }
 };
-
-namespace impl
-{
-namespace detail
-{
 
 template <typename RbTreeNodeBasePtr>
 RbTreeNodeBasePtr rb_tree_increment(RbTreeNodeBasePtr x) NESTL_NOEXCEPT_SPEC
@@ -723,9 +709,9 @@ protected:
             return nullptr;
         }
 
-        nestl::detail::allocation_scoped_guard<link_type, node_allocator> guard(node_alloc, l, 1);
+        nestl::detail::deallocation_scoped_guard<link_type, node_allocator> guard(node_alloc, l, 1);
 
-		nestl::detail::construct(err, l, node_alloc, std::forward<Args>(args)...);
+        l->construct_val(err, std::forward<Args>(args)...);
         if (err)
         {
             return nullptr;
@@ -738,7 +724,7 @@ protected:
     void
     m_destroy_node(link_type p) NESTL_NOEXCEPT_SPEC
     {
-        node_allocator_traits::destroy(m_get_node_allocator(), p->m_valptr());
+        nestl::detail::destroy(p->m_valptr());
         p->~rb_tree_node<Val>();
         m_put_node(p);
     }
@@ -1068,7 +1054,7 @@ public:
             }
 #endif //0
 
-            nestl::detail::assign(err, m_impl.m_key_compare, other.m_impl.m_key_compare);
+            nestl::class_operations::assign(err, m_impl.m_key_compare, other.m_impl.m_key_compare);
             if (err)
             {
                 return;

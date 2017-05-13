@@ -113,30 +113,14 @@ inline std::ostream& operator << (std::ostream& strm, const non_copyable& val)
 
 
 template <>
-struct class_operations<test::non_copyable>
+struct two_phase_initializable<test::non_copyable, const test::non_copyable&> : public std::true_type
 {
-    template <typename OperationError, typename Allocator>
-    static void construct(OperationError& err,
-                          test::non_copyable* ptr,
-                          Allocator& alloc,
-                          const test::non_copyable& other) NESTL_NOEXCEPT_SPEC
+    template <typename OperationError>
+    static void init(OperationError& err,
+                     test::non_copyable& defaultConstructed,
+                     const test::non_copyable& other) NESTL_NOEXCEPT_SPEC
     {
-        allocator_traits<Allocator>::construct(err, ptr);
-        if (err)
-        {
-            return;
-        }
-
-        test::non_copyable* end = ptr + 1;
-        nestl::detail::destruction_scoped_guard<test::non_copyable*, Allocator> guard(ptr, end, alloc);
-
-        ptr->assign(err, other);
-        if (err)
-        {
-            return;
-        }
-
-        guard.release();
+        defaultConstructed.assign(err, other);
     }
 };
 

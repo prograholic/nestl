@@ -3,6 +3,8 @@
 
 #include <nestl/config.hpp>
 
+#include <nestl/class_operations.hpp>
+
 #include <nestl/detail/select_type.hpp>
 
 #include <utility>
@@ -56,7 +58,7 @@ void alloc_on_move(Alloc& src, Alloc& dst) NESTL_NOEXCEPT_SPEC
 template <typename OperationError, typename Alloc>
 void alloc_on_copy(OperationError& err, Alloc& src, const Alloc& dst, std::true_type) NESTL_NOEXCEPT_SPEC
 {
-    nestl::detail::assign(err, src, dst);
+    nestl::class_operations::assign(err, src, dst);
 }
 
 template <typename OperationError, typename Alloc>

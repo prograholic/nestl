@@ -4,26 +4,26 @@
 #include <nestl/config.hpp>
 
 #include <nestl/class_operations.hpp>
-#include <nestl/detail/construct.hpp>
 
+#include <nestl/detail/destroy.hpp>
 
 namespace nestl
 {
+namespace detail
+{
 
-
-template <typename OperationError, typename InputIterator, typename ForwardIterator, typename Allocator>
+template <typename OperationError, typename InputIterator, typename ForwardIterator>
 ForwardIterator uninitialised_copy(OperationError& err,
                                    InputIterator first,
                                    InputIterator last,
-                                   ForwardIterator output,
-                                   Allocator& alloc) NESTL_NOEXCEPT_SPEC
+                                   ForwardIterator output) NESTL_NOEXCEPT_SPEC
 {
     ForwardIterator cur = output;
-    nestl::detail::destruction_scoped_guard<ForwardIterator, Allocator> guard(output, cur, alloc);
+    nestl::detail::destruction_scoped_guard<ForwardIterator> guard(output, cur);
 
     for ( ; first != last; ++first, ++cur)
     {
-		nestl::detail::construct(err, std::addressof(*cur), alloc, *first);
+		nestl::class_operations::construct(err, std::addressof(*cur), *first);
         if (err)
         {
             return cur;
@@ -34,6 +34,7 @@ ForwardIterator uninitialised_copy(OperationError& err,
     return cur;
 }
 
+} // namespace detail
 } // namespace nestl
 
 #endif // NESTL_MEMORY_HPP

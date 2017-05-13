@@ -3,11 +3,9 @@
 
 #include <nestl/config.hpp>
 
-#include <nestl/memory.hpp>
 
 #include <type_traits>
 #include <limits>
-#include <cassert>
 #include <new>
 
 namespace nestl
@@ -52,16 +50,6 @@ public:
     {
     }
 
-    pointer address(reference x) const NESTL_NOEXCEPT_SPEC
-    {
-        return std::addressof(x);
-    }
-
-    const_pointer address(const_reference x) const NESTL_NOEXCEPT_SPEC
-    {
-        return std::addressof(x);
-    }
-
     template<typename OperationError>
     pointer allocate(OperationError& err, size_type n, const void* /* hint */ = 0) NESTL_NOEXCEPT_SPEC
     {
@@ -77,25 +65,6 @@ public:
     void deallocate(pointer p, size_type /* n */) NESTL_NOEXCEPT_SPEC
     {
         ::operator delete(p);
-    }
-
-    size_type max_size() const NESTL_NOEXCEPT_SPEC
-    {
-        return std::numeric_limits<size_type>::max();
-    }
-
-    template<typename OperationError, typename U, typename ... Args>
-    void construct(OperationError& /* err */, U* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
-    {
-        NESTL_ASSERT(ptr);
-        ::new(static_cast<void*>(ptr)) U(std::forward<Args>(args)...);
-    }
-
-    template<typename U>
-    void destroy(U* ptr)
-    {
-        assert(ptr);
-        ptr->~U();
     }
 };
 

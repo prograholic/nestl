@@ -10,10 +10,11 @@
 #include <nestl/config.hpp>
 
 #include <nestl/allocator.hpp>
-#include <nestl/memory.hpp>
 #include <nestl/class_operations.hpp>
 #include <nestl/algorithm.hpp>
 #include <nestl/alignment.hpp>
+
+#include <nestl/detail/destroy.hpp>
 
 #include <cassert>
 
@@ -163,17 +164,16 @@ struct list_node : public list_node_base
     {
     }
 
-    template <typename Allocator>
-    void destroy_value(Allocator& a)
+    void destroy_value()
     {
         T* value = get_pointer();
-        nestl::detail::destroy(a, value, value + 1);
+        nestl::detail::destroy(value, value + 1);
     }
 
-    template <typename OperationError, typename Allocator, typename ... Args>
-    void initialize(OperationError& err, Allocator& a, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    template <typename OperationError, typename ... Args>
+    void initialize(OperationError& err, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
-		nestl::detail::construct(err, get_pointer(), a, std::forward<Args>(args) ...);
+		nestl::class_operations::construct(err, get_pointer(), std::forward<Args>(args) ...);
     }
 
     T* get_pointer() NESTL_NOEXCEPT_SPEC
@@ -619,38 +619,18 @@ private:
 
 } // namespace impl
 
-/**
- * @brief specialization of class_traits for nestl::list
- *
- * Allows construct one list from another (emulate copy construction)
- */
-template <typename T, typename ListAllocator>
-struct class_operations <nestl::impl::list<T, ListAllocator> >
+// Added emulation of copy construction
+template <typename T, typename Allocator>
+struct two_phase_initializable<impl::list<T, Allocator>, const impl::list<T, Allocator>&> : public std::true_type
 {
-    typedef nestl::impl::list<T, ListAllocator> list_t;
-
-    template <typename OperationError, typename Allocator>
-    static void construct(OperationError& err, list_t* ptr, Allocator& alloc, const list_t& other) NESTL_NOEXCEPT_SPEC
+    template <typename OperationError>
+    static void init(OperationError& err,
+                     impl::list<T, Allocator>& defaultConstructed,
+                     const impl::list<T, Allocator>& other) NESTL_NOEXCEPT_SPEC
     {
-        allocator_traits<Allocator>::construct(err, alloc, ptr);
-        if (err)
-        {
-            return;
-        }
-
-        list_t* end = ptr + 1;
-        nestl::detail::destruction_scoped_guard<list_t*, Allocator> guard(ptr, end, alloc);
-
-        ptr->copy_nothrow(err, other);
-        if (err)
-        {
-            return;
-        }
-
-        guard.release();
+        defaultConstructed.copy_nothrow(err, other);
     }
 };
-
 
 namespace impl
 {
@@ -996,8 +976,7 @@ list<T, A>::erase(const_iterator pos) NESTL_NOEXCEPT_SPEC
 
     node->remove();
 
-    allocator_type alloc = get_allocator();
-    node->destroy_value(alloc);
+    node->destroy_value();
     m_node_allocator.deallocate(node, 1);
 
     return ret;
@@ -1262,14 +1241,13 @@ void
 list<T, A>::destroy_list_content() NESTL_NOEXCEPT_SPEC
 {
     node_type* current = static_cast<node_type*>(m_node.m_next);
-    allocator_type alloc = get_allocator();
 
     while (current != &m_node)
     {
         node_type* tmp = current;
         current = static_cast<node_type*>(current->m_next);
 
-        tmp->destroy_value(alloc);
+        tmp->destroy_value();
         m_node_allocator.deallocate(tmp, 1);
     }
 }
@@ -1299,11 +1277,9 @@ list<T, A>::create_node(OperationError& err, Args&& ... args) NESTL_NOEXCEPT_SPE
     {
         return nullptr;
     }
-    nestl::detail::allocation_scoped_guard<node_type*, node_allocator_type> allocGuard(m_node_allocator, node, 1);
+    nestl::detail::deallocation_scoped_guard<node_type*, node_allocator_type> allocGuard(m_node_allocator, node, 1);
 
-    allocator_type alloc = get_allocator();
-
-	node->initialize(err, alloc, std::forward<Args>(args) ...);
+	node->initialize(err, std::forward<Args>(args) ...);
     if (err)
     {
         return nullptr;

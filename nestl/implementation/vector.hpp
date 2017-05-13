@@ -6,9 +6,12 @@
 #include <nestl/allocator.hpp>
 #include <nestl/allocator_traits.hpp>
 #include <nestl/algorithm.hpp>
-#include <nestl/memory.hpp>
 #include <nestl/class_operations.hpp>
 
+#include <nestl/detail/destroy.hpp>
+#include <nestl/detail/uninitialised_copy.hpp>
+
+#include <cassert>
 
 namespace nestl
 {
@@ -206,38 +209,17 @@ private:
 
 } // namespace impl
 
-/**
- * @brief specialization of class_operations for nestl::vector
- *
- * Allows construct one vector from another (emulate copy construction)
- */
-template <typename T, typename VectorAllocator>
-struct class_operations <nestl::impl::vector<T, VectorAllocator> >
+template <typename T, typename Allocator>
+struct two_phase_initializable<nestl::impl::vector<T, Allocator>, const nestl::impl::vector<T, Allocator>&> : std::true_type
 {
-    typedef nestl::impl::vector<T, VectorAllocator> vector_t;
+    typedef nestl::impl::vector<T, Allocator> vector_t;
 
-    template <typename OperationError, typename Allocator>
-    static void construct(OperationError& err, vector_t* ptr, Allocator& alloc, const vector_t& other) NESTL_NOEXCEPT_SPEC
+    template <typename OperationError>
+    static void construct(OperationError& err, vector_t& defaultConstructed, const vector_t& other) NESTL_NOEXCEPT_SPEC
     {
-        allocator_traits<Allocator>::construct(err, alloc, ptr);
-        if (err)
-        {
-            return;
-        }
-
-        vector_t* end = ptr + 1;
-        nestl::detail::destruction_scoped_guard<vector_t*, Allocator> guard(ptr, end, alloc);
-
-        ptr->copy_nothrow(err, other);
-        if (err)
-        {
-            return;
-        }
-
-        guard.release();
+        defaultConstructed.copy_nothrow(err, other);
     }
 };
-
 
 namespace impl
 {
@@ -298,7 +280,7 @@ vector<T, A>::vector(vector&& other) NESTL_NOEXCEPT_SPEC
 template <typename T, typename A>
 vector<T, A>::~vector() NESTL_NOEXCEPT_SPEC
 {
-    nestl::detail::destroy(m_allocator, m_start, m_finish);
+    nestl::detail::destroy(m_start, m_finish);
     m_allocator.deallocate(m_start, m_end_of_storage - m_start);
 }
 
@@ -526,7 +508,7 @@ template <typename T, typename A>
 typename vector<T, A>::size_type
 vector<T, A>::max_size() const NESTL_NOEXCEPT_SPEC
 {
-    return nestl::allocator_traits<A>::max_size(m_allocator);
+    return std::numeric_limits<size_type>::max();
 }
 
 template <typename T, typename A>
@@ -737,16 +719,16 @@ vector<T, A>::insert_value(OperationError& err, const_iterator pos, Args&& ... a
     for (value_type* val = last; val != first; --val)
     {
         value_type* oldLocation = val - 1;
-        nestl::detail::construct(err, val, m_allocator, *oldLocation);
+        nestl::class_operations::construct(err, val, *oldLocation);
         if (err)
         {
             return end();
         }
-        nestl::detail::destroy(m_allocator, oldLocation, val);
+        nestl::detail::destroy(oldLocation, val);
     }
 
 
-	nestl::detail::construct(err, first, m_allocator, std::forward<Args>(args) ...);
+	nestl::class_operations::construct(err, first, std::forward<Args>(args) ...);
     if (err)
     {
         return end();
@@ -788,7 +770,7 @@ vector<T, A>::do_resize(OperationError& err, size_type count, Args&& ... args) N
 {
     if (count <= size())
     {
-        nestl::detail::destroy(m_allocator, m_start + count, m_finish);
+        nestl::detail::destroy(m_start + count, m_finish);
         m_finish = m_start + count;
     }
     else
@@ -801,7 +783,7 @@ vector<T, A>::do_resize(OperationError& err, size_type count, Args&& ... args) N
 
         while (m_finish < m_start + count)
         {
-            nestl::detail::construct(err, m_finish, m_allocator, std::forward<Args>(args) ...);
+            nestl::class_operations::construct(err, m_finish, std::forward<Args>(args) ...);
             if (err)
             {
                 return;
@@ -838,16 +820,16 @@ vector<T, A>::do_reserve(OperationError& err, size_type new_cap) NESTL_NOEXCEPT_
     {
         return;
     }
-    nestl::detail::allocation_scoped_guard<value_type*, allocator_type> guard(m_allocator, ptr, new_cap);
+    nestl::detail::deallocation_scoped_guard<value_type*, allocator_type> guard(m_allocator, ptr, new_cap);
 
-    nestl::uninitialised_copy(err, m_start, m_finish, ptr, m_allocator);
+    nestl::detail::uninitialised_copy(err, m_start, m_finish, ptr);
     if (err)
     {
         return;
     }
 
     const size_t current_size = size();
-    nestl::detail::destroy(m_allocator, m_start, m_finish);
+    nestl::detail::destroy(m_start, m_finish);
     m_allocator.deallocate(m_start, m_end_of_storage - m_start);
 
     m_start = ptr;
