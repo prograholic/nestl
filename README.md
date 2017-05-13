@@ -2,37 +2,110 @@
 nestl
 =====
 
-Design and implementation of some of stl containers and smart pointers without exception support.
-
+**TODO: translate description from russian to english**
 **This implementation is not production ready yet**
+
+Design and implementation of some of stl containers, smart pointers and algorithms without exception support.
+
+
+Motivation
+==========
+
+
+```
+nestl::vector<int> vec;
+nestl::default_operation_error err;
+vec.push_back_nothrow(err, 10);
+if (err)
+{
+    // handle error somehow
+    std::cerr << "error occured" << std::endl;
+}
+```
+
+
+-----------------------------
+
+
+
+
+-----------------------------------------
+
+```
+std::vector<int> x;
+x.push_back(1);
+```
+
+
+```
+std::vector<std::list<int>> m;
+m.push_back(get_list_somehow());
+```
+
+
+
+
+1. exception handling - explicit error codes handling
+2. Any constructor which may throw - two-phase initialization (default ctor + `init(args)`)
+3. Any assignment operator which may throw - explicit `copy` method (for example `vec.copy_nothrow(err, other_vec);`)
+
+
+
+
+------------------------
+
+
+
+`template <typename HasException, typename NoException>
+using dispatch = typename ::std::conditional<exception_support_t::value, HasExceptions, NoExceptions>::type
+`
+
+
+
+--------------------------
+
+
+
+Error handling
+--------------
+
+
+
+
+
+
+
+
+
+Containers
+----------
+
+
+Type requirements and limitations
+---------------------------------
+
+
+
 
 
 How to build
 ============
-Library is header-only. Library detects version of c++ (03, 11) and configures itself according to c++ version.
-Also it is possible to add definition **NESTL_CONFIG_HAS_CXX11** for using c++11 features
+Library is header-only. Library requires C++-11 compliant compiler and standard library.
 
 
-How to use NESTL without standard library
+How to use NESTL
 -----------------------------------------
-It is possible to use NESTL without standard library.
-User should define macro **NESTL_NO_STD**
-and provide platform-specific header (should define **NESTL_PLATFORM_HEADER**).
-
-You can see nestl/platform.hpp.sample for details.
-Also you can see tests/CMakeLists.txt and tests/sample_test_platform.hpp for details
 
 How to run tests
 ----------------
 Nestl needs following dependencies for running tests:
 * CMake (http://www.cmake.org/), minimal version is 3.0
-* googlemock sources (https://code.google.com/p/googlemock/), minimal version 1.7 (1.6 should be acceptable but not tested)
 
 For configuring building and running nestl test suite one should perform following commands:
 ```sh
 mkdir build
 cd build
-cmake ../ -DNESTL_GOOGLEMOCK_DIR=/absolute/path/to/googlemock/
+cmake
 make
 make test
 ```
@@ -44,15 +117,13 @@ Compilers supported
 
 Library has been tested on following platforms and compilers:
 
-Toolchain                    |C++-03|C++-03-no-std|C++-11     |C++-11-no-std
------------------------------|------|-------------|-----------|-------------
-x86_64-linux-gnu G++-4.6.3   |Yes   |Yes          |Yes        |Yes
-i386-linux-gnu G++-4.7.4     |Yes   |Yes          |Yes        |Yes
-i386-linux-gnu G++-4.8.3     |Yes   |Yes          |Yes        |Yes
-i386-linux-gnu G++-4.9.1     |Yes   |Yes          |Yes        |Yes
-x86_64-linux-gnu clang++-3.4 |Yes   |Yes          |Yes        |Yes
-i386-linux-gnu clang++-3.4   |Yes   |Yes          |Yes        |Yes
-i386-linux-gnu clang++-3.5   |Yes   |Yes          |Yes        |Yes
-i386-windows msvc-2008       |Yes   |Yes          |Yes*       |Yes*
+Toolchain
+-----------------------------
+i386-linux-gnu G++-4.8.3
+x86_64-linux-gnu clang++-3.4
+i386-linux-gnu clang++-3.4
+i386-linux-gnu clang++-3.5
+i386-windows msvc-2013
+i386-windows msvc-2015
+i386-windows msvc-2017
 
-\* - Compiles, but actually this mode is same as C++-03
