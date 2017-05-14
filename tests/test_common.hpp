@@ -107,6 +107,7 @@ struct non_copyable
 
     int v;
 
+private:
     non_copyable(const non_copyable&) = delete;
     non_copyable& operator=(const non_copyable&) = delete;
 };
@@ -152,7 +153,7 @@ struct two_phase_initializator<test::non_copyable>
                      test::non_copyable& defaultConstructed,
                      test::non_copyable& other1, test::non_copyable&& other2) NESTL_NOEXCEPT_SPEC
     {
-        defaultConstructed.assign(err, other1.v + other2.v);
+        defaultConstructed.assign(err, other1, std::move(other2));
     }
 };
 
