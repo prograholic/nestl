@@ -621,7 +621,7 @@ private:
 
 // Added emulation of copy construction
 template <typename T, typename Allocator>
-struct two_phase_initializable<impl::list<T, Allocator>, const impl::list<T, Allocator>&> : public std::true_type
+struct two_phase_initializator<impl::list<T, Allocator>>
 {
     template <typename OperationError>
     static void init(OperationError& err,

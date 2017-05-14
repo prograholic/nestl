@@ -9,21 +9,29 @@ namespace nestl
 {
 
 
-/// @brief Trait describes ability of two-phase initialization of given type T with given arguments Args
+// NOTE: we use template struct instead of `using` as MSVC-2015 do, because `using` does not work in case of SFINAE error
+template<typename ...>
+struct void_t
+{
+    typedef void type;
+};
+
+
+/// @brief This template describes ability of two-phase initialization of given type T
 ///
-/// @note By default we forbide two-phase initialization therefore this trait is a std::false_type
-///
-/// Client may allow two-phas initialization by specialization this struct with concrete type T (Args may be variadic template).
+/// Client may allow two-phase initialization by specialization this struct with concrete type T
 /// Also such specialization should provide static method init with following signature:
 /// @code
 /// template <typename OperationError>
 /// static void init(OperationError& err, T& defaultConstructed, Args&& ... args) NESTL_NOEXCEPT_SPEC
 /// @endcode
 ///
-/// Please not that object of T already default constructed.
+/// @note There may be several static methods `init` in one specialization
+///
+/// Please note that object of T already default constructed.
 /// Also no need to perform destruction of defaultConstructed in case of failure
-template <typename T, typename ... Args>
-struct two_phase_initializable : std::false_type
+template <typename T>
+struct two_phase_initializator
 {
 };
 

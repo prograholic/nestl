@@ -23,3 +23,5 @@ add_subdirectory(vector)
 add_subdirectory(list)
 add_subdirectory(shared_ptr)
 add_subdirectory(set)
+add_subdirectory(class_operations)
+

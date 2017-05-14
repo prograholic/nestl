@@ -60,17 +60,6 @@ do \
     } \
 } while(0) \
 
-/**
- * @brief Special type which wraps type and corresponding allocator
- */
-template <typename T, typename Allocator = nestl::allocator<T> >
-struct type_with_allocator
-{
-    typedef T         value_type;
-    typedef Allocator allocator;
-};
-
-
 
 
 struct non_copyable
@@ -85,10 +74,35 @@ struct non_copyable
     {
     }
 
+    non_copyable(non_copyable&& other)
+        : v(other.v)
+    {
+        other.v = 0;
+    }
+    non_copyable& operator=(non_copyable&& other)
+    {
+        if (this != &other)
+        {
+            v = other.v;
+            other.v = 0;
+        }
+
+        return *this;
+    }
+
     template <typename OperationError>
     void assign(OperationError& /* err */, const non_copyable& other) NESTL_NOEXCEPT_SPEC
     {
         v = other.v;
+    }
+
+    template <typename OperationError>
+    void assign(OperationError& /* err */, non_copyable& other1, non_copyable&& other2) NESTL_NOEXCEPT_SPEC
+    {
+        *this = std::move(other2);
+        v += other1.v;
+
+        other1.v += 1;
     }
 
     int v;
@@ -108,12 +122,13 @@ inline std::ostream& operator << (std::ostream& strm, const non_copyable& val)
     return strm;
 }
 
+
 } // namespace test
 
 
 
 template <>
-struct two_phase_initializable<test::non_copyable, const test::non_copyable&> : public std::true_type
+struct two_phase_initializator<test::non_copyable>
 {
     template <typename OperationError>
     static void init(OperationError& err,
@@ -121,6 +136,23 @@ struct two_phase_initializable<test::non_copyable, const test::non_copyable&> : 
                      const test::non_copyable& other) NESTL_NOEXCEPT_SPEC
     {
         defaultConstructed.assign(err, other);
+    }
+
+
+    template <typename OperationError>
+    static void init(OperationError& err,
+                     test::non_copyable& defaultConstructed,
+                     const test::non_copyable& other, int val) NESTL_NOEXCEPT_SPEC
+    {
+        defaultConstructed.assign(err, other.v + val);
+    }
+
+    template <typename OperationError>
+    static void init(OperationError& err,
+                     test::non_copyable& defaultConstructed,
+                     test::non_copyable& other1, test::non_copyable&& other2) NESTL_NOEXCEPT_SPEC
+    {
+        defaultConstructed.assign(err, other1.v + other2.v);
     }
 };
 

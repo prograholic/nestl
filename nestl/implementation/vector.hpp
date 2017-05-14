@@ -210,7 +210,7 @@ private:
 } // namespace impl
 
 template <typename T, typename Allocator>
-struct two_phase_initializable<nestl::impl::vector<T, Allocator>, const nestl::impl::vector<T, Allocator>&> : std::true_type
+struct two_phase_initializator<nestl::impl::vector<T, Allocator>>
 {
     typedef nestl::impl::vector<T, Allocator> vector_t;
 
