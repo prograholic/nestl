@@ -1,17 +1,19 @@
-# version format
-version: 1.0.{build}
-
-
-
-# branches to build
-branches:
-  # whitelist
-  only:
-    - master
+shallow_clone: true
 
 os:
   - Visual Studio 2015 Update 2
 
+build:
+  verbosity: detailed
+
+configuration:
+  - Debug
+
+
+branches:
+  # whitelist
+  only:
+    - master
 
 
 configuration:
@@ -33,9 +35,12 @@ install:
   - cmake --version
 
 
+before_build:
+  - cd C:\projects
+
 build_script:
   - mkdir build
   - cd build
-  - cmake .. -G"Visual Studio 14"
+  - cmake ..\nestl -G"Visual Studio 14"
   - cmake --build ./
   - ctest -C Debug
