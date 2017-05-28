@@ -1,8 +1,4 @@
-﻿nestl
-=====
-
-
-<a target="_blank" href="https://travis-ci.org/prograholic/nestl">![Travis status][badge.Travis]</a> <a target="_blank" href="https://ci.appveyor.com/project/prograholic/nestl">![Appveyor status][badge.Appveyor]</a>
+﻿# nestl <a target="_blank" href="https://travis-ci.org/prograholic/nestl">![Travis status][badge.Travis]</a> <a target="_blank" href="https://ci.appveyor.com/project/prograholic/nestl">![Appveyor status][badge.Appveyor]</a>
 
 
 **TODO: translate description from russian to english**
