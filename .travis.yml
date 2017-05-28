@@ -36,7 +36,5 @@ branches:
   only:
     - master
 
-notifications:
-  email:
-    recipients
-      - alexey.kutumov@gmail.com
+addons:
+  notification_email: alexey.kutumov@gmail.com
