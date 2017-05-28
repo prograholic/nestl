@@ -1,7 +1,5 @@
 ﻿[![Build Status](https://travis-ci.org/prograholic/nestl.svg?branch=master)](https://travis-ci.org/prograholic/nestl)
-
-
-[![Windows Build status](https://ci.appveyor.com/project/prograholic/nestl?branch=master&svg=true)](https://ci.appveyor.com/project/prograholic/nestl)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/github/project/prograholic/nestl)](https://ci.appveyor.com/project/prograholic/nestl)
 
 
 nestl
