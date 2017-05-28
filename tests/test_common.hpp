@@ -74,12 +74,12 @@ struct non_copyable
     {
     }
 
-    non_copyable(non_copyable&& other)
+    non_copyable(non_copyable&& other) NESTL_NOEXCEPT_SPEC
         : v(other.v)
     {
         other.v = 0;
     }
-    non_copyable& operator=(non_copyable&& other)
+    non_copyable& operator=(non_copyable&& other) NESTL_NOEXCEPT_SPEC
     {
         if (this != &other)
         {

@@ -26,6 +26,8 @@ void run_tests()
         nestl::aligned_buffer<non_copyable> x;
         const non_copyable arg{42};
 
+        static_assert(std::is_nothrow_constructible<non_copyable>::value, "WAT??");
+
         ASSERT_OPERATION_SUCCESS(class_operations::construct(_, x.ptr(), arg));
 
         EXPECT_EQ(42, x.ptr()->v);

@@ -16,7 +16,12 @@ function (nestl_add_simple_test test_name)
              ${test_name}_nx_runner
              COMMAND
              ${test_name}_nx_exe)
+
+
+    set_property(TARGET ${test_name}_exe    PROPERTY FOLDER "test/${test_name}")
+    set_property(TARGET ${test_name}_nx_exe PROPERTY FOLDER "test/${test_name}")
 endfunction()
+
 
 
 add_subdirectory(vector)

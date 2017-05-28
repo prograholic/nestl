@@ -5,6 +5,7 @@
 
 #include <new>
 #include <utility>
+#include <type_traits>
 
 namespace nestl
 {
@@ -17,7 +18,8 @@ struct class_operations_helper
 {
     template <typename T, typename OperationError, typename ... Args>
     static
-        void construct(OperationError& err, T* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    typename std::enable_if<std::is_nothrow_constructible<T, Args...>::value>::type
+    construct(OperationError& /* err */, T* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
         ::new(static_cast<void*>(ptr)) T(std::forward<Args>(args)...);
     }
@@ -25,7 +27,8 @@ struct class_operations_helper
 
     template <typename T, typename OperationError, typename Y>
     static
-        void assign(OperationError& /* err */, T& dest, Y&& src) NESTL_NOEXCEPT_SPEC
+    typename std::enable_if<std::is_nothrow_assignable<T, Y>::value>::type
+    assign(OperationError& /* err */, T& dest, Y&& src) NESTL_NOEXCEPT_SPEC
     {
         dest = std::forward<Y>(src);
     }

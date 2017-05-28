@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 
 project(nestl CXX)
 
+set_property( GLOBAL PROPERTY USE_FOLDERS ON)
+
 set (CMAKE_MODULE_PATH
     ${nestl_SOURCE_DIR}/cmake
     ${CMAKE_MODULE_PATH})
@@ -55,7 +57,6 @@ set (nestl_impl_detail_headers
 set (nestl_no_exceptions_headers
     nestl/no_exceptions/errc_based_error.hpp
     nestl/no_exceptions/default_operation_error.hpp
-    nestl/no_exceptions/allocator.hpp
 
     nestl/no_exceptions/list.hpp
     nestl/no_exceptions/set.hpp
@@ -71,7 +72,6 @@ set (nestl_no_exceptions_details_headers
 set (nestl_has_exceptions_headers
     nestl/has_exceptions/exception_ptr_error.hpp
     nestl/has_exceptions/default_operation_error.hpp
-    nestl/has_exceptions/allocator.hpp
 
     nestl/has_exceptions/list.hpp
     nestl/has_exceptions/set.hpp

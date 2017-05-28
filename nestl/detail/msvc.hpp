@@ -33,7 +33,7 @@
 
 #   define NESTL_CONSTEXPR
 #   define NESTL_NOEXCEPT_OPERATOR(x)             true
-#   define NESTL_NOEXCEPT_SPEC                   
+#   define NESTL_NOEXCEPT_SPEC                    throw()
 
 #elif (_MSC_VER <= NESTL_COMPILER_MSVC_2015)
 #   define NESTL_HAS_NOEXCEPT                     1

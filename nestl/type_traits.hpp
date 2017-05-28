@@ -9,7 +9,7 @@ namespace nestl
 {
 
 
-// NOTE: we use template struct instead of `using` as MSVC-2015 do, because `using` does not work in case of SFINAE error
+// NOTE: we use template struct instead of `using` as MSVC-2015 does, because `using` does not work in case of SFINAE error
 template<typename ...>
 struct void_t
 {
