@@ -1,0 +1,41 @@
+# version format
+version: 1.0.{build}
+
+
+
+# branches to build
+branches:
+  # whitelist
+  only:
+    - master
+
+os:
+  - Visual Studio 2015 Update 2
+
+
+
+configuration:
+  - Debug
+
+
+
+install:
+
+  - mkdir C:\projects\deps
+  - cd C:\projects\deps
+
+
+  - set CMAKE_URL="https://cmake.org/files/v3.7/cmake-3.7.2-win64-x64.zip"
+  - appveyor DownloadFile %CMAKE_URL% -FileName cmake.zip
+  - 7z x cmake.zip -oC:\projects\deps > nul
+  - move C:\projects\deps\cmake-* C:\projects\deps\cmake # Move to a version-agnostic directory
+  - set PATH=C:\projects\deps\cmake\bin;%PATH%
+  - cmake --version
+
+
+build_script:
+  - mkdir build
+  - cd build
+  - cmake .. -G"Visual Studio 14"
+  - cmake --build ./
+  - ctest -C Debug
