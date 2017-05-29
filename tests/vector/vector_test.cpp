@@ -7,12 +7,12 @@ namespace nestl
 namespace test
 {
 
-void run_tests()
+NESTL_ADD_TEST(vector_test)
 {
     {
         vector<int> vec;
 
-        ASSERT_OPERATION_SUCCESS(vec.assign_nothrow(_, 0));
+        NESTL_CHECK_OPERATION(vec.assign_nothrow(_, 0));
 
         CheckVectorSize(vec, 0);
     }
@@ -22,15 +22,15 @@ void run_tests()
         vector<int> vec;
         int defaultParam = 0;
 
-        ASSERT_OPERATION_SUCCESS(vec.assign_nothrow(_, expectedSize, defaultParam));
+        NESTL_CHECK_OPERATION(vec.assign_nothrow(_, expectedSize, defaultParam));
 
         CheckVectorSize(vec, expectedSize);
 
-        EXPECT_EQ(defaultParam, *(vec.begin()));
-        EXPECT_EQ(defaultParam, *(vec.cbegin()));
-        EXPECT_EQ(defaultParam, vec[0]);
-        EXPECT_EQ(defaultParam, vec.front());
-        EXPECT_EQ(defaultParam, vec.back());
+        NESTL_CHECK_EQ(defaultParam, *(vec.begin()));
+        NESTL_CHECK_EQ(defaultParam, *(vec.cbegin()));
+        NESTL_CHECK_EQ(defaultParam, vec[0]);
+        NESTL_CHECK_EQ(defaultParam, vec.front());
+        NESTL_CHECK_EQ(defaultParam, vec.back());
     }
 
     {
@@ -38,7 +38,7 @@ void run_tests()
         vector<int> vec;
         int defaultParam = 0;
 
-        ASSERT_OPERATION_SUCCESS(vec.assign_nothrow(_, expectedSize, defaultParam));
+        NESTL_CHECK_OPERATION(vec.assign_nothrow(_, expectedSize, defaultParam));
 
         CheckVectorSize(vec, expectedSize);
 
@@ -46,9 +46,9 @@ void run_tests()
         vector<int>::iterator it = vec.begin();
         for (size_t i = 0; i != expectedSize; ++i)
         {
-            EXPECT_EQ(defaultParam, *constIt);
-            EXPECT_EQ(defaultParam, *it);
-            EXPECT_EQ(defaultParam, vec[i]);
+            NESTL_CHECK_EQ(defaultParam, *constIt);
+            NESTL_CHECK_EQ(defaultParam, *it);
+            NESTL_CHECK_EQ(defaultParam, vec[i]);
 
             ++constIt;
             ++it;
@@ -59,15 +59,15 @@ void run_tests()
         vector<int> vec;
         int val = 0;
 
-        ASSERT_OPERATION_SUCCESS(vec.insert_nothrow(_, vec.begin(), val));
+        NESTL_CHECK_OPERATION(vec.insert_nothrow(_, vec.begin(), val));
 
         CheckVectorSize(vec, 1);
 
-        EXPECT_EQ(val, *(vec.begin()));
-        EXPECT_EQ(val, *(vec.cbegin()));
-        EXPECT_EQ(val, vec[0]);
-        EXPECT_EQ(val, vec.front());
-        EXPECT_EQ(val, vec.back());
+        NESTL_CHECK_EQ(val, *(vec.begin()));
+        NESTL_CHECK_EQ(val, *(vec.cbegin()));
+        NESTL_CHECK_EQ(val, vec[0]);
+        NESTL_CHECK_EQ(val, vec.front());
+        NESTL_CHECK_EQ(val, vec.back());
     }
 
 
@@ -81,7 +81,7 @@ void run_tests()
         int values [] = {0, 1, 2, 3, 4, 5};
         const size_t expectedSize = nestl::distance(std::begin(values), std::end(values));
 
-        ASSERT_OPERATION_SUCCESS(vec.assign_nothrow(_, std::begin(values), std::end(values)));
+        NESTL_CHECK_OPERATION(vec.assign_nothrow(_, std::begin(values), std::end(values)));
 
         CheckVectorSize(vec, expectedSize);
 
@@ -89,9 +89,9 @@ void run_tests()
         iterator it = vec.begin();
         for (size_t i = 0; i != expectedSize; ++i)
         {
-            EXPECT_EQ(values[i], *constIt);
-            EXPECT_EQ(values[i], *it);
-            EXPECT_EQ(values[i], vec[i]);
+            NESTL_CHECK_EQ(values[i], *constIt);
+            NESTL_CHECK_EQ(values[i], *it);
+            NESTL_CHECK_EQ(values[i], vec[i]);
 
             ++constIt;
             ++it;
@@ -103,42 +103,42 @@ void run_tests()
         typedef vector<int>::iterator iterator_t;
         vector<int> vec;
 
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 1));
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 2));
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 3));
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 4));
+        NESTL_CHECK_OPERATION(vec.push_back_nothrow(_, 1));
+        NESTL_CHECK_OPERATION(vec.push_back_nothrow(_, 2));
+        NESTL_CHECK_OPERATION(vec.push_back_nothrow(_, 3));
+        NESTL_CHECK_OPERATION(vec.push_back_nothrow(_, 4));
 
         iterator_t st;
-        ASSERT_OPERATION_SUCCESS(st = vec.insert_nothrow(_, vec.begin(), 0););
+        NESTL_CHECK_OPERATION(st = vec.insert_nothrow(_, vec.begin(), 0););
         CheckVectorSize(vec, 5);
-        EXPECT_EQ(vec.begin(), st);
+        NESTL_CHECK_EQ(vec.begin(), st);
 
-        EXPECT_EQ(0, vec[0]);
-        EXPECT_EQ(1, vec[1]);
-        EXPECT_EQ(2, vec[2]);
-        EXPECT_EQ(3, vec[3]);
-        EXPECT_EQ(4, vec[4]);
+        NESTL_CHECK_EQ(0, vec[0]);
+        NESTL_CHECK_EQ(1, vec[1]);
+        NESTL_CHECK_EQ(2, vec[2]);
+        NESTL_CHECK_EQ(3, vec[3]);
+        NESTL_CHECK_EQ(4, vec[4]);
     }
 
     {
         typedef vector<int>::iterator iterator_t;
         vector<int> vec;
 
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 0));
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 1));
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 2));
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, 3));
+        NESTL_CHECK_OPERATION(vec.push_back_nothrow(_, 0));
+        NESTL_CHECK_OPERATION(vec.push_back_nothrow(_, 1));
+        NESTL_CHECK_OPERATION(vec.push_back_nothrow(_, 2));
+        NESTL_CHECK_OPERATION(vec.push_back_nothrow(_, 3));
 
         iterator_t st;
-        ASSERT_OPERATION_SUCCESS(st = vec.insert_nothrow(_, vec.end(), 4););
+        NESTL_CHECK_OPERATION(st = vec.insert_nothrow(_, vec.end(), 4););
         CheckVectorSize(vec, 5);
-        EXPECT_EQ(vec.end() - 1, st);
+        NESTL_CHECK_EQ(vec.end() - 1, st);
 
-        EXPECT_EQ(0, vec[0]);
-        EXPECT_EQ(1, vec[1]);
-        EXPECT_EQ(2, vec[2]);
-        EXPECT_EQ(3, vec[3]);
-        EXPECT_EQ(4, vec[4]);
+        NESTL_CHECK_EQ(0, vec[0]);
+        NESTL_CHECK_EQ(1, vec[1]);
+        NESTL_CHECK_EQ(2, vec[2]);
+        NESTL_CHECK_EQ(3, vec[3]);
+        NESTL_CHECK_EQ(4, vec[4]);
     }
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -147,7 +147,7 @@ void run_tests()
         vector<int> vec;
         int val = 0;
 
-        ASSERT_OPERATION_SUCCESS(vec.push_back_nothrow(_, val));
+        NESTL_CHECK_OPERATION(vec.push_back_nothrow(_, val));
 
         CheckVectorSize(vec, 1);
     }
@@ -157,7 +157,7 @@ void run_tests()
         vector<int> vec;
         int val = 0;
 
-        ASSERT_OPERATION_SUCCESS(vec.emplace_back_nothrow(_, val));
+        NESTL_CHECK_OPERATION(vec.emplace_back_nothrow(_, val));
 
         CheckVectorSize(vec, 1);
     }
@@ -165,8 +165,3 @@ void run_tests()
 
 } // namespace test
 } // namespace nestl
-
-int main()
-{
-    nestl::test::run_tests();
-}

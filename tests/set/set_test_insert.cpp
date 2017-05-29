@@ -5,13 +5,13 @@ namespace nestl
 namespace test
 {
 
-void run_tests()
+NESTL_ADD_TEST(set_test_insert)
 {
 
     {
         nestl::set<int> s;
 
-        ASSERT_OPERATION_SUCCESS(s.insert_nothrow(_, 10));
+        NESTL_CHECK_OPERATION(s.insert_nothrow(_, 10));
 
         CheckSetSize(s, 1);
     }
@@ -19,8 +19,3 @@ void run_tests()
 
 } // namespace test
 } // namespace nestl
-
-int main()
-{
-    nestl::test::run_tests();
-}

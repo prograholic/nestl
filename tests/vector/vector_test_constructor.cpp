@@ -5,7 +5,7 @@ namespace nestl
 namespace test
 {
 
-void run_tests()
+NESTL_ADD_TEST(vector_test_constructor)
 {
     {
         nestl::vector<int> vec;
@@ -32,7 +32,7 @@ void run_tests()
     {
         nestl::vector<int> vec1;
 
-        ASSERT_OPERATION_SUCCESS(vec1.assign_nothrow(_, 10));
+        NESTL_CHECK_OPERATION(vec1.assign_nothrow(_, 10));
 
         nestl::vector<int> vec2(std::move(vec1));
 
@@ -94,7 +94,7 @@ void run_tests()
     {
         nestl::vector<int, minimal_allocator<int> > vec1;
 
-        ASSERT_OPERATION_SUCCESS(vec1.assign_nothrow(_, 10));
+        NESTL_CHECK_OPERATION(vec1.assign_nothrow(_, 10));
 
 		nestl::vector<int, minimal_allocator<int> > vec2(std::move(vec1));
 
@@ -131,7 +131,7 @@ void run_tests()
     {
         nestl::vector<int, allocator_with_state<int> > vec1;
 
-        ASSERT_OPERATION_SUCCESS(vec1.assign_nothrow(_, 10));
+        NESTL_CHECK_OPERATION(vec1.assign_nothrow(_, 10));
 
 		nestl::vector<int, allocator_with_state<int> > vec2(std::move(vec1));
 
@@ -142,8 +142,3 @@ void run_tests()
 
 } // namespace test
 } // namespace nestl
-
-int main()
-{
-    nestl::test::run_tests();
-}

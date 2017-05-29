@@ -24,7 +24,6 @@ namespace impl
 template <typename T, typename Allocator = nestl::allocator<T> >
 class vector
 {
-
     vector(const vector&) = delete;
     vector& operator=(const vector&) = delete;
 

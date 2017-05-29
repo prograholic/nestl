@@ -14,13 +14,13 @@ Design and implementation of some of stl containers, smart pointers and algorith
 This library allows to write common code for environments with exceptions and for environments without exceptions.
 Therefore all operations which may perform in any modes are marked as `noexcept`.
 
-Кроме этого, для среды с исключениями библиотека предоставляет расширения для контейнеров и умных указателей.
-Эти расширения позволяют обычным для программиста способом инициализировать, наполнять контейнеры
+Additionally this library provides extensions for containers and smart pointers for environments with exceptions.
+Such extensions allow programmer to initialize, fill and work with containers in an usual way (as stl analogues).
 
 Motivation
 ==========
 
-Небольшой пример использования:
+Here is simple use case:
 
 ```
 nestl::vector<int> vec;
@@ -187,14 +187,14 @@ Library has been tested on following platforms and compilers:
 
 Toolchain
 -----------------------------
-i386-linux-gnu G++-4.8.3
-x86_64-linux-gnu clang++-3.4
-i386-linux-gnu clang++-3.4
-i386-linux-gnu clang++-3.5
-i386-windows msvc-2013 *
-i386-windows msvc-2015
-i386-windows msvc-2017
+i386-linux-gnu   | G++-4.8.3
+x86_64-linux-gnu | clang++-3.4
+i386-linux-gnu   | clang++-3.4
+i386-linux-gnu   | clang++-3.5
+i386-windows     | msvc-2013 *
+i386-windows     | msvc-2015
+i386-windows     | msvc-2017
 
 
 --
-* msvc-2013 does not support `noexcept` specifier, therefore we emulate it using `throw()` in nestl implementation
+`*` msvc-2013 does not support `noexcept` specifier, therefore we emulate it using `throw()` in nestl implementation

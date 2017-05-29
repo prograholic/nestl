@@ -109,7 +109,7 @@ public:
     allocator_with_state() NESTL_NOEXCEPT_SPEC
         : m_allocated_storage()
     {
-		ASSERT_OPERATION_SUCCESS(m_allocated_storage = nestl::make_shared_nothrow<storage_t>(_));
+        NESTL_CHECK_OPERATION(m_allocated_storage = nestl::make_shared_nothrow<storage_t>(_));
     }
 
     allocator_with_state(const allocator_with_state& other) NESTL_NOEXCEPT_SPEC
@@ -161,7 +161,7 @@ public:
     allocator_with_state& operator=(allocator_with_state<Y>&& other) NESTL_NOEXCEPT_SPEC
     {
         m_allocated_storage = std::move(other.m_allocated_storage);
-        NESTL_ASSERT(!other.m_allocated_storage);
+        assert(!other.m_allocated_storage);
         return *this;
     }
 
@@ -189,7 +189,7 @@ public:
             fatal_failure("pointer [", static_cast<void*>(res), "] already belong to this allocator");
         }
 
-        ASSERT_OPERATION_SUCCESS(m_allocated_storage->insert_nothrow(_, res));
+        NESTL_CHECK_OPERATION(m_allocated_storage->insert_nothrow(_, res));
 
         return res;
     }

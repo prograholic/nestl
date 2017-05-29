@@ -6,20 +6,15 @@ namespace nestl
 namespace test
 {
 
-void run_tests()
+NESTL_ADD_TEST(shared_ptr_test)
 {
     {
         shared_ptr<int> sp;
 
-        ASSERT_OPERATION_SUCCESS(sp = make_shared_nothrow<int>(_));
+        NESTL_CHECK_OPERATION(sp = make_shared_nothrow<int>(_));
         CheckSharedPtr(sp, 1);
     }
 }
 
 } // namespace test
 } // namespace nestl
-
-int main()
-{
-    nestl::test::run_tests();
-}
