@@ -2,6 +2,8 @@
 
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/github/prograholic/nestl)](https://ci.appveyor.com/project/prograholic/nestl)
 
+[![Coverage Status](https://coveralls.io/repos/github/prograholic/nestl/badge.svg?branch=master)](https://coveralls.io/github/prograholic/nestl?branch=master)
+
 
 nestl
 =====
