@@ -879,7 +879,7 @@ template <typename T, typename A>
 typename list<T, A>::size_type
 list<T, A>::size() const NESTL_NOEXCEPT_SPEC
 {
-    return nestl::distance(cbegin(), cend());
+    return std::distance(cbegin(), cend());
 }
 
 template <typename T, typename A>

@@ -76,7 +76,7 @@ NESTL_ADD_TEST(list_test)
     {
         list<int> l;
         int values [] = {0, 1, 2, 3, 4, 5};
-        const size_t expectedSize = nestl::distance(std::begin(values), std::end(values));
+        const size_t expectedSize = std::distance(std::begin(values), std::end(values));
 
         NESTL_CHECK_OPERATION(l.assign_nothrow(_, std::begin(values), std::end(values)));
 

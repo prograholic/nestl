@@ -2208,7 +2208,7 @@ typename rb_tree<Key, Val, KeyOfValue, Compare, Alloc>::size_type
 rb_tree<Key, Val, KeyOfValue, Compare, Alloc>::count(const Key& k) const NESTL_NOEXCEPT_SPEC
 {
     std::pair<const_iterator, const_iterator> p = equal_range(k);
-    const size_type n = nestl::distance(p.first, p.second);
+    const size_type n = std::distance(p.first, p.second);
     return n;
 }
 

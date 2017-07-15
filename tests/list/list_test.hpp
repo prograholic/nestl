@@ -27,13 +27,13 @@ void CheckListSize(const List& l, size_t expectedSize)
         fatal_failure("list empty method returns ", listIsEmpty, ", while it should be ", shouldBeEmpty);
     }
 
-    size_t dist = nestl::distance(l.begin(), l.end());
+    size_t dist = std::distance(l.begin(), l.end());
     if (dist != expectedSize)
     {
         fatal_failure("distance between iterators should be ", expectedSize, " elements, got ", dist, " elements");
     }
 
-    size_t cdist = nestl::distance(l.cbegin(), l.cend());
+    size_t cdist = std::distance(l.cbegin(), l.cend());
     if (cdist != expectedSize)
     {
         fatal_failure("distance between const iterators should be ", expectedSize, " elements, got ", cdist, " elements");

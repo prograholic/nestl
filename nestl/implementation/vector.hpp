@@ -500,7 +500,7 @@ template <typename T, typename A>
 typename vector<T, A>::size_type
 vector<T, A>::size() const NESTL_NOEXCEPT_SPEC
 {
-    return nestl::distance(m_start, m_finish);
+    return std::distance(m_start, m_finish);
 }
 
 template <typename T, typename A>
@@ -535,7 +535,7 @@ template <typename T, typename A>
 typename vector<T, A>::size_type
 vector<T, A>::capacity() const NESTL_NOEXCEPT_SPEC
 {
-    return nestl::distance(m_start, m_end_of_storage);
+    return std::distance(m_start, m_end_of_storage);
 }
 
 template <typename T, typename A>
@@ -659,7 +659,7 @@ vector<T, A>::assign_iterator(OperationError& err,
                               InputIterator last) NESTL_NOEXCEPT_SPEC
 {
     assert(empty());
-    size_t required_size = nestl::distance(first, last);
+    size_t required_size = std::distance(first, last);
 
     grow(err, required_size);
     if (err)

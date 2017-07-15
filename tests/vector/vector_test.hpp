@@ -34,13 +34,13 @@ void CheckVectorSize(const Vector& v, size_t expectedSize)
     }
 
 
-    size_t dist = nestl::distance(v.begin(), v.end());
+    size_t dist = std::distance(v.begin(), v.end());
     if (dist != expectedSize)
     {
         fatal_failure("distance between iterators should be ", expectedSize, " elements, got ", dist, " elements");
     }
 
-    size_t cdist = nestl::distance(v.cbegin(), v.cend());
+    size_t cdist = std::distance(v.cbegin(), v.cend());
     if (cdist != expectedSize)
     {
         fatal_failure("distance between const iterators should be ", expectedSize, " elements, got ", cdist, " elements");

@@ -9,6 +9,7 @@ namespace test
 
 NESTL_ADD_TEST(vector_test)
 {
+    // assign zero elements to empty vector
     {
         vector<int> vec;
 
@@ -17,6 +18,7 @@ NESTL_ADD_TEST(vector_test)
         CheckVectorSize(vec, 0);
     }
 
+    // assign one default params to vector
     {
         const size_t expectedSize = 1;
         vector<int> vec;
@@ -33,6 +35,7 @@ NESTL_ADD_TEST(vector_test)
         NESTL_CHECK_EQ(defaultParam, vec.back());
     }
 
+    // assign several default params to vector
     {
         const size_t expectedSize = 1024;
         vector<int> vec;
@@ -55,6 +58,7 @@ NESTL_ADD_TEST(vector_test)
         }
     }
 
+    // insert one element into empty vector
     {
         vector<int> vec;
         int val = 0;
@@ -79,7 +83,7 @@ NESTL_ADD_TEST(vector_test)
 
         vector<int> vec;
         int values [] = {0, 1, 2, 3, 4, 5};
-        const size_t expectedSize = nestl::distance(std::begin(values), std::end(values));
+        const size_t expectedSize = std::distance(std::begin(values), std::end(values));
 
         NESTL_CHECK_OPERATION(vec.assign_nothrow(_, std::begin(values), std::end(values)));
 
