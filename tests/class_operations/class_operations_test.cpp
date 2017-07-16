@@ -19,7 +19,7 @@ NESTL_ADD_TEST(class_operations_test)
 
         NESTL_CHECK_EQ(2, *x.ptr());
 
-        detail::destroy(x.ptr());
+        nestl::detail::destroy(x.ptr());
     }
 
     {
@@ -32,7 +32,7 @@ NESTL_ADD_TEST(class_operations_test)
 
         NESTL_CHECK_EQ(42, x.ptr()->v);
 
-        detail::destroy(x.ptr());
+		nestl::detail::destroy(x.ptr());
     }
 
     {
@@ -44,7 +44,7 @@ NESTL_ADD_TEST(class_operations_test)
 
         NESTL_CHECK_EQ(52, x.ptr()->v);
 
-        detail::destroy(x.ptr());
+		nestl::detail::destroy(x.ptr());
     }
 
     {
@@ -59,7 +59,7 @@ NESTL_ADD_TEST(class_operations_test)
         NESTL_CHECK_EQ(43, arg1.v);
         NESTL_CHECK_EQ(0, arg2.v);
 
-        detail::destroy(x.ptr());
+		nestl::detail::destroy(x.ptr());
     }
 }
 

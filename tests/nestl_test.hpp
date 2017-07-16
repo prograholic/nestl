@@ -15,17 +15,52 @@ namespace nestl
 namespace test
 {
 
+namespace detail
+{
+
+
+template<std::size_t...> struct seq
+{
+};
+
+template<std::size_t N, std::size_t... Is>
+struct gen_seq : gen_seq<N - 1, N - 1, Is...>
+{
+};
+
+template<std::size_t... Is>
+struct gen_seq<0, Is...> : seq<Is...>
+{
+};
+
+
+
+template<class Ch, class Tr, class Tuple, std::size_t... Is>
+void print_tuple_impl(std::basic_ostream<Ch, Tr>& os, const Tuple& t, seq<Is...>)
+{
+    using swallow = int[1 + sizeof...(Is)];
+    (void)swallow
+    {
+        0,
+        (void(os << /* (Is == 0 ? "" : ", ") << */ std::get<Is>(t)), 0)...
+    };
+}
+
 template <typename ...Args>
 void print_tuple(std::ostream& ostream, Args&&... args)
 {
-    ostream << "not implemented";
-    ostream << std::endl;
+    print_tuple_impl(ostream, std::make_tuple(args...), gen_seq<sizeof...(Args)>());
 }
+
+
+} // namespace detail
+
+
 
 template <typename ...Args>
 void fatal_failure(Args&&... args)
 {
-    print_tuple(std::cerr, std::forward<Args>(args)...);
+    detail::print_tuple(std::cerr, std::forward<Args>(args)...);
 
     std::abort();
 }
@@ -121,17 +156,17 @@ private:
 
 #define NESTL_ADD_TEST(test_name) \
 template <size_t Unused> \
-struct NESTL_PP_CAT(TestRegistrator, __LINE__) \
+struct NESTL_PP_CAT(TestRegistrator ## test_name, __LINE__) \
 { \
-    NESTL_PP_CAT(TestRegistrator, __LINE__)() \
+    NESTL_PP_CAT(TestRegistrator ## test_name, __LINE__)() \
     { \
         TestSuite::GetInstance().AddTest(TestRunner); \
     } \
     static void TestRunner(); \
 }; \
-namespace {NESTL_PP_CAT(TestRegistrator, __LINE__)<__COUNTER__> NESTL_PP_CAT(testRegistrator, __LINE__); }\
+namespace {NESTL_PP_CAT(TestRegistrator ## test_name, __LINE__)<__COUNTER__> NESTL_PP_CAT(testRegistrator, __LINE__); }\
 template <size_t Unused> \
-void NESTL_PP_CAT(TestRegistrator, __LINE__)<Unused>::TestRunner()\
+void NESTL_PP_CAT(TestRegistrator ## test_name, __LINE__)<Unused>::TestRunner()\
 
 
 #define NESTL_RUN_ALL_TESTS() nestl::test::TestSuite::GetInstance().RunTests()

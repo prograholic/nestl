@@ -22,15 +22,13 @@ NESTL_ADD_TEST(vector_test_assign)
     }
 
 
-    // self move assignment
+    // self move assignment with non-empty vector
     {
         nestl::vector<int> vec;
         NESTL_CHECK_OPERATION(vec.push_back_nothrow(_, 10));
 
 		vec = std::move(vec);
-        CheckVectorSize(vec, 1);
-
-        NESTL_CHECK_EQ(10, vec[0]);
+        CheckVectorSize(vec, 0);
     }
 
     // move assign non-empty vector to non-empty
@@ -71,9 +69,7 @@ NESTL_ADD_TEST(vector_test_assign)
         vec.push_back(10);
 
         vec = std::move(vec.as_noexcept());
-        CheckVectorSize(vec, 1);
-
-        NESTL_CHECK_EQ(10, vec[0]);
+        CheckVectorSize(vec, 0);
     }
 
     // move assign non-empty vector to non-empty

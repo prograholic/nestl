@@ -646,7 +646,8 @@ void vector<T, A>::swap_data(vector& other) NESTL_NOEXCEPT_SPEC
 template <typename T, typename A>
 void vector<T, A>::move_assign(const std::true_type& /* true_val */, vector&& other) NESTL_NOEXCEPT_SPEC
 {
-	const vector tmp(std::move(*this));
+	const vector destroyContentAtExit(std::move(*this));
+
     this->swap_data(other);
 }
 
