@@ -32,7 +32,8 @@ public:
     typedef typename base_t::reverse_iterator       reverse_iterator;
     typedef typename base_t::const_reverse_iterator const_reverse_iterator;
 
-    typedef base_t                                  as_noexcept_type;
+    typedef base_t&                                 as_noexcept_reference;
+    typedef const base_t&                           as_noexcept_const_reference;
 
     explicit vector(const allocator_type& alloc = allocator_type()) NESTL_NOEXCEPT_SPEC;
 
@@ -48,9 +49,9 @@ public:
 
     vector& operator=(const base_t& other);
 
-    as_noexcept_type& as_noexcept() NESTL_NOEXCEPT_SPEC;
+    as_noexcept_reference as_noexcept() NESTL_NOEXCEPT_SPEC;
 
-    const as_noexcept_type& as_noexcept() const NESTL_NOEXCEPT_SPEC;
+    as_noexcept_const_reference as_noexcept() const NESTL_NOEXCEPT_SPEC;
 
     using base_t::get_allocator;
     using base_t::copy_nothrow;
@@ -89,7 +90,7 @@ public:
 
 
 template <typename T, typename A>
-vector<T, A>::vector(const allocator_type& alloc = allocator_type()) NESTL_NOEXCEPT_SPEC
+vector<T, A>::vector(const allocator_type& alloc) NESTL_NOEXCEPT_SPEC
     : base_t(alloc)
 {
 }
@@ -149,17 +150,17 @@ vector<T, A>& vector<T, A>::operator=(const base_t& other)
 }
 
 template <typename T, typename A>
-typename vector<T, A>::as_noexcept_type&
+typename vector<T, A>::as_noexcept_reference
 vector<T, A>::as_noexcept() NESTL_NOEXCEPT_SPEC
 {
-    return static_cast<as_noexcept_type&>(*this);
+    return static_cast<as_noexcept_reference>(*this);
 }
 
 template <typename T, typename A>
-typename const vector<T, A>::as_noexcept_type&
+typename vector<T, A>::as_noexcept_const_reference
 vector<T, A>::as_noexcept() const NESTL_NOEXCEPT_SPEC
 {
-    return static_cast<const as_noexcept_type&>(*this);
+    return static_cast<as_noexcept_const_reference>(*this);
 }
 
 template <typename T, typename A>
