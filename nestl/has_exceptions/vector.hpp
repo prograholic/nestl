@@ -16,6 +16,7 @@ template <typename T, typename Allocator = nestl::allocator<T> >
 class vector: private impl::vector<T, Allocator>
 {
     typedef impl::vector<T, Allocator> base_t;
+
 public:
 
     typedef typename base_t::value_type             value_type;
@@ -31,58 +32,25 @@ public:
     typedef typename base_t::reverse_iterator       reverse_iterator;
     typedef typename base_t::const_reverse_iterator const_reverse_iterator;
 
-    explicit vector(const allocator_type& alloc = allocator_type()) NESTL_NOEXCEPT_SPEC
-        : base_t(alloc)
-    {
-    }
+    typedef base_t                                  as_noexcept_type;
 
-    explicit vector(vector&& other) NESTL_NOEXCEPT_SPEC
-        : base_t(std::move(other))
-    {
-    }
+    explicit vector(const allocator_type& alloc = allocator_type()) NESTL_NOEXCEPT_SPEC;
 
-    vector(const vector& other)
-        : base_t(other.get_allocator())
-    {
-        default_operation_error err;
-        this->copy_nothrow(err, other);
-        if (err)
-        {
-            throw_exception(err);
-        }
-    }
+    explicit vector(vector&& other) NESTL_NOEXCEPT_SPEC;
 
-    vector(const base_t& other)
-        : base_t(other.get_allocator())
-    {
-        default_operation_error err;
-        this->copy_nothrow(err, other);
-        if (err)
-        {
-            throw_exception(err);
-        }
-    }
+    vector(const vector& other);
 
-    vector(base_t&& other) NESTL_NOEXCEPT_SPEC
-        : base_t(std::move(other))
-    {
-    }
+    vector(const base_t& other);
 
-    vector& operator=(const vector& other)
-    {
-        vector tmp(other);
-        this->swap(tmp);
+    vector(base_t&& other) NESTL_NOEXCEPT_SPEC;
 
-        return *this;
-    }
+    vector& operator=(const vector& other);
 
-    vector& operator=(const base_t& other)
-    {
-        vector tmp(other);
-        this->swap(tmp);
+    vector& operator=(const base_t& other);
 
-        return *this;
-    }
+    as_noexcept_type& as_noexcept() NESTL_NOEXCEPT_SPEC;
+
+    const as_noexcept_type& as_noexcept() const NESTL_NOEXCEPT_SPEC;
 
     using base_t::get_allocator;
     using base_t::copy_nothrow;
@@ -114,26 +82,109 @@ public:
     using base_t::resize_nothrow;
     using base_t::swap;
 
-    void push_back(const value_type& value)
-    {
-        default_operation_error error;
-        push_back_nothrow(error, value);
-        if (error)
-        {
-            throw_exception(error);
-        }
-    }
+    void push_back(const value_type& value);
 
-    void push_back(value_type&& value)
-    {
-        default_operation_error error;
-        push_back_nothrow(error, std::move(value));
-        if (error)
-        {
-            throw_exception(error);
-        }
-    }
+    void push_back(value_type&& value);
 };
+
+
+template <typename T, typename A>
+vector<T, A>::vector(const allocator_type& alloc = allocator_type()) NESTL_NOEXCEPT_SPEC
+    : base_t(alloc)
+{
+}
+
+template <typename T, typename A>
+vector<T, A>::vector(vector&& other) NESTL_NOEXCEPT_SPEC
+    : base_t(std::move(other))
+{
+}
+
+template <typename T, typename A>
+vector<T, A>::vector(const vector& other)
+    : base_t(other.get_allocator())
+{
+    default_operation_error err;
+    this->copy_nothrow(err, other);
+    if (err)
+    {
+        throw_exception(err);
+    }
+}
+
+template <typename T, typename A>
+vector<T, A>::vector(const base_t& other)
+    : base_t(other.get_allocator())
+{
+    default_operation_error err;
+    this->copy_nothrow(err, other);
+    if (err)
+    {
+        throw_exception(err);
+    }
+}
+
+template <typename T, typename A>
+vector<T, A>::vector(base_t&& other) NESTL_NOEXCEPT_SPEC
+    : base_t(std::move(other))
+{
+}
+
+template <typename T, typename A>
+vector<T, A>& vector<T, A>::operator=(const vector& other)
+{
+    vector tmp(other);
+    this->swap(tmp);
+
+    return *this;
+}
+
+template <typename T, typename A>
+vector<T, A>& vector<T, A>::operator=(const base_t& other)
+{
+    vector tmp(other);
+    this->swap(tmp);
+
+    return *this;
+}
+
+template <typename T, typename A>
+typename vector<T, A>::as_noexcept_type&
+vector<T, A>::as_noexcept() NESTL_NOEXCEPT_SPEC
+{
+    return static_cast<as_noexcept_type&>(*this);
+}
+
+template <typename T, typename A>
+typename const vector<T, A>::as_noexcept_type&
+vector<T, A>::as_noexcept() const NESTL_NOEXCEPT_SPEC
+{
+    return static_cast<const as_noexcept_type&>(*this);
+}
+
+template <typename T, typename A>
+void
+vector<T, A>::push_back(const value_type& value)
+{
+    default_operation_error error;
+    push_back_nothrow(error, value);
+    if (error)
+    {
+        throw_exception(error);
+    }
+}
+
+template <typename T, typename A>
+void
+vector<T, A>::push_back(value_type&& value)
+{
+    default_operation_error error;
+    push_back_nothrow(error, std::move(value));
+    if (error)
+    {
+        throw_exception(error);
+    }
+}
 
 } // namespace has_exceptions
 } // namespace nestl
