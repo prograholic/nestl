@@ -191,16 +191,19 @@ Compilers supported
 
 Library has been tested on following platforms and compilers:
 
-Toolchain
------------------------------
-i386-linux-gnu   | G++-4.8.3
-x86_64-linux-gnu | clang++-3.4
-i386-linux-gnu   | clang++-3.4
-i386-linux-gnu   | clang++-3.5
-i386-windows     | msvc-2013 *
-i386-windows     | msvc-2015
-i386-windows     | msvc-2017
-i386-windows     | mingw32-G++-5.3.0
+Toolchain list
+--------------
+
+| Platform        | Compiler          |
+|-----------------|-------------------|
+|i386-linux-gnu   | G++-4.8.3         |
+|x86_64-linux-gnu | clang++-3.4       |
+|i386-linux-gnu   | clang++-3.4       |
+|i386-linux-gnu   | clang++-3.5       |
+|i386-windows     | msvc-2013 *       |
+|i386-windows     | msvc-2015         |
+|i386-windows     | msvc-2017         |
+|i386-windows     | mingw32-G++-5.3.0 |
 
 
 
