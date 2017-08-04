@@ -58,26 +58,21 @@ std::vector<int> x;
 x.push_back(1);
 ```
 
-В среде без исключений этот код либо вообще не скомпилируется, либо скомпилируется, но может таить в себе несколько проблем.
-Одна из проблем - как узнать, успешно завершилась операция или нет?
-Ну, мы можем позвать метод `x.size()` и проверить, что значение равно 1.
-
-А как проверить в случае, если у нас следующая конструкция:
+Such code may not complie, or may not link or may crash in runtime when excetions are disabled.
+The main problem is how to know whether operation was succeed or not?
+Well, we can call method `x.size()` and check that it returns `1`.
+But such approach may be very difficult and inconvenient:
 ```
 std::vector<std::list<int>> m;
 m.push_back(get_list_somehow());
 ```
-В этом случае, нам нужно проверить не только вектор m, но еще и лист, который мы добавили, так как его копирование могло тоже сломаться.
+We should check vector and all elements in vector, because copying of std::list may fail too.
 
-Есть еще одна проблема - реализация std::vector, может ожидать, что если аллокатор вернул указатель,
-то он валиден (не nullptr) и содержит достаточно места для элементов.
-Как поступить аллокатору в случае отсутствия исключений, если он не может выделить память?
-Вернуть nullptr? Мы можем сломать std::vector.
-Выполнить std::abort? Ну это не совсем user-friendly, кроме того, в некоторые системы, должны уметь обрабатывать такие ошибки.
-Или же, например, пользователь ошибся, и ввел некорректное число и т.д.
+Alos implementation of std::vector assume that method allocator::allocate returns valid pointer (or throws exception).
+How allocator can handle situation when it cannot allocate memory? It can return nullptr - but we can break implementation of std::vector.
+Also allocator can invoke std::abort, but such approach is not user-friendly.
 
-Итого, из данных примеров видно, что стандарнтая библиотека не может быть использована в среде без исключений полным образом.
-Она может быть использована только до возникновения первой ошибки, после этого никаких гарантий нет.
+Therefore current implementation of standard library can be used in exceptionless environments until first error occurs. After that library cannot give us any guarantee.
 
 
 Если переформулировать проблему, то в среде без исключений мы должны предоставить некие аналоги следующих механизмов:
@@ -88,8 +83,8 @@ m.push_back(get_list_somehow());
 
 
 
-Режимы работы библиотеки
-------------------------
+Library modes
+-------------
 
 Library can work in two modes - when exceptions are enabled (has_exceptions) and when exceptions are disabled (no_exceptions).
 Programmer may check for particular mode using macro `NESTL_HAS_EXCEPTIONS` it`s value can be 1 and 0 respectively.
@@ -110,7 +105,7 @@ Library structure
 -----------------
 
 We decouple containers, alocators and algorithms like STL does.
-Moreover we explicitly decouple error handling because client may have it`s own error handling mechanism
+Moreover we explicitly decouple error handling because client may have it`s own error handling mechanism.
 
 
 Error handling
@@ -141,19 +136,29 @@ For environments with exception support library additionally requires following 
 
 Containers
 ----------
-Библиотека предоставляет набор контейнеров
+Library provides analogues of standard containers (vector, list, set, map)
 
 
-Type requirements and limitations
----------------------------------
-В библиотеке есть несколько ограничений на типы, которые могут использоваться в контейнерах и алгоритмах.
-Если тип реализует `move ctor` and `move assignment operator`, то они должны быть noexcept.
-Если тип реализует `copy ctor` and `copy assignment operator`, то они должны быть noexcept.
-
-Если тип не может реализовать `copy ctor` and `copy assignment operator`, с указанными требованиями,
-то программист может предоставить специализацию nestl::class_operations для своего типа, и реализовать статические методы
-`construct` для эмуляции конструктора копирования
-
+Emulating of object copying and non-trivial initialization
+----------------------------------------------------------
+Sometimes it is necessary to construct object with some non trivial initialization. For such cases library allows user to specialize type
+`nestl::two_phase_initializator` and provide static method `init`
+```
+namespace nestl
+{
+template <>
+struct two_phase_initializator <MyType>
+{
+    template <typename OperationError, typename ... Args>
+    static void init(OperationError& err, MyType& defaultConstructed, Args&& ... args) NESTL_NOEXCEPT_SPEC
+    {
+        defaultConstructed.CustomInit(err, std::forward<Args>(args)...);
+    }
+};
+}
+```
+Implementation of method `init` may perform som non-trivial initialization of obejct.
+Note that client should not destroy `defaultConstructed` object in case of failure. Library will handle such situation and properly destroys object
 
 
 
@@ -195,6 +200,8 @@ i386-linux-gnu   | clang++-3.5
 i386-windows     | msvc-2013 *
 i386-windows     | msvc-2015
 i386-windows     | msvc-2017
+i386-windows     | mingw32-G++-5.3.0
+
 
 
 --

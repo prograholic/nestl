@@ -22,7 +22,7 @@ struct void_t
 /// Client may allow two-phase initialization by specialization this struct with concrete type T
 /// Also such specialization should provide static method init with following signature:
 /// @code
-/// template <typename OperationError>
+/// template <typename OperationError, typename ... Args>
 /// static void init(OperationError& err, T& defaultConstructed, Args&& ... args) NESTL_NOEXCEPT_SPEC
 /// @endcode
 ///
