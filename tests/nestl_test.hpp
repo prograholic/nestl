@@ -6,6 +6,7 @@
 #include <nestl/class_operations.hpp>
 
 #include <tuple>
+#include <cstdlib>
 #include <iostream>
 
 
