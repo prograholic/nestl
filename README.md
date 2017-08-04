@@ -49,9 +49,9 @@ if (err)
 Поэтому, бросание исключения может быть дорогой операцией.
 
 
-Почему не подходит стандартная библиотека
------------------------------------------
-Рассмотрим следующий пример:
+Why stl is not suitable
+-----------------------
+Consider following example
 
 ```
 std::vector<int> x;
@@ -91,53 +91,52 @@ m.push_back(get_list_somehow());
 Режимы работы библиотеки
 ------------------------
 
-Библиотека работает в двух режимах - в режиме, когда есть исключения, и когда исключений нет.
-Программист может проверить тот или иной режим явно с помощью макроса NESTL_HAS_EXCEPTIONS.
-Значение этого макроса вычисляется в true, если исключения есть, и false если исключений нет.
+Library can work in two modes - when exceptions are enabled (has_exceptions) and when exceptions are disabled (no_exceptions).
+Programmer may check for particular mode using macro `NESTL_HAS_EXCEPTIONS` it`s value can be 1 and 0 respectively.
 
-Кроме этого, есть специальный тип 
-`nestl::exception_support_t` - в случае наличия исключений, он эквивалентен типу std::true_type,
-и std::false_type в случае, если исключений нет.
+Additionally there is special type
+`nestl::exception_support_t` - when exceptions are enabled it`s equal to type std::true_type,
+and std::false_type in case when exceptions are disabled
 
-Также есть еще один вспомогательный шаблон
+Also there is helper template
 `template <typename HasException, typename NoException>
 using dispatch = typename ::std::conditional<exception_support_t::value, HasExceptions, NoExceptions>::type
 `
-Этот шаблон позволяет выбирать ту или иную реализацию в зависимости от наличия исключений.
+This template allows to select implementation depending on exception support.
 
 
 
-Общая структура библиотеки
---------------------------
+Library structure
+-----------------
 
-Как и в стандартной библиотеке, в nestl мы разделяем, контейнеры, аллокаторы и алгоритмы.
-Кроме того, мы дополнительно отделяем и обработку ошибок, так как у клиента могут существовать свои механизмы обработки ошибок.
+We decouple containers, alocators and algorithms like STL does.
+Moreover we explicitly decouple error handling because client may have it`s own error handling mechanism
 
 
 Error handling
 --------------
 
-Так как в среде без исключений мы не можем бросать и ловить исключения,
-то единственным вариантом обработки ошибок становятся коды ошибок (или их аналоги).
+We should use error codes since we cannot throw and catch excptions in exceptionless environments.
 
-Библиотека предоставляет для этого т.н. OperationError - это сущность, которая в себе содержит каким-то образом информацию об ошибке.
-Объект этого типа можно проверить на наличие ошибки с помощью `explicit operator bool()`
+Library provides `OperationError` concept - objects of types which satifies this concept can store some information about error.
+Client may check for error using `explicit operator bool()`
 
-Библиотека предоствляет т.н. `default_operation_error` - это дефолтная реализация OperationError для каждого режима работы.
+Library provides `default_operation_error` - it`s default error handling implementation for each mode.
 
 
-Кроме того, программист может сам добавить свою реализацию OperationError для своих нужд.
-Для того чтобы это сделать, библиотека требует от OperationError реализацию `operator bool` или аналога.
-Этот оператор должен возвращать `true` в случае, если объект содержит ошибку, и `false` в противном случае.
+Also programmer can provide it`s own operation error implementation.
+Such operation error type should provide `operator bool` or it`s analogue.
+This operator should return `true` in case when object contains error and `false` otherwise.
 
 Кроме этого, библиотека требует наличия следующих функций:
-`build_length_error` - функция должна создать ошибку, аналог исключения `std::length_error`
-`build_bad_alloc` - функция должна создать ошибку, аналог исключения `std::bad_alloc`
+Additionally library requires following functions (they should be accessible via ADL lookup)
+`build_length_error` - function should initialize error (analogue of `std::length_error` exception)
+`build_bad_alloc` - function should ininitialize error (analogue of `std::bad_alloc` exception)
 
-Также, для среды с исключениями библиотека требует функций:
-`from_exception_ptr` - функция должна создать ошибку из объекта `std::exception_ptr`
-`from_exception` - функция должна создать ошибку из произвольного объекта исключения
-`throw_exception` - функция должна бросить исключение из данного объекта OperationError
+For environments with exception support library additionally requires following functions:
+`from_exception_ptr` - function should initialize error from `std::exception_ptr` object (should capture exception from exception_ptr somehow)
+`from_exception` - function should initialize error from arbitrary exception object (should capture exception).
+`throw_exception` - function should throw previously captured exception from given error obejct.
 
 
 Containers
