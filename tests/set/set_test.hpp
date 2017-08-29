@@ -30,13 +30,13 @@ void CheckSetSize(const Set& s, size_t expectedSize)
         fatal_failure("set empty method returns ", setIsEmpty, ", while it should be ", shouldBeEmpty);
     }
 
-    size_t dist = nestl::distance(s.begin(), s.end());
+    size_t dist = std::distance(s.begin(), s.end());
     if (dist != expectedSize)
     {
         fatal_failure("distance between iterators should be ", expectedSize, " elements, got ", dist, " elements");
     }
 
-    size_t cdist = nestl::distance(s.cbegin(), s.cend());
+    size_t cdist = std::distance(s.cbegin(), s.cend());
     if (cdist != expectedSize)
     {
         fatal_failure("distance between const iterators should be " ,expectedSize, " elements, got ", cdist, " elements");

@@ -28,7 +28,7 @@ namespace nestl
     typedef decltype(NESTL_##ResultType##_helper((Type*)0)) nestl_nested_type_##ResultType \
 
 
-#define NESTL_CHECK_METHOD_WITH_SIGNATURE(Type, method) \
+#define NESTL_CHECK_METHOD_WITH_SIGNATURE(method) \
 template<typename TypeWithSignatureOrNot, typename Signature> \
 struct has_ ## method ## _impl \
 { \

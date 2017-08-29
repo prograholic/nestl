@@ -3,11 +3,11 @@
 
 #include <nestl/config.hpp>
 
-#include <nestl/memory.hpp>
 #include <nestl/allocator.hpp>
 #include <nestl/alignment.hpp>
+#include <nestl/class_operations.hpp>
 
-#include <nestl/detail/construct.hpp>
+#include <nestl/detail/destroy.hpp>
 
 #include <cassert>
 
@@ -106,21 +106,21 @@ public:
     virtual void destroy_value() NESTL_NOEXCEPT_SPEC
     {
         T* value = get();
-        nestl::detail::destroy(m_allocator, value, value + 1);
+        nestl::detail::destroy(value, value + 1);
     }
 
     virtual void destroy_self() NESTL_NOEXCEPT_SPEC
     {
         allocator_type alloc(m_allocator);
 
-        alloc.destroy(this);
+        nestl::detail::destroy(this);
         alloc.deallocate(this, 1);
     }
 
     template <typename OperationError, typename ... Args>
     void initialize(OperationError& err, Args&& ... args) NESTL_NOEXCEPT_SPEC
     {
-        nestl::detail::construct(err, get(), m_allocator, std::forward<Args>(args) ...);
+        nestl::class_operations::construct(err, get(), std::forward<Args>(args) ...);
     }
 
 private:
@@ -513,9 +513,9 @@ shared_ptr<T> make_shared_a_nothrow(OperationError& err, Allocator& /* alloc */,
     {
         return {nullptr};
     }
-    nestl::detail::allocation_scoped_guard<shared_count_t*, SharedCountAllocator> allocationGuard(sharedCountAlloc, ptr, 1);
+    nestl::detail::deallocation_scoped_guard<shared_count_t*, SharedCountAllocator> deallocationGuard(sharedCountAlloc, ptr, 1);
 
-    nestl::detail::construct(err, ptr, sharedCountAlloc, sharedCountAlloc);
+    nestl::class_operations::construct(err, ptr, sharedCountAlloc);
     if (err)
     {
         return {nullptr};
@@ -527,7 +527,7 @@ shared_ptr<T> make_shared_a_nothrow(OperationError& err, Allocator& /* alloc */,
         return {nullptr};
     }
 
-    allocationGuard.release();
+    deallocationGuard.release();
     return shared_ptr<T>(ptr->get(), ptr);
 }
 

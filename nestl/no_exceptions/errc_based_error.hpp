@@ -14,7 +14,7 @@ enum
 {
     invalid_argument  = EINVAL,
     not_enough_memory = ENOMEM,
-    value_too_large   = EOVERFLOW
+    value_too_large   = ERANGE
 };
 
 } // namespace errc

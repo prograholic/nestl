@@ -3,48 +3,76 @@
 
 #include <nestl/config.hpp>
 
-#include <nestl/allocator_traits.hpp>
+#include <nestl/exception_support.hpp>
+#include <nestl/has_exceptions/detail/class_operations.hpp>
+#include <nestl/no_exceptions/detail/class_operations.hpp>
+
+#include <nestl/type_traits.hpp>
+
+#include <nestl/detail/destroy.hpp>
+
+#include <type_traits>
 
 /**
- * @file implementation of class_operations template
+ * @file emulation of various class operations
  */
 
 namespace nestl
 {
-
-template <typename T>
-struct class_operations
+namespace class_operations
 {
-    template <typename OperationError, typename Allocator, typename ... Args>
-    static void construct(OperationError& err, T* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
-    {
-		nestl::allocator_traits<Allocator>::construct(err, alloc, ptr, std::forward<Args>(args) ...);
-    }
-
-    template <typename OperationError, typename Y>
-    static void assign(OperationError& /* err */, T& dest, Y&& src) NESTL_NOEXCEPT_SPEC
-    {
-		dest = std::forward<Y>(src);
-    }
-};
-
-
 namespace detail
 {
 
-template<typename OperationError, typename T, typename Allocator, typename ... Args>
-void construct(OperationError& err, T* ptr, Allocator& alloc, Args&& ... args) NESTL_NOEXCEPT_SPEC
-{
-	nestl::class_operations<T>::construct(err, ptr, alloc, std::forward<Args>(args) ...);
-}
-
-template<typename OperationError, typename T, typename ... Args>
-void assign(OperationError& err, T& dest, Args&& ... args) NESTL_NOEXCEPT_SPEC
-{
-	nestl::class_operations<T>::assign(err, dest, std::forward<Args>(args) ...);
-}
+using class_operations_helper = exception_support::dispatch<has_exceptions::detail::class_operations_helper,
+                                                            no_exceptions::detail::class_operations_helper>;
 
 } // namespace detail
+
+template <typename T, typename OperationError, typename ... Args>
+typename std::enable_if<std::is_constructible<T, Args...>::value>::type
+construct(OperationError& err, T* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
+{
+    detail::class_operations_helper::construct(err, ptr, std::forward<Args>(args) ...);
+}
+
+
+
+/// @brief Emulate construction via 2-phase initialization
+template <typename T, typename OperationError, typename ... Args>
+typename std::enable_if<std::is_default_constructible<T>::value &&
+                        !std::is_constructible<T, Args...>::value,
+                        typename void_t<decltype(two_phase_initializator<T>::init(std::declval<OperationError&>(),
+                                                                                  std::declval<T&>(),
+                                                                                  std::declval<Args&&>() ...))>::type>::type
+construct(OperationError& err, T* ptr, Args&& ... args) NESTL_NOEXCEPT_SPEC
+{
+    detail::class_operations_helper::construct(err, ptr); // use default constructor
+    if (err)
+    {
+        return;
+    }
+    T* end = ptr + 1;
+    nestl::detail::destruction_scoped_guard<T*> guard(ptr, end);
+
+    two_phase_initializator<T>::init(err, *ptr, std::forward<Args>(args)...);
+    if (err)
+    {
+        return;
+    }
+
+    guard.release();
+}
+
+
+template <typename T, typename OperationError, typename Y>
+typename std::enable_if<std::is_assignable<T&, Y&&>::value>::type
+assign(OperationError& err, T& dest, Y&& src) NESTL_NOEXCEPT_SPEC
+{
+    detail::class_operations_helper::assign(err, dest, std::forward<Y>(src));
+}
+
+} // namespace class_operations
 } // namespace nestl
 
 #endif // NESTL_CLASS_OPERATIONS_HPP
