@@ -81,6 +81,20 @@ Therefore current implementation of standard library can be used in exceptionles
 3. Any assignment operator which may throw - explicit `copy` method (for example `vec.copy_nothrow(err, other_vec);`)
 
 
+Error handling strategy
+-----------------------
+
+В среде без исключений, так или иначе, мы будем проверять ошибки после выполнения каждой операции. В библиотеке используется подход, когда каждый метод или функция принимает по ссылке объект произвольного типа данных, который удовлетворяет концепции OperationError. Почему такой подход был принят? Во-первых, сразу видно из сигнатуры функции, что нужно произвести обработку ошибки после вызова. Во-вторых, отличии от возвращаемого значения, которое может быть проигнорировано в месте вызова, при таком подходе проще заметить отсутствие реакции на ошибку. Возврат ошибки с помощью return еще плох тем, что явно привязывает реализацию к какому-то конкретному типу ошибок (заметьте, что для исключений такой привязки нет). Можно сделать тип ошибки шаблонным параметром, но тогда при вызове придется указывать тип ошибки, что не удобно и излишне (TODO deduction guides).
+
+
+TODO expected<T, E>.
+
+Containers
+----------
+
+Each nestl container provides <operation>\_nothrow methods for each corresponding method in std container which may throw exception. Consider method std::vector::push_back(const T& value), corresponding method in nestl vector will be template <typename OperationError> void nestl::vector::push_back_nothrow(OperationError& error, const T& value) noexcept
+
+
 
 
 Library modes
