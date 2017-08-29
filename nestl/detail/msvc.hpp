@@ -10,7 +10,9 @@
 #define NESTL_COMPILER_MSVC_2012                 1700
 #define NESTL_COMPILER_MSVC_2013                 1800
 #define NESTL_COMPILER_MSVC_2015                 1900
-#define NESTL_COMPILER_MSVC_2017                 1910
+
+// NOTE: VS2017 has two compiler versions 1910 and 1911 depending on installed updates
+#define NESTL_COMPILER_MSVC_2017                 1911
 
 #define NESTL_UNUSED
 
